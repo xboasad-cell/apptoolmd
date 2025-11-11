@@ -167,6 +167,44 @@
       box-shadow: 0 6px 16px rgba(100, 116, 139, 0.4);
     }
 
+    .btn-history {
+      background: linear-gradient(135deg, #f59e0b, #fbbf24);
+      color: white;
+      border-radius: 12px;
+      font-weight: 600;
+      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+      padding: 0.75rem;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 48px;
+      height: 48px;
+      position: relative;
+      overflow: hidden;
+      transition: box-shadow 0.3s ease;
+    }
+
+    .btn-history::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      transition: left 0.5s;
+    }
+
+    .btn-history:hover::before {
+      left: 100%;
+    }
+
+    .btn-history:hover {
+      box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
+    }
+
     textarea, #output {
       width: 100%;
       min-height: 400px;
@@ -252,8 +290,8 @@
 
     .main-full.cleaned .input-section {
       flex: 0 0 150px;
-      min-width: 150px;
-      max-width: 150px;
+      min-width: 500px;
+      max-width: 500px;
     }
 
     .main-full.cleaned .output-section {
@@ -406,11 +444,26 @@
       backdrop-filter: blur(5px);
     }
 
-    .settings-content {
+    .history-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 90%;
+      background: rgba(0, 0, 0, 0.4);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(5px);
+    }
+
+    .settings-content, .history-content {
       background: rgba(255, 255, 255, 0.95);
       backdrop-filter: blur(20px);
       border-radius: 20px;
-      width: 85%;
+      width: 90%;
+      max-width: 1000px;
       overflow: hidden;
       padding: 2rem;
       box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
@@ -420,7 +473,7 @@
       flex-direction: column;
     }
 
-    .settings-content::before {
+    .settings-content::before, .history-content::before {
       content: '';
       position: absolute;
       top: 0;
@@ -430,7 +483,7 @@
       background: linear-gradient(90deg, transparent, var(--primary-light), transparent);
     }
 
-    .settings-header {
+    .settings-header, .history-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -439,7 +492,7 @@
       border-bottom: 1px solid var(--border);
     }
 
-    .settings-title {
+    .settings-title, .history-title {
       font-size: 1.5rem;
       font-weight: 700;
       color: var(--text-primary);
@@ -448,7 +501,7 @@
       -webkit-text-fill-color: transparent;
     }
 
-    .close-settings {
+    .close-settings, .close-history {
       background: none;
       border: none;
       font-size: 1.5rem;
@@ -462,7 +515,7 @@
       border-radius: 50%;
     }
 
-    .close-settings:hover {
+    .close-settings:hover, .close-history:hover {
       color: var(--text-primary);
       background: rgba(0, 0, 0, 0.05);
     }
@@ -477,21 +530,56 @@
       padding-right: 0.5rem;
     }
 
-    .settings-sections::-webkit-scrollbar {
+    .history-content {
+      width: 95%;
+      max-width: 1200px;
+    }
+
+    .history-search {
+      margin-bottom: 1.5rem;
+    }
+
+    .history-search-input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--surface);
+      color: var(--text-primary);
+      font-size: 1rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .history-search-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .history-items {
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1rem;
+      flex: 1;
+      overflow-y: auto;
+      max-height: 60vh;
+      padding-right: 0.5rem;
+    }
+
+    .settings-sections::-webkit-scrollbar, .history-items::-webkit-scrollbar {
       width: 6px;
     }
 
-    .settings-sections::-webkit-scrollbar-track {
+    .settings-sections::-webkit-scrollbar-track, .history-items::-webkit-scrollbar-track {
       background: rgba(0, 0, 0, 0.05);
       border-radius: 3px;
     }
 
-    .settings-sections::-webkit-scrollbar-thumb {
+    .settings-sections::-webkit-scrollbar-thumb, .history-items::-webkit-scrollbar-thumb {
       background: rgba(0, 0, 0, 0.2);
       border-radius: 3px;
     }
 
-    .settings-sections::-webkit-scrollbar-thumb:hover {
+    .settings-sections::-webkit-scrollbar-thumb:hover, .history-items::-webkit-scrollbar-thumb:hover {
       background: rgba(0, 0, 0, 0.3);
     }
 
@@ -531,6 +619,23 @@
       border-radius: 8px;
       padding: 1rem;
       background: var(--surface-light);
+    }
+
+    .history-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      padding: 1.25rem;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--surface-light);
+      transition: all 0.3s ease;
+	  margin:15px;
+    }
+
+    .history-item:hover {
+ 
+      border-color: var(--primary-light);
     }
 
     .settings-group::-webkit-scrollbar {
@@ -591,7 +696,7 @@
       font-family: 'SF Mono', 'Monaco', 'Inconsolata', monospace;
     }
 
-    .settings-footer {
+    .settings-footer, .history-footer {
       display: flex;
       justify-content: flex-end;
       gap: 1rem;
@@ -605,7 +710,11 @@
         grid-template-columns: 1fr;
       }
       
-      .settings-content {
+      .history-items {
+        grid-template-columns: 1fr;
+      }
+      
+      .settings-content, .history-content {
         width: 95%;
         padding: 1.5rem;
       }
@@ -830,6 +939,19 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
+
+    .save-named-entry {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .save-named-entry input {
+      flex: 1;
+    }
   </style>
 </head>
 <body>
@@ -927,7 +1049,13 @@
 
     <main class="main-full" id="mainLayout">
       <section class="glass-card p-6 input-section">
-        <h2 class="section-title"><i class="fas fa-paste"></i><span>Paste Raw Email Source</span></h2>
+        <div class="section-title" style="display: flex; justify-content: space-between; align-items: center;">
+          <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <i class="fas fa-paste"></i>
+            <span>Paste Raw Email Source</span>
+          </div>
+      
+        </div>
 
         <div class="textarea-container">
           <textarea id="input" placeholder="Paste your raw email source here..."></textarea>
@@ -935,8 +1063,16 @@
         </div>
       </section>
 
-      <section class="glass-card p-6 output-section">
-        <h2 class="section-title"><i class="fas fa-file-code"></i><span>Cleaned Email Source</span></h2>
+           <section class="glass-card p-6 output-section">
+        <div class="section-title" style="display: flex; justify-content: space-between; align-items: center;">
+          <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <i class="fas fa-file-code"></i>
+            <span>Cleaned Email Source</span>
+          </div>
+          <button class="btn-history" id="historyBtn" title="View History">
+            <i class="fas fa-history"></i>
+          </button>
+        </div>
         
         <div class="output-container">
           <div class="output-content" id="output">
@@ -1005,6 +1141,33 @@
     </div>
   </div>
 
+  <!-- History Modal -->
+  <div class="history-modal" id="historyModal">
+    <div class="history-content">
+      <div class="history-header">
+        <h2 class="history-title">Email History</h2>
+        <button class="close-history" id="closeHistory">X</button>
+      </div>
+      
+      <div class="history-search">
+        <input type="text" class="history-search-input" id="historySearch" placeholder="Search  subject">
+      </div>
+      
+      <div class="history-items" id="historyItems">
+        <!-- History items will be populated here -->
+      </div>
+      
+      <div class="history-footer">
+        <button class="btn-outline" id="clearHistory">
+          <i class="fas fa-trash"></i> Clear History
+        </button>
+        <button class="btn-primary" id="closeHistoryBtn">
+          <i class="fas fa-times"></i> Close
+        </button>
+      </div>
+    </div>
+  </div>
+
   <footer style="position: fixed; bottom: 0; left: 0; width: 100%;background-color: #f8f9fa;padding: 10px 0;text-align: center;border-top: 1px solid #e9ecef;box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);z-index: 1000; display:flex;flex-direction:column;align-items:center;font-family:Inter,system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial;color:#333;">
     <div style="width:80%;max-width:900px;height:1px;background:#e6e6e6;margin-bottom:14px;"></div>
     <div style="display:inline-flex;justify-content:center;align-items:baseline;gap:12px;flex-wrap:wrap;">
@@ -1039,6 +1202,7 @@
     let HEADERS_TO_REMOVE = [...DEFAULT_HEADERS_TO_REMOVE];
     let REPLACEMENT_HEADERS = [...DEFAULT_REPLACEMENT_HEADERS];
     let ALLOWED_HEADERS = ["from", "subject", "date", "message-id", "content-type"];
+    let EMAIL_HISTORY = [];
 
     // DOM elements
     const inputEl = document.getElementById('input');
@@ -1046,17 +1210,24 @@
     const cleanBtn = document.getElementById('cleanBtn');
     const copyBtn = document.getElementById('copyBtn');
     const downloadBtn = document.getElementById('downloadBtn');
+    const historyBtn = document.getElementById('historyBtn');
     const settingsBtn = document.getElementById('settingsBtn');
     const inputCount = document.getElementById('input-count');
     const outputCount = document.getElementById('output-count');
     const settingsModal = document.getElementById('settingsModal');
+    const historyModal = document.getElementById('historyModal');
     const closeSettings = document.getElementById('closeSettings');
+    const closeHistory = document.getElementById('closeHistory');
+    const closeHistoryBtn = document.getElementById('closeHistoryBtn');
     const headersToRemoveGroup = document.getElementById('headersToRemoveGroup');
     const newHeaderToRemove = document.getElementById('newHeaderToRemove');
     const addHeaderToRemove = document.getElementById('addHeaderToRemove');
     const replacementHeaders = document.getElementById('replacementHeaders');
     const resetSettings = document.getElementById('resetSettings');
     const saveSettings = document.getElementById('saveSettings');
+    const clearHistory = document.getElementById('clearHistory');
+    const historyItems = document.getElementById('historyItems');
+    const historySearch = document.getElementById('historySearch');
     const toast = document.getElementById('toast');
     const toastMessage = document.getElementById('toast-message');
     const newFrom = document.getElementById('newFrom');
@@ -1234,6 +1405,227 @@
             checkbox.checked = checkboxStates[headerName];
           }
         });
+      }
+    }
+
+    // Load email history from localStorage
+    function loadEmailHistory() {
+      const savedHistory = localStorage.getItem('emailHistory');
+      if (savedHistory) {
+        EMAIL_HISTORY = JSON.parse(savedHistory);
+      }
+    }
+
+    // Save email history to localStorage
+    function saveEmailHistory() {
+      localStorage.setItem('emailHistory', JSON.stringify(EMAIL_HISTORY));
+    }
+
+    // Extract subject from email source
+    function extractSubjectFromSource(emailSource) {
+      const subjectMatch = emailSource.match(/^Subject:\s*(.*)$/mi);
+      if (subjectMatch && subjectMatch[1]) {
+        return subjectMatch[1].trim();
+      }
+      return 'No Subject';
+    }
+
+    // Add email source to history with name
+    function addToHistory(emailSource, name = '') {
+      if (!emailSource || emailSource.trim() === '') return;
+      
+      // Check for duplicate source
+      const isDuplicate = EMAIL_HISTORY.some(item => 
+        item.fullContent === emailSource
+      );
+      
+      if (isDuplicate) {
+        // If duplicate found, don't save and show message
+        showToast('This email source is already in history!');
+        return;
+      }
+      
+      // Get current From and Subject values
+      const fromValue = newFrom.value.trim();
+      const subjectValue = newSubject.value.trim();
+      
+      // Extract subject from email source if available
+      const extractedSubject = extractSubjectFromSource(emailSource);
+      
+      // Use extracted subject as the title, fallback to custom name or default
+      const title = extractedSubject !== 'No Subject' ? extractedSubject : (name || `Email ${new Date().toLocaleString()}`);
+      
+      // Create history item
+      const historyItem = {
+        id: Date.now(),
+        name: title,
+        date: new Date().toLocaleString(),
+        from: fromValue,
+        subject: subjectValue,
+        content: emailSource.substring(0, 500) + (emailSource.length > 500 ? '...' : ''),
+        fullContent: emailSource
+      };
+      
+      // Add to beginning of history array
+      EMAIL_HISTORY.unshift(historyItem);
+      
+      // Keep only last 6 items
+      if (EMAIL_HISTORY.length > 6) {
+        EMAIL_HISTORY = EMAIL_HISTORY.slice(0, 6);
+      }
+      
+      // Save to localStorage
+      saveEmailHistory();
+      
+      return historyItem;
+    }
+
+    // Display history items in modal with search
+	//*********************************************************
+     // Display history items in modal with search
+    function displayHistory(searchTerm = '') {
+      historyItems.innerHTML = '';
+      
+      let filteredHistory = EMAIL_HISTORY;
+      
+      // Filter history if search term is provided - ONLY by subject and from
+      if (searchTerm) {
+        const searchLower = searchTerm.toLowerCase();
+        filteredHistory = EMAIL_HISTORY.filter(item => 
+          (item.from && item.from.toLowerCase().includes(searchLower)) ||
+          (item.subject && item.subject.toLowerCase().includes(searchLower)) ||
+          (item.name && item.name.toLowerCase().includes(searchLower))
+        );
+      }
+      
+      if (filteredHistory.length === 0) {
+        const emptyState = document.createElement('div');
+        emptyState.className = 'history-empty';
+        emptyState.innerHTML = `
+          <i class="fas fa-inbox"></i>
+          <h3>No history found</h3>
+          <p>${searchTerm ? 'No items match your search in Subject or From fields' : 'Your email history will appear here'}</p>
+        `;
+        historyItems.appendChild(emptyState);
+        return;
+      }
+      
+      filteredHistory.forEach(item => {
+        const historyItem = document.createElement('div');
+        historyItem.className = 'history-item';
+        historyItem.innerHTML = `
+          <div class="history-item-header" style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; margin-bottom: 0.75rem;">
+            <div style="flex: 1;">
+              <div class="history-item-title" style="font-weight: 700; color: var(--text-primary); font-size: 1.1rem; margin-bottom: 0.25rem;">${item.name}</div>
+              <div class="history-item-meta" style="display: flex; flex-wrap: wrap; gap: 0.75rem; font-size: 0.875rem; color: var(--text-secondary);">
+                ${item.from ? `
+                  <div style="display: flex; align-items: center; gap: 0.25rem;">
+                    <span style="font-weight: 600;">From:</span>
+                    <span>${item.from}</span>
+                  </div>
+                ` : ''}
+                ${item.subject ? `
+                  <div style="display: flex; align-items: center; gap: 0.25rem;">
+                    <span style="font-weight: 600;">Subject:</span>
+                    <span>${item.subject}</span>
+                  </div>
+                ` : ''}
+                <div style="display: flex; align-items: center; gap: 0.25rem;">
+                  <span style="font-weight: 600;">Saved:</span>
+                  <span>${item.date}</span>
+                </div>
+              </div>
+            </div>
+            <div class="history-item-actions" style="display: flex; gap: 0.5rem; flex-shrink: 0;">
+              <button class="btn-primary use-history" data-id="${item.id}" style="padding: 0.5rem 1rem; font-size: 0.875rem; white-space: nowrap;">
+                <i class="fas fa-paste"></i> Use
+              </button>
+              <button class="btn-outline delete-history" data-id="${item.id}" style="padding: 0.5rem 1rem; font-size: 0.875rem;">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+          </div>
+          <div class="history-item-content" style="font-family: 'SF Mono', 'Monaco', 'Inconsolata', monospace; font-size: 0.75rem; color: var(--text-secondary); max-height: 60px; overflow: hidden; text-overflow: ellipsis; background: var(--surface); padding: 0.5rem; border-radius: 6px; border: 1px solid var(--border); margin-bottom: 0.75rem;">
+            ${item.content}
+          </div>
+        `;
+        historyItems.appendChild(historyItem);
+      });
+      
+      // Add event listeners to history buttons
+      document.querySelectorAll('.use-history').forEach(button => {
+        button.addEventListener('click', function() {
+          const id = parseInt(this.getAttribute('data-id'));
+          useHistoryItem(id);
+        });
+      });
+      
+      document.querySelectorAll('.delete-history').forEach(button => {
+        button.addEventListener('click', function() {
+          const id = parseInt(this.getAttribute('data-id'));
+          deleteHistoryItem(id);
+        });
+      });
+    }
+
+    // Use history item (load email content)
+    function useHistoryItem(id) {
+      const item = EMAIL_HISTORY.find(item => item.id === id);
+      if (item) {
+        inputEl.value = item.fullContent;
+        inputCount.textContent = item.fullContent.length + " characters";
+        historyModal.style.display = 'none';
+        showToast('Email source loaded from history!');
+      }
+    }
+
+    // Use history fields (load From and Subject)
+    function useHistoryFields(id) {
+      const item = EMAIL_HISTORY.find(item => item.id === id);
+      if (item) {
+        if (item.from) {
+          newFrom.value = item.from;
+        }
+        if (item.subject) {
+          newSubject.value = item.subject;
+        }
+        showToast('From and Subject fields loaded from history!');
+      }
+    }
+
+    // Delete history item
+    function deleteHistoryItem(id) {
+      EMAIL_HISTORY = EMAIL_HISTORY.filter(item => item.id !== id);
+      saveEmailHistory();
+      displayHistory(historySearch.value);
+      showToast('History item deleted!');
+    }
+
+    // Clear all history
+    function clearAllHistory() {
+      EMAIL_HISTORY = [];
+      saveEmailHistory();
+      displayHistory();
+      showToast('History cleared!');
+    }
+
+    // Save named entry
+    function saveNamedEntry() {
+      const emailSource = inputEl.value.trim();
+      if (!emailSource) {
+        showToast('Please paste email source first!', 'error');
+        return;
+      }
+      
+      const name = prompt('Enter a name for this email entry:');
+      if (name) {
+        const historyItem = addToHistory(emailSource, name);
+        showToast(`Saved as "${name}" in history!`);
+        
+        // If history modal is open, refresh it
+        if (historyModal.style.display === 'flex') {
+          displayHistory(historySearch.value);
+        }
       }
     }
 
@@ -1648,9 +2040,32 @@
       settingsModal.style.display = 'none';
     });
 
+    historyBtn.addEventListener('click', () => {
+      displayHistory();
+      historyModal.style.display = 'flex';
+    });
+
+    closeHistory.addEventListener('click', () => {
+      historyModal.style.display = 'none';
+    });
+
+    closeHistoryBtn.addEventListener('click', () => {
+      historyModal.style.display = 'none';
+    });
+
+    clearHistory.addEventListener('click', clearAllHistory);
+
+    // Search functionality
+    historySearch.addEventListener('input', (e) => {
+      displayHistory(e.target.value);
+    });
+
     window.addEventListener('click', (e) => {
       if (e.target === settingsModal) {
         settingsModal.style.display = 'none';
+      }
+      if (e.target === historyModal) {
+        historyModal.style.display = 'none';
       }
     });
 
@@ -1719,6 +2134,9 @@
       outpre.textContent = cleaned;
       outputCount.textContent = cleaned.length + " characters";
       
+      // Add to history when cleaning (auto-save without name)
+      addToHistory(src);
+      
       // Check for mailto links ONLY in <a href=""> tags in the HTML body
       const mailtoLinks = checkMailtoLinksInEmail(cleaned);
       showMailtoAlerts(mailtoLinks);
@@ -1745,6 +2163,20 @@
       await navigator.clipboard.writeText(txt);
       copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
       showToast('Cleaned email copied to clipboard!');
+      
+      // Auto-save to history with name from From + Subject + Date
+      const fromValue = newFrom.value.trim();
+      const subjectValue = newSubject.value.trim();
+      const currentDate = new Date().toLocaleString();
+      
+      // Create name from From + Subject + Date
+      let nameParts = [];
+      if (fromValue) nameParts.push(fromValue);
+      if (subjectValue) nameParts.push(subjectValue);
+      nameParts.push(currentDate);
+      
+      const autoName = nameParts.join(' - ');
+      addToHistory(inputEl.value, autoName);
       
       // Clean all inputs and outputs
       inputEl.value = '';
@@ -1783,122 +2215,21 @@
 
     // Close settings modal with Escape key
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && settingsModal.style.display === 'flex') {
-        settingsModal.style.display = 'none';
+      if (e.key === 'Escape') {
+        if (settingsModal.style.display === 'flex') {
+          settingsModal.style.display = 'none';
+        }
+        if (historyModal.style.display === 'flex') {
+          historyModal.style.display = 'none';
+        }
       }
     });
-//--------------------------
-	  // Prevent keyboard shortcuts for developer tools
-document.addEventListener('keydown', function(e) {
-    // Disable F12
-    if (e.key === 'F12') {
-        e.preventDefault();
-        return false;
-    }
-    
-    // Disable Ctrl+Shift+I (Chrome, Firefox)
-    if (e.ctrlKey && e.shiftKey && e.key === 'I') {
-        e.preventDefault();
-        return false;
-    }
-    
-    // Disable Ctrl+Shift+J (Chrome)
-    if (e.ctrlKey && e.shiftKey && e.key === 'J') {
-        e.preventDefault();
-        return false;
-    }
-    
-    // Disable Ctrl+U (View source)
-    if (e.ctrlKey && e.key === 'u') {
-        e.preventDefault();
-        return false;
-    }
-    
-    // Disable Ctrl+Shift+C (Inspect element)
-    if (e.ctrlKey && e.shiftKey && e.key === 'C') {
-        e.preventDefault();
-        return false;
-    }
-    
-    // Disable Ctrl+S (Save page)
-    if (e.ctrlKey && e.key === 's') {
-        e.preventDefault();
-        return false;
-    }
-});
-
-// Detect and prevent developer tools opening
-(function() {
-    let devtools = {
-        open: false,
-        orientation: null
-    };
-    
-    let threshold = 160;
-    
-    let emitEvent = function(state, orientation) {
-        window.dispatchEvent(new CustomEvent('devtoolschange', {
-            detail: {
-                open: state,
-                orientation: orientation
-            }
-        }));
-    };
-    
-    setInterval(function() {
-        let widthThreshold = window.outerWidth - window.innerWidth > threshold;
-        let heightThreshold = window.outerHeight - window.innerHeight > threshold;
-        let orientation = widthThreshold ? 'vertical' : 'horizontal';
-        
-        if (!(heightThreshold && widthThreshold) &&
-            ((window.Firebug && window.Firebug.chrome && window.Firebug.chrome.isInitialized) || widthThreshold || heightThreshold)) {
-            
-            if (!devtools.open || devtools.orientation !== orientation) {
-                emitEvent(true, orientation);
-            }
-            
-            devtools.open = true;
-            devtools.orientation = orientation;
-        } else {
-            if (devtools.open) {
-                emitEvent(false, null);
-            }
-            
-            devtools.open = false;
-            devtools.orientation = null;
-        }
-    }, 500);
-    
-    window.addEventListener('devtoolschange', function(event) {
-        if (event.detail.open) {
-            // Developer tools opened - redirect or show warning
-            document.body.innerHTML = '<div style="display:flex;justify-content:center;align-items:center;height:100vh;font-family:Arial,sans-serif;background:#f0f0f0;"><div style="text-align:center;padding:2rem;background:white;border-radius:10px;box-shadow:0 4px 6px rgba(0,0,0,0.1)"><h1 style="color:#e74c3c;">Developer Tools Detected</h1><p>Inspection is not allowed on this page.</p><p>Please close developer tools to continue.</p></div></div>';
-        }
-    });
-})();
-
-// Enable full text selection and editing capabilities
-document.addEventListener('DOMContentLoaded', function() {
-    // Enable text selection for the whole document
-    document.body.style.userSelect = 'text';
-    document.body.style.webkitUserSelect = 'text';
-    document.body.style.mozUserSelect = 'text';
-    document.body.style.msUserSelect = 'text';
-    
-    // Ensure textareas and inputs allow selection
-    const textInputs = document.querySelectorAll('textarea, input[type="text"], input[type="email"]');
-    textInputs.forEach(input => {
-        input.style.userSelect = 'text';
-        input.style.webkitUserSelect = 'text';
-        input.style.mozUserSelect = 'text';
-        input.style.msUserSelect = 'text';
-    });
-});
 
     // Initialize the application
     document.getElementById('year').textContent = new Date().getFullYear();
     createFloatingElements();
     loadSettings();
+    loadEmailHistory();
   </script>
 </body>
 </html>
