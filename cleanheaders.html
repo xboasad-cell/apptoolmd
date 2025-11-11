@@ -1787,6 +1787,113 @@
         settingsModal.style.display = 'none';
       }
     });
+//--------------------------
+	  // Prevent keyboard shortcuts for developer tools
+document.addEventListener('keydown', function(e) {
+    // Disable F12
+    if (e.key === 'F12') {
+        e.preventDefault();
+        return false;
+    }
+    
+    // Disable Ctrl+Shift+I (Chrome, Firefox)
+    if (e.ctrlKey && e.shiftKey && e.key === 'I') {
+        e.preventDefault();
+        return false;
+    }
+    
+    // Disable Ctrl+Shift+J (Chrome)
+    if (e.ctrlKey && e.shiftKey && e.key === 'J') {
+        e.preventDefault();
+        return false;
+    }
+    
+    // Disable Ctrl+U (View source)
+    if (e.ctrlKey && e.key === 'u') {
+        e.preventDefault();
+        return false;
+    }
+    
+    // Disable Ctrl+Shift+C (Inspect element)
+    if (e.ctrlKey && e.shiftKey && e.key === 'C') {
+        e.preventDefault();
+        return false;
+    }
+    
+    // Disable Ctrl+S (Save page)
+    if (e.ctrlKey && e.key === 's') {
+        e.preventDefault();
+        return false;
+    }
+});
+
+// Detect and prevent developer tools opening
+(function() {
+    let devtools = {
+        open: false,
+        orientation: null
+    };
+    
+    let threshold = 160;
+    
+    let emitEvent = function(state, orientation) {
+        window.dispatchEvent(new CustomEvent('devtoolschange', {
+            detail: {
+                open: state,
+                orientation: orientation
+            }
+        }));
+    };
+    
+    setInterval(function() {
+        let widthThreshold = window.outerWidth - window.innerWidth > threshold;
+        let heightThreshold = window.outerHeight - window.innerHeight > threshold;
+        let orientation = widthThreshold ? 'vertical' : 'horizontal';
+        
+        if (!(heightThreshold && widthThreshold) &&
+            ((window.Firebug && window.Firebug.chrome && window.Firebug.chrome.isInitialized) || widthThreshold || heightThreshold)) {
+            
+            if (!devtools.open || devtools.orientation !== orientation) {
+                emitEvent(true, orientation);
+            }
+            
+            devtools.open = true;
+            devtools.orientation = orientation;
+        } else {
+            if (devtools.open) {
+                emitEvent(false, null);
+            }
+            
+            devtools.open = false;
+            devtools.orientation = null;
+        }
+    }, 500);
+    
+    window.addEventListener('devtoolschange', function(event) {
+        if (event.detail.open) {
+            // Developer tools opened - redirect or show warning
+            document.body.innerHTML = '<div style="display:flex;justify-content:center;align-items:center;height:100vh;font-family:Arial,sans-serif;background:#f0f0f0;"><div style="text-align:center;padding:2rem;background:white;border-radius:10px;box-shadow:0 4px 6px rgba(0,0,0,0.1)"><h1 style="color:#e74c3c;">Developer Tools Detected</h1><p>Inspection is not allowed on this page.</p><p>Please close developer tools to continue.</p></div></div>';
+        }
+    });
+})();
+
+// Enable full text selection and editing capabilities
+document.addEventListener('DOMContentLoaded', function() {
+    // Enable text selection for the whole document
+    document.body.style.userSelect = 'text';
+    document.body.style.webkitUserSelect = 'text';
+    document.body.style.mozUserSelect = 'text';
+    document.body.style.msUserSelect = 'text';
+    
+    // Ensure textareas and inputs allow selection
+    const textInputs = document.querySelectorAll('textarea, input[type="text"], input[type="email"]');
+    textInputs.forEach(input => {
+        input.style.userSelect = 'text';
+        input.style.webkitUserSelect = 'text';
+        input.style.mozUserSelect = 'text';
+        input.style.msUserSelect = 'text';
+    });
+});
 
     // Initialize the application
     document.getElementById('year').textContent = new Date().getFullYear();
