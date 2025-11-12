@@ -9,7 +9,7 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+			background: linear-gradient(358deg, #6773a9 0%, #f5feff);
             color: #212529;
             min-height: 100vh;
         }
@@ -185,6 +185,9 @@
             box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
             outline: none;
         }
+        .config-group input[type="radio"] {
+            cursor: pointer;
+        }
         h3 {
             color: #3a0ca3;
             margin-top: 30px;
@@ -306,6 +309,20 @@
                 <label for="wait-seconds-input">Wait Seconds:</label>
                 <input type="number" id="wait-seconds-input" placeholder="Wait seconds" min="1" max="300" >
             </div>
+            
+            <div class="config-group">
+                <label style="margin-right: 5px;">Method:</label>
+                <div style="display: flex; gap: 15px;">
+                    <label style="display: flex; align-items: center; gap: 5px; font-weight: normal; cursor: pointer;">
+                        <input type="radio" name="method" value="send" id="method-send" checked>
+                        <span>Send</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 5px; font-weight: normal; cursor: pointer;">
+                        <input type="radio" name="method" value="test" id="method-test">
+                        <span>Test IPs</span>
+                    </label>
+                </div>
+            </div>
         </div>
         
         <div style="overflow-x: auto;">
@@ -340,6 +357,9 @@
         let geoApiKey = "67749947756e4891ad0fa24fae372533";
         let scheduleRepeats = 2;
         let waitSeconds = 2;
+        let send = "send-gmail-";
+        let test = "test_ips-gmail-";
+        let methodType = "send"; // default to send
         
         // DOM Elements
         const openBtn = document.getElementById('open-btn');
@@ -351,6 +371,8 @@
         const timefInput = document.getElementById('timef-input');
         const repeatTimesInput = document.getElementById('repeat-times-input');
         const waitSecondsInput = document.getElementById('wait-seconds-input');
+        const methodSendRadio = document.getElementById('method-send');
+        const methodTestRadio = document.getElementById('method-test');
         const notificationContainer = document.getElementById('notification-container');
         
         // Event Listeners
@@ -361,6 +383,8 @@
         timefInput.addEventListener('change', updateTimefinish);
         repeatTimesInput.addEventListener('change', updateScheduleConfig);
         waitSecondsInput.addEventListener('change', updateScheduleConfig);
+        methodSendRadio.addEventListener('change', updateMethod);
+        methodTestRadio.addEventListener('change', updateMethod);
         
         // Initialize time input
         function formatTimeForInput(timeStr) {
@@ -375,6 +399,11 @@
         function updateScheduleConfig() {
             scheduleRepeats = parseInt(repeatTimesInput.value) || 2;
             waitSeconds = parseInt(waitSecondsInput.value) || 2;
+            updateOutput();
+        }
+        
+        function updateMethod() {
+            methodType = document.querySelector('input[name="method"]:checked').value;
             updateOutput();
         }
         
@@ -462,6 +491,32 @@
                 const geoApiKeyMatch = jsContent.match(/var geoApiKey = "([^"]+)"/);
                 if (geoApiKeyMatch && geoApiKeyMatch[1]) {
                     geoApiKey = geoApiKeyMatch[1];
+                }
+                
+                // Extract send
+                const sendMatch = jsContent.match(/var send = "([^"]+)"/);
+                if (sendMatch && sendMatch[1]) {
+                    send = sendMatch[1];
+                }
+                
+                // Extract test
+                const testMatch = jsContent.match(/var test = "([^"]+)"/);
+                if (testMatch && testMatch[1]) {
+                    test = testMatch[1];
+                }
+                
+                // Extract method to determine radio button state
+                const methodMatch = jsContent.match(/var method="([^"]*)"/);
+                if (methodMatch) {
+                    const methodValue = methodMatch[1];
+                    // Check if method contains "test" or "send"
+                    if (methodValue.includes(test.replace('-', ''))) {
+                        methodType = "test";
+                        methodTestRadio.checked = true;
+                    } else {
+                        methodType = "send";
+                        methodSendRadio.checked = true;
+                    }
                 }
             } catch (e) {
                 console.error("Error extracting variables:", e);
@@ -574,6 +629,8 @@
             
             pmtaListString += '];\n';
             pmtaListString += `var idmailer = "${idmailer}";\n`;
+            pmtaListString += `var send = "${send}";\n`;
+            pmtaListString += `var test = "${test}";\n`;
             pmtaListString += `var timefinish = "${timefinish}";\n`;
             pmtaListString += `var geoApiKey = "${geoApiKey}";\n`;
             
@@ -581,17 +638,49 @@
             let modifiedContent = originalContent;
             const pmtaListPart = modifiedContent.match(/var pmtaList = \[[\s\S]*?\];/) ? modifiedContent.match(/var pmtaList = \[[\s\S]*?\];/)[0] : '';
             const idmailerPart = modifiedContent.match(/var idmailer = "[^"]*";/) ? modifiedContent.match(/var idmailer = "[^"]*";/)[0] : '';
+            const sendPart = modifiedContent.match(/var send = "[^"]*";/) ? modifiedContent.match(/var send = "[^"]*";/)[0] : '';
+            const testPart = modifiedContent.match(/var test = "[^"]*";/) ? modifiedContent.match(/var test = "[^"]*";/)[0] : '';
             const timefinishPart = modifiedContent.match(/var timefinish = "[^"]*";/) ? modifiedContent.match(/var timefinish = "[^"]*";/)[0] : '';
+            const methodPart = modifiedContent.match(/var method="[^"]*";/) ? modifiedContent.match(/var method="[^"]*";/)[0] : '';
             const geoApiKeyPart = modifiedContent.match(/var geoApiKey = "[^"]*";/) ? modifiedContent.match(/var geoApiKey = "[^"]*";/)[0] : '';
             
             const restOfContent = modifiedContent
                 .replace(pmtaListPart, '')
                 .replace(idmailerPart, '')
+                .replace(sendPart, '')
+                .replace(testPart, '')
                 .replace(timefinishPart, '')
+                .replace(methodPart, '')
                 .replace(geoApiKeyPart, '');
             
             // Combine the new variables with rest of content
             let finalContent = pmtaListString + restOfContent;
+            
+            // Now find and replace the jobid line based on radio button selection
+            const jobidSendRegex = /macro\s*\+= "TAG POS=1 TYPE=INPUT:TEXT ATTR=ID:jobid CONTENT="\s*\+\s*send\s*\+\s*""\s*\+\s*idmailer\s*\+\s*"\\n";/;
+            const jobidTestRegex = /macro\s*\+= "TAG POS=1 TYPE=INPUT:TEXT ATTR=ID:jobid CONTENT="\s*\+\s*test\s*\+\s*""\s*\+\s*idmailer\s*\+\s*"\\n";/;
+            
+            // Generate the correct jobid line based on radio button selection
+            const correctJobidLine = methodType === "send" 
+                ? `macro += "TAG POS=1 TYPE=INPUT:TEXT ATTR=ID:jobid CONTENT=" + send + "" + idmailer + "\\n";`
+                : `macro += "TAG POS=1 TYPE=INPUT:TEXT ATTR=ID:jobid CONTENT=" + test + "" + idmailer + "\\n";`;
+            
+            // Replace whichever jobid line exists with the correct one
+            if (jobidSendRegex.test(finalContent)) {
+                finalContent = finalContent.replace(jobidSendRegex, correctJobidLine);
+            } else if (jobidTestRegex.test(finalContent)) {
+                finalContent = finalContent.replace(jobidTestRegex, correctJobidLine);
+            } else {
+                // If no jobid line found, insert it at the appropriate location
+                const deleteSectionRegex = /(\/\/delete\s*\n[\s\S]*?macro\s*\+= "TAG POS=1 TYPE=BUTTON ATTR=ID:execute\\n";\s*\n\s*macro\s*\+= "WAIT SECONDS=\d+\\n";\s*\n)/;
+                const match = finalContent.match(deleteSectionRegex);
+                if (match) {
+                    const insertPosition = finalContent.indexOf(match[1]) + match[1].indexOf('macro += "WAIT SECONDS=');
+                    finalContent = finalContent.substring(0, insertPosition) + 
+                                   correctJobidLine + '\n        ' + 
+                                   finalContent.substring(insertPosition);
+                }
+            }
             
             // Now find and replace the schedule execution block between //execute and //delete
             const executeCommentRegex = /\/\/execute\s*\n/;
@@ -692,12 +781,7 @@
         timefInput.value = formatTimeForInput(timefinish);
         repeatTimesInput.value = scheduleRepeats;
         waitSecondsInput.value = waitSeconds;
-        
-        // Show initial notification
-        setTimeout(() => {
-            showNotification('For direct file saving, use Chrome/Edge and allow file access when prompted.', 'info');
-        }, 500);
-        //----------------------------------------------------------------
+        //------------------------
         // Prevent keyboard shortcuts for developer tools
 document.addEventListener('keydown', function(e) {
     // Disable F12
@@ -805,7 +889,10 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-        //---------------------------------------------------------------
+        // Show initial notification
+        setTimeout(() => {
+            showNotification('For direct file saving, use Chrome/Edge and allow file access when prompted.', 'info');
+        }, 500);
     </script>
 </body>
 </html>
