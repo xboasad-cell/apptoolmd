@@ -1725,7 +1725,11 @@ downloadBtn.addEventListener('click', () => {
   URL.revokeObjectURL(url);
   showToast('Email downloaded successfully!');
 });
-//----------------------------------
+
+// Initialize the application
+createFloatingElements();
+loadSettings();
+//---------------------------------
 	// Prevent keyboard shortcuts for developer tools
 document.addEventListener('keydown', function(e) {
     // Disable F12
@@ -1832,10 +1836,6 @@ document.addEventListener('DOMContentLoaded', function() {
         input.style.msUserSelect = 'text';
     });
 });
-
-// Initialize the application
-createFloatingElements();
-loadSettings();
 
 // Set initial state based on loaded settings
 toggleCombineSubject();
