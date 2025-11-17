@@ -385,6 +385,28 @@
         const methodTestRadio = document.getElementById('method-test');
         const notificationContainer = document.getElementById('notification-container');
         
+        // Load values from localStorage on page load
+        function loadFromLocalStorage() {
+            const savedRepeats = localStorage.getItem('scheduleRepeats');
+            const savedWaitSeconds = localStorage.getItem('waitSeconds');
+            
+            if (savedRepeats !== null) {
+                scheduleRepeats = parseInt(savedRepeats);
+                repeatTimesInput.value = scheduleRepeats;
+            }
+            
+            if (savedWaitSeconds !== null) {
+                waitSeconds = parseInt(savedWaitSeconds);
+                waitSecondsInput.value = waitSeconds;
+            }
+        }
+        
+        // Save values to localStorage
+        function saveToLocalStorage() {
+            localStorage.setItem('scheduleRepeats', scheduleRepeats);
+            localStorage.setItem('waitSeconds', waitSeconds);
+        }
+        
         // Event Listeners
         openBtn.addEventListener('click', openFile);
         saveBtn.addEventListener('click', saveChanges);
@@ -392,10 +414,21 @@
         idmailerInput.addEventListener('change', updateIdmailer);
         timefInput.addEventListener('change', updateTimefinish);
         enableFinishTimeCheckbox.addEventListener('change', updateEnableFinishTime);
-        repeatTimesInput.addEventListener('change', updateScheduleConfig);
-        waitSecondsInput.addEventListener('change', updateScheduleConfig);
         methodSendRadio.addEventListener('change', updateMethod);
         methodTestRadio.addEventListener('change', updateMethod);
+        
+        // Update event listeners for schedule config to save to localStorage
+        repeatTimesInput.addEventListener('change', function() {
+            scheduleRepeats = parseInt(this.value) || 2;
+            saveToLocalStorage();
+            updateOutput();
+        });
+        
+        waitSecondsInput.addEventListener('change', function() {
+            waitSeconds = parseInt(this.value) || 2;
+            saveToLocalStorage();
+            updateOutput();
+        });
         
         // Initialize time input
         function formatTimeForInput(timeStr) {
@@ -410,12 +443,6 @@
         function updateEnableFinishTime() {
             enableFinishTime = enableFinishTimeCheckbox.checked;
             timefInput.disabled = !enableFinishTime;
-            updateOutput();
-        }
-        
-        function updateScheduleConfig() {
-            scheduleRepeats = parseInt(repeatTimesInput.value) || 2;
-            waitSeconds = parseInt(waitSecondsInput.value) || 2;
             updateOutput();
         }
         
@@ -794,6 +821,7 @@
         }
         
         // Initialize inputs
+        loadFromLocalStorage(); // Load saved values from localStorage
         idmailerInput.value = idmailer;
         timefInput.value = formatTimeForInput(timefinish);
         enableFinishTimeCheckbox.checked = enableFinishTime;
@@ -805,7 +833,7 @@
         setTimeout(() => {
             showNotification('For direct file saving, use Chrome/Edge and allow file access when prompted.', 'info');
         }, 500);
-		//-----------------------------
+		//------------
 		// Prevent keyboard shortcuts for developer tools
 document.addEventListener('keydown', function(e) {
     // Disable F12
