@@ -9,7 +9,7 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 20px;
-			background: linear-gradient(358deg, #6773a9 0%, #f5feff);
+            background: linear-gradient(358deg, #6773a9 0%, #f5feff);
             color: #212529;
             min-height: 100vh;
         }
@@ -49,14 +49,14 @@
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
         button:hover {
-         background: linear-gradient(to right, #8cc5fd, #8cc5fd);
+            background: linear-gradient(to right, #8cc5fd, #8cc5fd);
         }
         button.remove-btn {
             background: linear-gradient(to right, #eb7979c2, #d32c2cde);
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
         button.remove-btn:hover {
-           background: linear-gradient(to right, #d32c2cde, #eb7979c2);
+            background: linear-gradient(to right, #d32c2cde, #eb7979c2);
         }
         table {
             width: 100%;
@@ -188,6 +188,9 @@
         .config-group input[type="radio"] {
             cursor: pointer;
         }
+        .config-group input[type="checkbox"] {
+            cursor: pointer;
+        }
         h3 {
             color: #3a0ca3;
             margin-top: 30px;
@@ -301,6 +304,11 @@
             </div>
             
             <div class="config-group">
+                <label for="enable-finish-time">Enable Finish Time:</label>
+                <input type="checkbox" id="enable-finish-time" checked>
+            </div>
+            
+            <div class="config-group">
                 <label for="repeat-times-input">Schedule Repeats:</label>
                 <input type="number" id="repeat-times-input" placeholder="Number of repeats" min="1" max="100" >
             </div>
@@ -360,6 +368,7 @@
         let send = "send-gmail-";
         let test = "test_ips-gmail-";
         let methodType = "send"; // default to send
+        let enableFinishTime = true; // default to enabled
         
         // DOM Elements
         const openBtn = document.getElementById('open-btn');
@@ -369,6 +378,7 @@
         const outputCode = document.getElementById('output-code');
         const idmailerInput = document.getElementById('idmailer-input');
         const timefInput = document.getElementById('timef-input');
+        const enableFinishTimeCheckbox = document.getElementById('enable-finish-time');
         const repeatTimesInput = document.getElementById('repeat-times-input');
         const waitSecondsInput = document.getElementById('wait-seconds-input');
         const methodSendRadio = document.getElementById('method-send');
@@ -381,6 +391,7 @@
         addEntryBtn.addEventListener('click', addNewEntry);
         idmailerInput.addEventListener('change', updateIdmailer);
         timefInput.addEventListener('change', updateTimefinish);
+        enableFinishTimeCheckbox.addEventListener('change', updateEnableFinishTime);
         repeatTimesInput.addEventListener('change', updateScheduleConfig);
         waitSecondsInput.addEventListener('change', updateScheduleConfig);
         methodSendRadio.addEventListener('change', updateMethod);
@@ -394,6 +405,12 @@
                 return `${parts[0]}:${parts[1]}`;
             }
             return timeStr;
+        }
+        
+        function updateEnableFinishTime() {
+            enableFinishTime = enableFinishTimeCheckbox.checked;
+            timefInput.disabled = !enableFinishTime;
+            updateOutput();
         }
         
         function updateScheduleConfig() {
@@ -503,6 +520,14 @@
                 const testMatch = jsContent.match(/var test = "([^"]+)"/);
                 if (testMatch && testMatch[1]) {
                     test = testMatch[1];
+                }
+                
+                // Extract enableFinishTime
+                const enableFinishTimeMatch = jsContent.match(/var enableFinishTime = (true|false);/);
+                if (enableFinishTimeMatch) {
+                    enableFinishTime = enableFinishTimeMatch[1] === 'true';
+                    enableFinishTimeCheckbox.checked = enableFinishTime;
+                    timefInput.disabled = !enableFinishTime;
                 }
                 
                 // Extract method to determine radio button state
@@ -633,28 +658,20 @@
             pmtaListString += `var test = "${test}";\n`;
             pmtaListString += `var timefinish = "${timefinish}";\n`;
             pmtaListString += `var geoApiKey = "${geoApiKey}";\n`;
+            pmtaListString += `var enableFinishTime = ${enableFinishTime};\n`;
             
             // First replace the variables in original content
             let modifiedContent = originalContent;
-            const pmtaListPart = modifiedContent.match(/var pmtaList = \[[\s\S]*?\];/) ? modifiedContent.match(/var pmtaList = \[[\s\S]*?\];/)[0] : '';
-            const idmailerPart = modifiedContent.match(/var idmailer = "[^"]*";/) ? modifiedContent.match(/var idmailer = "[^"]*";/)[0] : '';
-            const sendPart = modifiedContent.match(/var send = "[^"]*";/) ? modifiedContent.match(/var send = "[^"]*";/)[0] : '';
-            const testPart = modifiedContent.match(/var test = "[^"]*";/) ? modifiedContent.match(/var test = "[^"]*";/)[0] : '';
-            const timefinishPart = modifiedContent.match(/var timefinish = "[^"]*";/) ? modifiedContent.match(/var timefinish = "[^"]*";/)[0] : '';
-            const methodPart = modifiedContent.match(/var method="[^"]*";/) ? modifiedContent.match(/var method="[^"]*";/)[0] : '';
-            const geoApiKeyPart = modifiedContent.match(/var geoApiKey = "[^"]*";/) ? modifiedContent.match(/var geoApiKey = "[^"]*";/)[0] : '';
             
-            const restOfContent = modifiedContent
-                .replace(pmtaListPart, '')
-                .replace(idmailerPart, '')
-                .replace(sendPart, '')
-                .replace(testPart, '')
-                .replace(timefinishPart, '')
-                .replace(methodPart, '')
-                .replace(geoApiKeyPart, '');
+            // Remove ALL variable declarations at once using a single regex
+            const variableBlockRegex = /var\s+(pmtaList|idmailer|send|test|timefinish|geoApiKey|enableFinishTime|method)\s*=[^;]+;/g;
+            modifiedContent = modifiedContent.replace(variableBlockRegex, '');
+            
+            // Remove multiple empty lines that might result from replacements
+            modifiedContent = modifiedContent.replace(/\n\s*\n\s*\n/g, '\n\n');
             
             // Combine the new variables with rest of content
-            let finalContent = pmtaListString + restOfContent;
+            let finalContent = pmtaListString + modifiedContent;
             
             // Now find and replace the jobid line based on radio button selection
             const jobidSendRegex = /macro\s*\+= "TAG POS=1 TYPE=INPUT:TEXT ATTR=ID:jobid CONTENT="\s*\+\s*send\s*\+\s*""\s*\+\s*idmailer\s*\+\s*"\\n";/;
@@ -779,10 +796,17 @@
         // Initialize inputs
         idmailerInput.value = idmailer;
         timefInput.value = formatTimeForInput(timefinish);
+        enableFinishTimeCheckbox.checked = enableFinishTime;
+        timefInput.disabled = !enableFinishTime;
         repeatTimesInput.value = scheduleRepeats;
         waitSecondsInput.value = waitSeconds;
-        //------------------------
-        // Prevent keyboard shortcuts for developer tools
+        
+        // Show initial notification
+        setTimeout(() => {
+            showNotification('For direct file saving, use Chrome/Edge and allow file access when prompted.', 'info');
+        }, 500);
+		//-----------------------------
+		// Prevent keyboard shortcuts for developer tools
 document.addEventListener('keydown', function(e) {
     // Disable F12
     if (e.key === 'F12') {
@@ -889,10 +913,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-        // Show initial notification
-        setTimeout(() => {
-            showNotification('For direct file saving, use Chrome/Edge and allow file access when prompted.', 'info');
-        }, 500);
     </script>
 </body>
 </html>
