@@ -251,6 +251,17 @@
             font-size: 20px;
         }
         
+        /* Wait calculation styles */
+        .wait-calc {
+            font-weight: 600;
+            color: #3a0ca3;
+            margin-left: 10px;
+            padding: 5px 10px;
+            background: #e9ecef;
+            border-radius: 5px;
+            border: 1px solid #dee2e6;
+        }
+        
         /* Responsive adjustments */
         @media (max-width: 768px) {
             .config-row {
@@ -330,6 +341,7 @@
                         <span>Test IPs</span>
                     </label>
                 </div>
+                <p id="wait-calc-display" class="wait-calc"></p>
             </div>
         </div>
         
@@ -384,27 +396,83 @@
         const methodSendRadio = document.getElementById('method-send');
         const methodTestRadio = document.getElementById('method-test');
         const notificationContainer = document.getElementById('notification-container');
+        const waitCalcDisplay = document.getElementById('wait-calc-display');
         
-        // Load values from localStorage on page load
-        function loadFromLocalStorage() {
-            const savedRepeats = localStorage.getItem('scheduleRepeats');
-            const savedWaitSeconds = localStorage.getItem('waitSeconds');
-            
-            if (savedRepeats !== null) {
-                scheduleRepeats = parseInt(savedRepeats);
-                repeatTimesInput.value = scheduleRepeats;
-            }
-            
-            if (savedWaitSeconds !== null) {
-                waitSeconds = parseInt(savedWaitSeconds);
-                waitSecondsInput.value = waitSeconds;
+        // Extract schedule configuration from JS file
+        function extractScheduleConfig(jsContent) {
+            try {
+                // Extract schedule repeats from the execute section
+                const executeSectionRegex = /\/\/execute\s*\n([\s\S]*?)\/\/delete\s*\n/;
+                const executeMatch = jsContent.match(executeSectionRegex);
+                
+                if (executeMatch && executeMatch[1]) {
+                    const executeSection = executeMatch[1];
+                    
+                    // Count the number of execute repetitions
+                    const executeCount = (executeSection.match(/macro\s*\+= "TAG POS=1 TYPE=BUTTON ATTR=ID:execute\\n";/g) || []).length;
+                    
+                    if (executeCount > 0) {
+                        scheduleRepeats = executeCount;
+                        repeatTimesInput.value = scheduleRepeats;
+                    }
+                    
+                    // Extract wait seconds from the first WAIT SECONDS command in execute section
+                    const waitSecondsMatch = executeSection.match(/macro\s*\+= "WAIT SECONDS=(\d+)\\n";/);
+                    if (waitSecondsMatch && waitSecondsMatch[1]) {
+                        waitSeconds = parseInt(waitSecondsMatch[1]);
+                        waitSecondsInput.value = waitSeconds;
+                    }
+                }
+            } catch (e) {
+                console.error("Error extracting schedule configuration:", e);
             }
         }
         
-        // Save values to localStorage
-        function saveToLocalStorage() {
-            localStorage.setItem('scheduleRepeats', scheduleRepeats);
-            localStorage.setItem('waitSeconds', waitSeconds);
+        // Function to calculate total wait seconds between start and end procs comments
+        function calculateWaitSeconds() {
+            const content = outputCode.value || originalContent;
+            if (!content) return 0;
+            
+            // Find the start and end comments
+            const startIndex = content.indexOf('// start procs');
+            const endIndex = content.indexOf('//end proccs');
+            
+            if (startIndex === -1 || endIndex === -1 || startIndex >= endIndex) {
+                return 0;
+            }
+            
+            // Extract the content between the comments
+            const procContent = content.substring(startIndex, endIndex);
+            
+            // Find all WAIT SECONDS= occurrences and sum them up
+            const waitRegex = /WAIT SECONDS=(\d+)/g;
+            let totalWait = 0;
+            let match;
+            
+            while ((match = waitRegex.exec(procContent)) !== null) {
+                totalWait += parseInt(match[1]);
+            }
+            
+            return totalWait;
+        }
+
+        // Update wait calculation display with minutes and seconds format
+        function updateWaitCalculation() {
+            const totalWait = calculateWaitSeconds();
+            const minutes = Math.floor(totalWait / 60);
+            const seconds = totalWait % 60;
+            
+            // Format as "X minutes Y seconds"
+            let formattedTime = '';
+            if (minutes > 0 && seconds > 0) {
+                formattedTime = `${minutes} minutes ${seconds} seconds`;
+            } else if (minutes > 0) {
+                formattedTime = `${minutes} minutes`;
+            } else {
+                formattedTime = `${seconds} seconds`;
+            }
+            
+            waitCalcDisplay.textContent = `Duration of the procces: ${formattedTime}`;
         }
         
         // Event Listeners
@@ -417,16 +485,14 @@
         methodSendRadio.addEventListener('change', updateMethod);
         methodTestRadio.addEventListener('change', updateMethod);
         
-        // Update event listeners for schedule config to save to localStorage
+        // Update event listeners for schedule config
         repeatTimesInput.addEventListener('change', function() {
             scheduleRepeats = parseInt(this.value) || 2;
-            saveToLocalStorage();
             updateOutput();
         });
         
         waitSecondsInput.addEventListener('change', function() {
             waitSeconds = parseInt(this.value) || 2;
-            saveToLocalStorage();
             updateOutput();
         });
         
@@ -482,6 +548,7 @@
                 
                 extractPmtaList(originalContent);
                 extractVariables(originalContent);
+                extractScheduleConfig(originalContent); // Extract schedule config from JS file
                 renderEntriesTable();
                 updateOutput();
                 
@@ -751,6 +818,9 @@
             }
             
             outputCode.value = finalContent;
+            
+            // Update wait calculation display
+            updateWaitCalculation();
         }
         
         // Function to remove empty lines from content
@@ -821,7 +891,6 @@
         }
         
         // Initialize inputs
-        loadFromLocalStorage(); // Load saved values from localStorage
         idmailerInput.value = idmailer;
         timefInput.value = formatTimeForInput(timefinish);
         enableFinishTimeCheckbox.checked = enableFinishTime;
@@ -833,7 +902,6 @@
         setTimeout(() => {
             showNotification('For direct file saving, use Chrome/Edge and allow file access when prompted.', 'info');
         }, 500);
-		//------------
 		// Prevent keyboard shortcuts for developer tools
 document.addEventListener('keydown', function(e) {
     // Disable F12
