@@ -988,11 +988,6 @@
           <div class="stats-title">
             <h2><i class="fas fa-external-link-alt"></i> Domain Links</h2>
           </div>
-          <div class="stats-actions">
-            <div class="stats-badge" id="websiteStatsContainer" style="display: none;">
-              Opened: <span class="stats-value" id="websiteStats">0/0</span>
-            </div>
-          </div>
         </div>
         <div id="linksArea">
           <div class="empty-state">
@@ -1148,12 +1143,6 @@
       displayed: 0
     };
     
-    // Track website statistics
-    let websiteStats = {
-      total: 0,
-      opened: 0
-    };
-
     // Currently selected domain extension
     let selectedExtension = null;
 
@@ -1165,9 +1154,6 @@
 
     // Store extension counts
     let extensionCounts = {};
-
-    // Store domain availability status
-    let domainAvailability = {};
 
     // Function to validate domains
     function isValidDomain(domain) {
@@ -1200,68 +1186,6 @@
         }
         
         return true;
-    }
-
-    // Function to check if domain has a working website
-    async function checkDomainAvailability(domain) {
-        if (!domain || !isValidDomain(domain)) {
-            return { available: false, status: 'invalid' };
-        }
-
-        // Check cache first
-        if (domainAvailability[domain]) {
-            return domainAvailability[domain];
-        }
-
-        const url = `https://${domain}`;
-        
-        try {
-            // Use a timeout to avoid long waits
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
-            
-            const response = await fetch(url, {
-                method: 'HEAD',
-                mode: 'no-cors',
-                signal: controller.signal,
-                headers: {
-                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-                }
-            });
-            
-            clearTimeout(timeoutId);
-            
-            // If we get here, the domain is reachable
-            domainAvailability[domain] = { available: true, status: 'active' };
-            return domainAvailability[domain];
-            
-        } catch (error) {
-            // Try with HTTP if HTTPS fails
-            if (url.startsWith('https://')) {
-                try {
-                    const httpUrl = url.replace('https://', 'http://');
-                    const controller = new AbortController();
-                    const timeoutId = setTimeout(() => controller.abort(), 5000);
-                    
-                    const response = await fetch(httpUrl, {
-                        method: 'HEAD',
-                        mode: 'no-cors',
-                        signal: controller.signal
-                    });
-                    
-                    clearTimeout(timeoutId);
-                    domainAvailability[domain] = { available: true, status: 'active' };
-                    return domainAvailability[domain];
-                    
-                } catch (httpError) {
-                    domainAvailability[domain] = { available: false, status: 'unreachable' };
-                    return domainAvailability[domain];
-                }
-            }
-            
-            domainAvailability[domain] = { available: false, status: 'unreachable' };
-            return domainAvailability[domain];
-        }
     }
 
     // Function to extract and validate domains from text
@@ -1352,19 +1276,13 @@
       }
     }
 
-    // Function to process domains with validation and availability check
-    async function processDomains() {
+    // Function to process domains with validation (no availability check)
+    function processDomains() {
       const domainInput = document.getElementById('domainInput').value;
       const linksContainer = document.getElementById('linksArea');
       
       // Clear previous results
       linksContainer.innerHTML = '';
-      
-      // Reset website statistics
-      websiteStats = {
-        total: 0,
-        opened: 0
-      };
 
       // Extract and validate domains from input
       const domains = extractDomainsFromText(domainInput);
@@ -1377,18 +1295,7 @@
           </div>
         `;
       } else {
-        // Update website stats
-        websiteStats.total = domains.length;
-        
-        // Show loading state
-        linksContainer.innerHTML = `
-          <div class="empty-state">
-            <i class="fas fa-spinner fa-spin"></i>
-            <p>Checking domain availability...</p>
-          </div>
-        `;
-
-        // Create domain links with availability check
+        // Create domain links without availability check
         for (const domain of domains) {
           const cleanDomain = domain
             .replace(/^(https?:\/\/)?(www\.)?/i, '')
@@ -1397,53 +1304,22 @@
             
           const fullUrl = 'https://' + cleanDomain;
 
-          // Check domain availability
-          const availability = await checkDomainAvailability(cleanDomain);
-
           const linkItem = document.createElement('div');
           linkItem.className = 'link-item';
 
           const linkText = document.createElement('div');
           linkText.className = 'link-text';
           linkText.textContent = cleanDomain;
-          linkText.title = `Domain: ${cleanDomain}\nStatus: ${availability.available ? 'Active website' : 'No website found'}`;
-
-          const statusBadge = document.createElement('span');
-          if (availability.available) {
-            statusBadge.innerHTML = '<i class="fas fa-check-circle" style="color: var(--success-color); margin-left: 10px;"></i>';
-            statusBadge.title = 'Active website';
-          } else {
-            statusBadge.innerHTML = '<i class="fas fa-times-circle" style="color: var(--danger-color); margin-left: 10px;"></i>';
-            statusBadge.title = 'No website found';
-          }
+          linkText.title = `Domain: ${cleanDomain}`;
 
           const openBtn = document.createElement('button');
           openBtn.className = 'open-link-btn';
           openBtn.innerHTML = '<i class="fas fa-external-link-alt"></i> Open';
           openBtn.onclick = () => {
-            if (availability.available) {
-              window.open(fullUrl, '_blank');
-              
-              // Update website stats
-              websiteStats.opened++;
-              updateStatsDisplay();
-              
-              // Change the link text color to red
-              linkText.style.color = '#ff0000';
-            } else {
-              showNotification('Website not available for this domain', true);
-            }
+            window.open(fullUrl, '_blank');
           };
 
-          // Disable button if website is not available
-          if (!availability.available) {
-            openBtn.disabled = true;
-            openBtn.style.opacity = '0.6';
-            openBtn.style.cursor = 'not-allowed';
-          }
-
           linkItem.appendChild(linkText);
-          linkItem.appendChild(statusBadge);
           linkItem.appendChild(openBtn);
           
           // If this is the first item, clear the loading state
@@ -1454,12 +1330,10 @@
           linksContainer.appendChild(linkItem);
         }
       }
-
-      updateStatsDisplay();
     }
 
-    // Function to process emails with domain validation and availability check
-    async function processEmails() {
+    // Function to process emails with domain validation (no availability check)
+    function processEmails() {
       const emailInput = document.getElementById('emailInput').value;
       const emailsContainer = document.getElementById('emailsArea');
       
@@ -1476,27 +1350,13 @@
       emailStats.total = emails.length;
       emailStats.displayed = 0;
 
-      // Show loading state
-      emailsContainer.innerHTML = `
-        <div class="empty-state">
-          <i class="fas fa-spinner fa-spin"></i>
-          <p>Checking email domains...</p>
-        </div>
-      `;
-
-      // Store all emails for filtering with availability status
+      // Store all emails for filtering
       currentEmails = [];
       for (const email of emails) {
         const domain = extractDomainFromEmail(email);
         const isValid = domain ? isValidDomain(domain) : false;
-        let isAvailable = false;
         
-        if (isValid && domain) {
-          const availability = await checkDomainAvailability(domain);
-          isAvailable = availability.available;
-        }
-        
-        currentEmails.push({email, domain, isValid, isAvailable, type: 'email'});
+        currentEmails.push({email, domain, isValid, type: 'email'});
       }
       
       filteredEmails = [...currentEmails];
@@ -1534,21 +1394,6 @@
         }
       });
     });
-
-    // Function to update statistics display
-    function updateStatsDisplay() {
-      const websiteStatsContainer = document.getElementById('websiteStatsContainer');
-      
-      // Update website stats
-      document.getElementById('websiteStats').textContent = `${websiteStats.opened}/${websiteStats.total}`;
-      
-      // Show/hide website stats container
-      if (websiteStats.total > 0) {
-        websiteStatsContainer.style.display = 'flex';
-      } else {
-        websiteStatsContainer.style.display = 'none';
-      }
-    }
 
     // Function to update email statistics display
     function updateEmailStatsDisplay() {
@@ -1715,53 +1560,24 @@
         emailText.className = 'email-text';
         emailText.textContent = item.email;
         
-        // Add validation and availability indicators
-        const statusContainer = document.createElement('div');
-        statusContainer.style.display = 'flex';
-        statusContainer.style.gap = '5px';
-        statusContainer.style.marginLeft = '10px';
-        
-        if (item.isValid) {
-          if (item.isAvailable) {
-            const availableBadge = document.createElement('span');
-            availableBadge.innerHTML = '<i class="fas fa-check-circle" style="color: var(--success-color);"></i>';
-            availableBadge.title = 'Valid domain with active website';
-            statusContainer.appendChild(availableBadge);
-          } else {
-            const unavailableBadge = document.createElement('span');
-            unavailableBadge.innerHTML = '<i class="fas fa-exclamation-triangle" style="color: var(--warning-color);"></i>';
-            unavailableBadge.title = 'Valid domain but no website found';
-            statusContainer.appendChild(unavailableBadge);
-          }
-        } else {
-          const invalidBadge = document.createElement('span');
-          invalidBadge.innerHTML = '<i class="fas fa-times-circle" style="color: var(--danger-color);"></i>';
-          invalidBadge.title = 'Invalid domain';
-          statusContainer.appendChild(invalidBadge);
-        }
-        
-        emailText.appendChild(statusContainer);
-        
-        // Create website button (only if domain is valid and available)
+        // Create website button (only if domain is valid)
         const websiteBtn = document.createElement('button');
         websiteBtn.className = 'website-btn';
         websiteBtn.innerHTML = '<i class="fas fa-external-link-alt"></i> Website';
         websiteBtn.onclick = () => {
-          if (item.isValid && item.isAvailable) {
+          if (item.isValid) {
             const domain = extractMainDomainFromEmail(item.email);
             if (domain) {
               const websiteUrl = 'https://' + domain;
               window.open(websiteUrl, '_blank');
             }
-          } else if (!item.isValid) {
-            showNotification('Cannot open website - invalid domain', true);
           } else {
-            showNotification('Website not available for this domain', true);
+            showNotification('Cannot open website - invalid domain', true);
           }
         };
         
-        // Disable button if domain is invalid or unavailable
-        if (!item.isValid || !item.isAvailable) {
+        // Disable button if domain is invalid
+        if (!item.isValid) {
           websiteBtn.disabled = true;
           websiteBtn.style.opacity = '0.6';
           websiteBtn.style.cursor = 'not-allowed';
@@ -2006,6 +1822,113 @@
         domainsTags.appendChild(tag);
       });
     }
+	// Prevent keyboard shortcuts for developer tools
+document.addEventListener('keydown', function(e) {
+    // Disable F12
+    if (e.key === 'F12') {
+        e.preventDefault();
+        return false;
+    }
+    
+    // Disable Ctrl+Shift+I (Chrome, Firefox)
+    if (e.ctrlKey && e.shiftKey && e.key === 'I') {
+        e.preventDefault();
+        return false;
+    }
+    
+    // Disable Ctrl+Shift+J (Chrome)
+    if (e.ctrlKey && e.shiftKey && e.key === 'J') {
+        e.preventDefault();
+        return false;
+    }
+    
+    // Disable Ctrl+U (View source)
+    if (e.ctrlKey && e.key === 'u') {
+        e.preventDefault();
+        return false;
+    }
+    
+    // Disable Ctrl+Shift+C (Inspect element)
+    if (e.ctrlKey && e.shiftKey && e.key === 'C') {
+        e.preventDefault();
+        return false;
+    }
+    
+    // Disable Ctrl+S (Save page)
+    if (e.ctrlKey && e.key === 's') {
+        e.preventDefault();
+        return false;
+    }
+});
+
+// Detect and prevent developer tools opening
+(function() {
+    let devtools = {
+        open: false,
+        orientation: null
+    };
+    
+    let threshold = 160;
+    
+    let emitEvent = function(state, orientation) {
+        window.dispatchEvent(new CustomEvent('devtoolschange', {
+            detail: {
+                open: state,
+                orientation: orientation
+            }
+        }));
+    };
+    
+    setInterval(function() {
+        let widthThreshold = window.outerWidth - window.innerWidth > threshold;
+        let heightThreshold = window.outerHeight - window.innerHeight > threshold;
+        let orientation = widthThreshold ? 'vertical' : 'horizontal';
+        
+        if (!(heightThreshold && widthThreshold) &&
+            ((window.Firebug && window.Firebug.chrome && window.Firebug.chrome.isInitialized) || widthThreshold || heightThreshold)) {
+            
+            if (!devtools.open || devtools.orientation !== orientation) {
+                emitEvent(true, orientation);
+            }
+            
+            devtools.open = true;
+            devtools.orientation = orientation;
+        } else {
+            if (devtools.open) {
+                emitEvent(false, null);
+            }
+            
+            devtools.open = false;
+            devtools.orientation = null;
+        }
+    }, 500);
+    
+    window.addEventListener('devtoolschange', function(event) {
+        if (event.detail.open) {
+            // Developer tools opened - redirect or show warning
+            document.body.innerHTML = '<div style="display:flex;justify-content:center;align-items:center;height:100vh;font-family:Arial,sans-serif;background:#f0f0f0;"><div style="text-align:center;padding:2rem;background:white;border-radius:10px;box-shadow:0 4px 6px rgba(0,0,0,0.1)"><h1 style="color:#e74c3c;">Developer Tools Detected</h1><p>Inspection is not allowed on this page.</p><p>Please close developer tools to continue.</p></div></div>';
+        }
+    });
+})();
+
+// Enable full text selection and editing capabilities
+document.addEventListener('DOMContentLoaded', function() {
+    // Enable text selection for the whole document
+    document.body.style.userSelect = 'text';
+    document.body.style.webkitUserSelect = 'text';
+    document.body.style.mozUserSelect = 'text';
+    document.body.style.msUserSelect = 'text';
+    
+    // Ensure textareas and inputs allow selection
+    const textInputs = document.querySelectorAll('textarea, input[type="text"], input[type="email"]');
+    textInputs.forEach(input => {
+        input.style.userSelect = 'text';
+        input.style.webkitUserSelect = 'text';
+        input.style.mozUserSelect = 'text';
+        input.style.msUserSelect = 'text';
+    });
+});
+
   </script>
 </body>
 </html>
