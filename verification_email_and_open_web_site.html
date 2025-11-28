@@ -44,7 +44,8 @@
     }
 
     .container {
-      margin: 10 auto;
+
+      margin: 0 auto;
       background: var(--card-bg);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
@@ -53,7 +54,7 @@
     }
 
     header {
-     background: linear-gradient(359deg, #b5d3f5 0%, #ff8a8a 100%);
+      background: linear-gradient(359deg, #b5d3f5 0%, #ff8a8a 100%);
       color: white;
       padding: 25px 30px;
       display: flex;
@@ -102,13 +103,13 @@
     }
 
     .btn-copy {
-    background: #ffffff;
-    color: #000000;
-    border: #ff3800 2px solid;
+      background: #ffffff;
+      color: #000000;
+      border: #ff3800 2px solid;
     }
 
     .btn-copy:hover {
-   border: #0ecad1 2px solid;
+      border: #0ecad1 2px solid;
       box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
     }
 
@@ -175,7 +176,6 @@
       font-size: 1.3rem;
       font-weight: 600;
       color: #ff0000;
-   
       border-bottom: 1px solid var(--border-color);
     }
 
@@ -253,20 +253,19 @@
 
     /* Process Button in Radio Group */
     .process-btn {
-         padding: 12px 21px;
-    align-items: center;
-    background: #fff;
-    border-radius: 8px;
-	background: #ffffff;
-    color: #000000;
-    border: #ff3800 2px solid;
-	cursor: pointer;
-       
+      padding: 12px 21px;
+      align-items: center;
+      background: #fff;
+      border-radius: 8px;
+      background: #ffffff;
+      color: #000000;
+      border: #ff3800 2px solid;
+      cursor: pointer;
     }
 
     .process-btn:hover {
       box-shadow: 0 4px 8px rgba(67, 97, 238, 0.3);
-	    border: #67e7da 2px solid;
+      border: #67e7da 2px solid;
     }
 
     /* Input Fields */
@@ -338,6 +337,47 @@
       color: var(--text-light);
       margin-bottom: 15px;
       text-align: center;
+    }
+
+    /* Search Container */
+    .search-container {
+      margin-bottom: 20px;
+      padding: 18px;
+      background: var(--light-bg);
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+    }
+
+    .search-label {
+      display: block;
+      margin-bottom: 10px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-color);
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      font-family: inherit;
+      margin-bottom: 8px;
+      transition: var(--transition);
+      background: var(--card-bg);
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: var(--accent-color);
+      box-shadow: 0 0 0 2px rgba(76, 201, 240, 0.1);
+    }
+
+    .search-info {
+      font-size: 0.8rem;
+      color: var(--text-light);
     }
 
     .keywords-panel {
@@ -560,7 +600,7 @@
       color: var(--text-light);
     }
 
-    #linksArea, #emailsArea {
+    #linksArea, #rightEmailsArea {
       flex: 1;
       overflow-y: auto;
       background: var(--light-bg);
@@ -814,7 +854,32 @@
     .stat-value {
       font-size: 1.2rem;
       font-weight: 700;
-          color: #ff0000;
+      color: #ff0000;
+    }
+
+    /* NEW: Output panel visibility control */
+    .output-panel {
+      display: none;
+    }
+
+    .output-panel.active {
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Center panel styling */
+    .center-panel {
+      display: none;
+      flex-direction: column;
+    }
+
+    .center-panel.active {
+      display: flex;
+    }
+
+    /* Email controls container */
+    .email-controls {
+      margin-bottom: 15px;
     }
 
     @media (max-width: 1024px) {
@@ -921,7 +986,6 @@
         <h1>Domain & Email Generator</h1>
       </div>
       <div class="button-group">
-        
         <button class="btn btn-icon" onclick="toggleKeywordsPanel()" title="Toggle Keywords Panel">
           <i class="fas fa-cog"></i>
         </button>
@@ -981,14 +1045,12 @@
             </label>
           </div>
           
-         
-          
           <textarea id="emailInput" placeholder="Enter emails separated by commas or new lines"></textarea>
         </div>
       </div>
 
-      <!-- Domain Links Output -->
-      <div class="panel">
+      <!-- Center Panel - Shows Domain Links -->
+      <div id="centerPanel" class="panel center-panel active">
         <div class="stats-header">
           <div class="stats-title">
             <h2><i class="fas fa-external-link-alt"></i> Domain Links</h2>
@@ -999,6 +1061,35 @@
             </div>
           </div>
         </div>
+        
+        <!-- Email Controls Container -->
+        <div class="email-controls" id="emailControls" style="display: none;">
+          <!-- Email Statistics -->
+          <div class="email-stats">
+            <div class="stat-item">
+              <div class="stat-label">Total Emails</div>
+              <div class="stat-value" id="totalEmailCount">0</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-label">Currently Displayed</div>
+              <div class="stat-value" id="displayedEmailCount">0</div>
+            </div>
+          </div>
+          
+          <!-- Domain Extension Filter -->
+          <div class="filter-container">
+            <label class="filter-label" for="domainFilter">
+              <i class="fas fa-filter"></i> Filter by Domain Extension
+            </label>
+            <div class="domain-extensions" id="domainExtensions">
+              <!-- Domain extension buttons will appear here -->
+            </div>
+            <div class="filter-info">
+              Click on a domain extension to filter emails
+            </div>
+          </div>
+        </div>
+        
         <div id="linksArea">
           <div class="empty-state">
             <i class="fas fa-link"></i>
@@ -1007,8 +1098,8 @@
         </div>
       </div>
 
-      <!-- Email Links Output -->
-      <div class="panel">
+      <!-- Email Links Output - Right Panel -->
+      <div id="emailOutputPanel" class="panel output-panel">
         <div class="stats-header">
           <div class="stats-title">
             <h2><i class="fas fa-inbox"></i> Filtered Emails</h2>
@@ -1020,32 +1111,18 @@
           </div>
         </div>
         
-        <!-- Email Statistics -->
-        <div class="email-stats">
-          <div class="stat-item">
-            <div class="stat-label">Total Emails</div>
-            <div class="stat-value" id="totalEmailCount">0</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-label">Currently Displayed</div>
-            <div class="stat-value" id="displayedEmailCount">0</div>
-          </div>
-        </div>
-        
-        <!-- Domain Extension Filter -->
-        <div class="filter-container">
-          <label class="filter-label" for="domainFilter">
-            <i class="fas fa-filter"></i> Filter by Domain Extension
+        <!-- Search Container - Now in the right panel -->
+        <div class="search-container">
+          <label class="search-label" for="emailSearch">
+            <i class="fas fa-search"></i> Search Emails
           </label>
-          <div class="domain-extensions" id="domainExtensions">
-            <!-- Domain extension buttons will appear here -->
-          </div>
-          <div class="filter-info">
-            Click on a domain extension to filter emails
+          <input type="text" id="emailSearch" class="search-input" placeholder="Enter keyword to search in emails..." onkeyup="searchEmails()">
+          <div class="search-info">
+            Search for specific keywords in email addresses
           </div>
         </div>
         
-        <div id="emailsArea">
+        <div id="rightEmailsArea">
           <div class="empty-state">
             <i class="fas fa-envelope"></i>
             <p>Emails will appear here</p>
@@ -1134,7 +1211,7 @@
     <i class="fas fa-check-circle"></i> Copied to clipboard!
   </div>
 
-<script>
+  <script>
     // Initialize email keywords from localStorage or use default
     let emailKeywords = JSON.parse(localStorage.getItem('emailKeywords')) || 
       ['support', 'contact', 'admissions', 'services', 'communications', 'humanresources', 'university', 'info'];
@@ -1173,6 +1250,9 @@
 
     // Store opened domains
     let openedDomains = JSON.parse(localStorage.getItem('openedDomains')) || {};
+
+    // Search term for emails
+    let emailSearchTerm = '';
 
     // Function to validate domains
     function isValidDomain(domain) {
@@ -1269,18 +1349,38 @@
       }
     }
 
-    // Function to toggle between domain and email input fields
+    // Function to toggle between domain and email input fields AND output panels
     function toggleInputField() {
       const domainRadio = document.querySelector('input[name="inputType"][value="domains"]');
       const domainField = document.getElementById('domainInputField');
       const emailField = document.getElementById('emailInputField');
+      const centerPanel = document.getElementById('centerPanel');
+      const emailOutputPanel = document.getElementById('emailOutputPanel');
+      const emailControls = document.getElementById('emailControls');
+      const linksArea = document.getElementById('linksArea');
       
       if (domainRadio.checked) {
         domainField.classList.add('active');
         emailField.classList.remove('active');
+        centerPanel.classList.add('active');
+        emailOutputPanel.classList.remove('active');
+        emailControls.style.display = 'none';
+        linksArea.style.display = 'block';
+        
+        // Update center panel title for domains
+        const centerTitle = centerPanel.querySelector('h2');
+        centerTitle.innerHTML = '<i class="fas fa-external-link-alt"></i> Domain Links';
       } else {
         domainField.classList.remove('active');
         emailField.classList.add('active');
+        centerPanel.classList.add('active');
+        emailOutputPanel.classList.add('active');
+        emailControls.style.display = 'block';
+        linksArea.style.display = 'none';
+        
+        // Update center panel title for emails
+        const centerTitle = centerPanel.querySelector('h2');
+        centerTitle.innerHTML = '<i class="fas fa-inbox"></i> Filtered Emails';
       }
     }
 
@@ -1382,10 +1482,10 @@
     // Function to process emails with domain validation (no availability check)
     function processEmails() {
       const emailInput = document.getElementById('emailInput').value;
-      const emailsContainer = document.getElementById('emailsArea');
+      const rightEmailsContainer = document.getElementById('rightEmailsArea');
       
       // Clear previous results
-      emailsContainer.innerHTML = '';
+      rightEmailsContainer.innerHTML = '';
 
       // Extract emails from input
       const emails = emailInput
@@ -1413,7 +1513,7 @@
       updateEmailStatsDisplay();
 
       if (emails.length === 0) {
-        emailsContainer.innerHTML = `
+        rightEmailsContainer.innerHTML = `
           <div class="empty-state">
             <i class="fas fa-envelope"></i>
             <p>No valid emails entered</p>
@@ -1566,27 +1666,39 @@
       }
     }
 
-    // Function to filter emails by domain extension
+    // Function to search emails by keyword
+    function searchEmails() {
+      const searchInput = document.getElementById('emailSearch');
+      emailSearchTerm = searchInput.value.trim().toLowerCase();
+      
+      // Apply all filters
+      filterEmailsByDomain();
+    }
+
+    // Function to filter emails by domain extension, keywords, domain removal, and search
     function filterEmailsByDomain() {
-      const emailsContainer = document.getElementById('emailsArea');
+      const rightEmailsContainer = document.getElementById('rightEmailsArea');
       
       // Clear previous results
-      emailsContainer.innerHTML = '';
+      rightEmailsContainer.innerHTML = '';
       
-      // Filter emails based on selected extension, keywords, and domain removal
+      // Filter emails based on selected extension, keywords, domain removal, and search
       if (selectedExtension) {
         filteredEmails = currentEmails.filter(item => {
           const domain = extractDomainFromEmail(item.email);
           if (domain) {
             return domain.toLowerCase().endsWith(selectedExtension) && 
                    emailContainsKeywords(item.email) &&
-                   !emailHasDomainToRemove(item.email);
+                   !emailHasDomainToRemove(item.email) &&
+                   (emailSearchTerm === '' || item.email.toLowerCase().includes(emailSearchTerm));
           }
           return false;
         });
       } else {
         filteredEmails = currentEmails.filter(item => 
-          emailContainsKeywords(item.email) && !emailHasDomainToRemove(item.email)
+          emailContainsKeywords(item.email) && 
+          !emailHasDomainToRemove(item.email) &&
+          (emailSearchTerm === '' || item.email.toLowerCase().includes(emailSearchTerm))
         );
       }
       
@@ -1595,7 +1707,7 @@
       updateEmailStatsDisplay();
       
       if (filteredEmails.length === 0) {
-        emailsContainer.innerHTML = `
+        rightEmailsContainer.innerHTML = `
           <div class="empty-state">
             <i class="fas fa-envelope"></i>
             <p>No emails match the selected filter</p>
@@ -1604,55 +1716,62 @@
         return;
       }
       
-      // Display all filtered emails
+      // Display all filtered emails in the right container only
       filteredEmails.forEach(item => {
-        const emailItem = document.createElement('div');
-        emailItem.className = 'email-item';
-        
-        const emailText = document.createElement('div');
-        emailText.className = 'email-text';
-        emailText.textContent = item.email;
-        
-        // Create website button (only if domain is valid)
-        const websiteBtn = document.createElement('button');
-        websiteBtn.className = 'website-btn';
-        websiteBtn.innerHTML = '<i class="fas fa-external-link-alt"></i> Website';
-        websiteBtn.onclick = () => {
-          if (item.isValid) {
-            const domain = extractMainDomainFromEmail(item.email);
-            if (domain) {
-              const websiteUrl = 'https://' + domain;
-              window.open(websiteUrl, '_blank');
-              
-              // Mark domain as opened
-              openedDomains[domain] = true;
-              localStorage.setItem('openedDomains', JSON.stringify(openedDomains));
-            }
-          } else {
-            showNotification('Cannot open website - invalid domain', true);
-          }
-        };
-        
-        // Disable button if domain is invalid
-        if (!item.isValid) {
-          websiteBtn.disabled = true;
-          websiteBtn.style.opacity = '0.6';
-          websiteBtn.style.cursor = 'not-allowed';
-        }
-        
-        // Create copy button
-        const copyBtn = document.createElement('button');
-        copyBtn.className = 'copy-btn';
-        copyBtn.innerHTML = '<i class="fas fa-copy"></i>';
-        copyBtn.onclick = () => {
-          copyToClipboard(item.email);
-        };
-        
-        emailItem.appendChild(emailText);
-        emailItem.appendChild(websiteBtn);
-        emailItem.appendChild(copyBtn);
-        emailsContainer.appendChild(emailItem);
+        const emailItem = createEmailItem(item);
+        rightEmailsContainer.appendChild(emailItem);
       });
+    }
+
+    // Helper function to create email item
+    function createEmailItem(item) {
+      const emailItem = document.createElement('div');
+      emailItem.className = 'email-item';
+      
+      const emailText = document.createElement('div');
+      emailText.className = 'email-text';
+      emailText.textContent = item.email;
+      
+      // Create website button (only if domain is valid)
+      const websiteBtn = document.createElement('button');
+      websiteBtn.className = 'website-btn';
+      websiteBtn.innerHTML = '<i class="fas fa-external-link-alt"></i> Website';
+      websiteBtn.onclick = () => {
+        if (item.isValid) {
+          const domain = extractMainDomainFromEmail(item.email);
+          if (domain) {
+            const websiteUrl = 'https://' + domain;
+            window.open(websiteUrl, '_blank');
+            
+            // Mark domain as opened
+            openedDomains[domain] = true;
+            localStorage.setItem('openedDomains', JSON.stringify(openedDomains));
+          }
+        } else {
+          showNotification('Cannot open website - invalid domain', true);
+        }
+      };
+      
+      // Disable button if domain is invalid
+      if (!item.isValid) {
+        websiteBtn.disabled = true;
+        websiteBtn.style.opacity = '0.6';
+        websiteBtn.style.cursor = 'not-allowed';
+      }
+      
+      // Create copy button
+      const copyBtn = document.createElement('button');
+      copyBtn.className = 'copy-btn';
+      copyBtn.innerHTML = '<i class="fas fa-copy"></i>';
+      copyBtn.onclick = () => {
+        copyToClipboard(item.email);
+      };
+      
+      emailItem.appendChild(emailText);
+      emailItem.appendChild(websiteBtn);
+      emailItem.appendChild(copyBtn);
+      
+      return emailItem;
     }
 
     // Function to copy all emails to clipboard
