@@ -3,1012 +3,1391 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PMTA Table Editor</title>
+    <title>PMTA Script Editor Pro</title>
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        * {
             margin: 0;
-            padding: 20px;
-            background: linear-gradient(358deg, #6773a9 0%, #f5feff);
-            color: #212529;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
             min-height: 100vh;
+            padding: 20px;
+            color: #1e293b;
         }
+
         .container {
-            max-width: 1500px;
+            max-width: 1400px;
             margin: 0 auto;
-            background: white;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-            border: 2px solid #e0e0e0;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(14, 165, 233, 0.1);
+            overflow: hidden;
+            border: 1px solid rgba(14, 165, 233, 0.15);
         }
-        h1 {
-            color: #3a0ca3;
+
+        .header {
+            background: linear-gradient(135deg, #0ea5e9 0%, #3b82f6 100%);
+            color: white;
+            padding: 30px 40px;
             text-align: center;
-            margin-bottom: 25px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.15) 50%, transparent 70%);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .header h1 {
             font-size: 2.2rem;
+            margin-bottom: 8px;
             font-weight: 700;
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+            letter-spacing: -0.5px;
+            position: relative;
+            z-index: 1;
         }
-        .button-group {
-            margin: 25px 0;
-            text-align: center;
+
+        .header p {
+            opacity: 0.95;
+            font-size: 1.05rem;
+            font-weight: 400;
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+            line-height: 1.5;
         }
+
+        .content {
+            padding: 30px;
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+            padding: 18px;
+            background: #f8fafc;
+            border-radius: 14px;
+            border: 1px solid #e2e8f0;
+        }
+
         button {
-            background: linear-gradient(to right, #8cc5fd, #007ffb);
+            background: linear-gradient(135deg, #0ea5e9 0%, #3b82f6 100%);
             color: white;
             border: none;
-            padding: 12px 20px;
-            margin: 8px;
-            border-radius: 8px;
+            padding: 10px 18px;
+            border-radius: 10px;
             cursor: pointer;
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 600;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            height: 42px;
         }
+
         button:hover {
-            background: linear-gradient(to right, #8cc5fd, #8cc5fd);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(14, 165, 233, 0.25);
         }
-        button.remove-btn {
-            background: linear-gradient(to right, #eb7979c2, #d32c2cde);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+
+        button.danger {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
         }
-        button.remove-btn:hover {
-            background: linear-gradient(to right, #d32c2cde, #eb7979c2);
+
+        button.danger:hover {
+            box-shadow: 0 8px 20px rgba(239, 68, 68, 0.25);
         }
+
+        button.success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+
+        button.success:hover {
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.25);
+        }
+
+        button.info {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+        }
+
+        button.info:hover {
+            box-shadow: 0 8px 20px rgba(139, 92, 246, 0.25);
+        }
+
+        .status {
+            padding: 14px 16px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            font-weight: 500;
+            border-left: 5px solid;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .status.success {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            color: #065f46;
+            border-color: #10b981;
+        }
+
+        .status.error {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            color: #991b1b;
+            border-color: #ef4444;
+        }
+
+        .status.warning {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            color: #92400e;
+            border-color: #f59e0b;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin: 25px 0;
+        }
+
+        .stat-card {
+            padding: 16px;
+            background: linear-gradient(135deg, rgba(14, 165, 233, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%);
+            color: #1e293b;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid rgba(14, 165, 233, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(14, 165, 233, 0.4);
+            box-shadow: 0 8px 20px rgba(14, 165, 233, 0.15);
+        }
+
+        .stat-value {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+            color: #0ea5e9;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            opacity: 0.8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #64748b;
+        }
+
+        .section {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            border: 1px solid #e2e8f0;
+        }
+
+        .section h3 {
+            color: #1e293b;
+            margin-bottom: 16px;
+            font-size: 1.15rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+        }
+
+        .field {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .field:hover {
+            border-color: #0ea5e9;
+            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.1);
+        }
+
+        .field label {
+            display: block;
+            font-weight: 500;
+            color: #475569;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .field input,
+        .field select,
+        .field textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+            color: #1e293b;
+            transition: all 0.2s;
+        }
+
+        .field input:focus,
+        .field select:focus,
+        .field textarea:focus {
+            outline: none;
+            border-color: #0ea5e9;
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+        }
+
+        .field textarea {
+            min-height: 100px;
+            resize: vertical;
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            font-size: 13px;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            margin: 20px 0;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            background: white;
+        }
+
         table {
             width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-            margin: 25px 0;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-            border-radius: 10px;
-            overflow: hidden;
-            border: 2px solid #e0e0e0;
+            border-collapse: collapse;
+            background: white;
         }
-        th, td {
-            border-bottom: 1px solid #dee2e6;
-            padding: 15px;
-            text-align: left;
-        }
-        th {
-            background: #4cc9f0;
+
+        thead {
+            background: linear-gradient(135deg, #0ea5e9 0%, #3b82f6 100%);
             color: white;
+        }
+
+        th {
+            padding: 12px 10px;
+            text-align: left;
             font-weight: 600;
-            position: sticky;
-            top: 0;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
-            border-right: 1px solid rgba(255,255,255,0.3);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
-        th:last-child {
-            border-right: none;
+
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #e2e8f0;
+            color: #475569;
         }
-        tr:nth-child(even) {
-            background-color: #f8f9fa;
+
+        tbody tr:hover {
+            background: #f1f5f9;
         }
-        tr:hover {
-            background-color: #e9ecef;
+
+        tbody tr:last-child td {
+            border-bottom: none;
         }
+
         .edit-cell input {
             width: 100%;
-            padding: 10px;
-            border: 2px solid #dee2e6;
+            padding: 8px 10px;
+            border: 1px solid #cbd5e1;
             border-radius: 6px;
-            box-sizing: border-box;
-            font-family: inherit;
-            transition: all 0.3s ease;
+            font-size: 13px;
+            background: white;
+            color: #1e293b;
         }
+
         .edit-cell input:focus {
             outline: none;
-            border-color: #4361ee;
-            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+            border-color: #0ea5e9;
         }
-        .url-input {
-            min-width: 300px;
-            word-break: break-all;
-        }
-        #output-code {
-            width: 95%;
-            min-height: 300px;
-            padding: 15px;
-            border: 2px solid #dee2e6;
-            border-radius: 8px;
-            font-family: 'Consolas', 'Monaco', monospace;
-            background-color: #f8f9fa;
-            margin-top: 25px;
-            font-size: 14px;
-            line-height: 1.5;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
-        }
-        .action-buttons {
-            display: flex;
-            gap: 8px;
-            justify-content: center;
-        }
-        .config-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 25px;
-            margin: 20px 0;
-            padding: 20px;
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+
+        textarea#output {
+            width: 100%;
+            min-height: 350px;
+            padding: 18px;
+            border: 1px solid #cbd5e1;
             border-radius: 10px;
-            align-items: center;
-            border: 2px solid #dee2e6;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            font-size: 13px;
+            background: #f8fafc;
+            color: #1e293b;
+            resize: vertical;
+            line-height: 1.6;
         }
-        .config-group {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .config-group label {
-            font-weight: 600;
-            white-space: nowrap;
-            color: #3a0ca3;
-        }
-        .config-group input[type="text"] {
-            padding: 10px 14px;
-            border: 2px solid #dee2e6;
-            border-radius: 6px;
-            min-width: 140px;
-            transition: all 0.3s ease;
-        }
-        .config-group input[type="text"]:focus {
-            border-color: #4361ee;
-            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+
+        textarea#output:focus {
             outline: none;
+            border-color: #0ea5e9;
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
         }
-        .config-group input[type="time"] {
-            padding: 10px 14px;
-            border: 2px solid #dee2e6;
-            border-radius: 6px;
-            font-family: Arial, sans-serif;
-            transition: all 0.3s ease;
-        }
-        .config-group input[type="time"]:focus {
-            border-color: #4361ee;
-            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
-            outline: none;
-        }
-        .config-group input[type="number"] {
-            padding: 10px 14px;
-            border: 2px solid #dee2e6;
-            border-radius: 6px;
-            min-width: 120px;
-            transition: all 0.3s ease;
-        }
-        .config-group input[type="number"]:focus {
-            border-color: #4361ee;
-            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
-            outline: none;
-        }
-        .config-group input[type="radio"] {
-            cursor: pointer;
-        }
-        .config-group input[type="checkbox"] {
-            cursor: pointer;
-        }
-        h3 {
-            color: #3a0ca3;
-            margin-top: 30px;
-            margin-bottom: 15px;
-            font-size: 1.5rem;
-            border-bottom: 2px solid #4cc9f0;
-            padding-bottom: 8px;
-        }
-        
-        /* Notification styles */
-        .notification-container {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 1000;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            max-width: 350px;
-        }
-        
-        .notification {
-            padding: 15px 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            background: linear-gradient(135deg, #0ea5e9 0%, #3b82f6 100%);
             color: white;
-            font-weight: 500;
-            opacity: 0;
-            transform: translateX(100%);
-            transition: all 0.4s ease;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .spacer {
+            flex-grow: 1;
+        }
+
+        .ip-list-item {
             display: flex;
             align-items: center;
             gap: 10px;
+            margin-bottom: 8px;
+            padding: 10px;
+            background: #f8fafc;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
         }
-        
-        .notification.show {
-            opacity: 1;
-            transform: translateX(0);
+
+        .ip-list-item input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 13px;
         }
-        
-        .notification.success {
-            background: linear-gradient(135deg, #4caf50, #2e7d32);
+
+        .ip-list-item button {
+            padding: 6px 12px;
+            font-size: 12px;
         }
-        
-        .notification.error {
-            background: linear-gradient(135deg, #f44336, #c62828);
+
+        .ipvols-list-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+            padding: 10px;
+            background: #f8fafc;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            animation: slideIn 0.2s ease-out;
         }
-        
-        .notification.warning {
-            background: linear-gradient(135deg, #ff9800, #ef6c00);
+
+        .ipvols-list-item.hidden {
+            display: none;
         }
-        
-        .notification.info {
-            background: linear-gradient(135deg, #2196f3, #1565c0);
+
+        .ipvols-list-item input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 13px;
         }
-        
-        .notification-icon {
-            font-size: 20px;
+
+        .ipvols-list-item input:nth-child(1) {
+            min-width: 150px;
         }
-        
-        /* Wait calculation styles */
-        .wait-calc {
-            font-weight: 600;
-            color: #3a0ca3;
-            margin-left: 10px;
-            padding: 5px 10px;
-            background: #e9ecef;
-            border-radius: 5px;
-            border: 1px solid #dee2e6;
+
+        .ipvols-list-item input:nth-child(2) {
+            min-width: 100px;
         }
-        
-        /* Responsive adjustments */
+
+        .ipvols-list-item button {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .ip-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .show-more-container {
+            margin-top: 10px;
+            text-align: center;
+            padding: 10px;
+        }
+
+        .show-more-container .count-info {
+            font-size: 12px;
+            color: #64748b;
+            margin-bottom: 8px;
+        }
+
+        .dual-container {
+            display: flex;
+            gap: 20px;
+            margin-top: 15px;
+        }
+
+        .dual-container > div {
+            flex: 1;
+        }
+
+        .dual-container .field {
+            height: 100%;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .section-header h3 {
+            margin-bottom: 0;
+        }
+
         @media (max-width: 768px) {
-            .config-row {
-                flex-direction: column;
-                gap: 15px;
+            .content {
+                padding: 20px;
             }
             
-            .config-group {
-                width: 100%;
+            .header {
+                padding: 20px;
             }
             
-            .config-group input {
-                flex-grow: 1;
+            .header h1 {
+                font-size: 1.8rem;
             }
             
-            .button-group {
-                display: flex;
+            .header p {
+                font-size: 1rem;
+            }
+            
+            .toolbar {
                 flex-direction: column;
             }
             
             button {
                 width: 100%;
-                margin: 5px 0;
+                justify-content: center;
             }
             
-            .notification-container {
-                max-width: calc(100% - 40px);
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .stat-card {
+                padding: 14px;
+            }
+            
+            .stat-value {
+                font-size: 1.4rem;
+            }
+            
+            .section {
+                padding: 16px;
+            }
+            
+            .dual-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .ip-list-item,
+            .ipvols-list-item {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .ip-list-item input,
+            .ipvols-list-item input {
+                width: 100%;
+            }
+            
+            .ip-list-item button,
+            .ipvols-list-item button {
+                width: 100%;
+            }
+            
+            .ip-controls {
+                flex-direction: column;
+            }
+            
+            .ip-controls button {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .grid {
+                grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>PMTA List Editor</h1>
-        
-        <div class="button-group">
-            <button id="open-btn">📂 Open JS File</button>
-            <button id="save-btn">💾 Save Changes</button>
-            <button id="add-entry-btn">➕ Add New Entry</button>
+        <div class="header">
+            <h1>🚀 PMTA Script Editor Pro</h1>
+            <p>Advanced configuration editor for optimized PMTA mailer scripts</p>
         </div>
         
-        <div class="config-row">
-            <div class="config-group">
-                <label for="idmailer-input">ID Mailer:</label>
-                <input type="text" id="idmailer-input" placeholder="Enter ID Mailer">
+        <div class="content">
+            <div class="toolbar">
+                <button id="open-btn">📂 Open File</button>
+                <button id="save-btn" class="success">💾 Save Changes</button>
+                <button id="add-btn">➕ Add Entry</button>
+                <button id="copy-btn">📋 Copy Code</button>
+                <button id="test-notification-btn">📱 Test Alert</button>
+                <div class="spacer"></div>
+                <span class="badge">v2.0</span>
             </div>
             
-            <div class="config-group">
-                <label for="timef-input">Finish Time:</label>
-                <input type="time" id="timef-input" step="1" required>
+            <div id="status" class="status warning">
+                ⚠️ Ready. Load your JavaScript file to begin editing.
             </div>
             
-            <div class="config-group">
-                <label for="enable-finish-time">Enable Finish Time:</label>
-                <input type="checkbox" id="enable-finish-time" checked>
-            </div>
-            
-            <div class="config-group">
-                <label for="repeat-times-input">Schedule Repeats:</label>
-                <input type="number" id="repeat-times-input" placeholder="Number of repeats" min="1" max="100" >
-            </div>
-            
-            <div class="config-group">
-                <label for="wait-seconds-input">Wait Seconds:</label>
-                <input type="number" id="wait-seconds-input" placeholder="Wait seconds" min="1" max="300" >
-            </div>
-            
-            <div class="config-group">
-                <label style="margin-right: 5px;">Method:</label>
-                <div style="display: flex; gap: 15px;">
-                    <label style="display: flex; align-items: center; gap: 5px; font-weight: normal; cursor: pointer;">
-                        <input type="radio" name="method" value="send" id="method-send" checked>
-                        <span>Send</span>
-                    </label>
-                    <label style="display: flex; align-items: center; gap: 5px; font-weight: normal; cursor: pointer;">
-                        <input type="radio" name="method" value="test" id="method-test">
-                        <span>Test IPs</span>
-                    </label>
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="entry-count">0</div>
+                    <div class="stat-label">PMTA Entries</div>
                 </div>
-                <p id="wait-calc-display" class="wait-calc"></p>
+                <div class="stat-card">
+                    <div class="stat-value" id="code-lines">0</div>
+                    <div class="stat-label">Code Lines</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="total-time">0h</div>
+                    <div class="stat-label">Total Runtime</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="ip-count">0</div>
+                    <div class="stat-label">IP Addresses</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="ipvols-count">0</div>
+                    <div class="stat-label">VoIP IPs</div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-header">
+                    <h3>⚙️ Core Configuration</h3>
+                </div>
+                <div class="grid">
+                    <div class="field">
+                        <label>Finish Time (UTC)</label>
+                        <input type="time" id="timefinish" step="1">
+                    </div>
+                    
+                    <div class="field">
+                        <label>Enable Auto-Loop</label>
+                        <select id="enablefinish">
+                            <option value="false">Disabled</option>
+                            <option value="true">Enabled</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-header">
+                    <h3>🔧 Macro Optimization</h3>
+                </div>
+                <div class="grid">
+                    <div class="field">
+                        <label>Schedule Repeats</label>
+                        <input type="number" id="schedulerepeats" value="360" min="1" max="1000">
+                    </div>
+                    
+                    <div class="field">
+                        <label>Wait Time (seconds)</label>
+                        <input type="number" id="schedulewait" value="5" min="1" max="60">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-header">
+                    <h3>📋 PMTA Entries</h3>
+                    <button id="add-pmta-btn" style="height: 36px; padding: 0 15px;">➕ Add</button>
+                </div>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 50px">#</th>
+                                <th style="width: 120px">Time (UTC)</th>
+                                <th>URL</th>
+                                <th style="width: 150px">Product</th>
+                                <th style="width: 100px">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-header">
+                    <h3>🌐 IP Addresses for Data Extraction</h3>
+                    <div class="ip-controls" style="margin-top: 0;">
+                        <button id="add-ip-btn" style="height: 36px; padding: 0 15px;">➕ Add</button>
+                        <button id="remove-all-ip-btn" class="danger" style="height: 36px; padding: 0 15px;">🗑️ All</button>
+                    </div>
+                </div>
+                <div class="dual-container">
+                    <div class="field">
+                        <label>IP Addresses (one per line or comma-separated)</label>
+                        <textarea id="ip-list" placeholder="92.118.151.116
+92.118.151.11
+92.118.151.111"></textarea>
+                        <small style="display: block; margin-top: 5px; color: #64748b;">
+                            Enter IP addresses that will be used for data extraction.
+                        </small>
+                    </div>
+                    <div id="ip-list-container" class="field" style="overflow-y: auto; max-height: 200px;">
+                        <label>IP List Preview</label>
+                        <div style="margin-top: 8px;"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-header">
+                    <h3>Volume /IP Configuration</h3>
+                    <div class="ip-controls" style="margin-top: 0;">
+                        <button id="add-ipvols-btn" style="height: 36px; padding: 0 15px;">➕ Add</button>
+                        <button id="remove-all-ipvols-btn" class="danger" style="height: 36px; padding: 0 15px;">🗑️ All</button>
+                    </div>
+                </div>
+                <div class="dual-container">
+                    <div class="field">
+                        <label>VoIP IPs with Volume (IP:Volume or IP[tab]Volume)</label>
+                        <textarea style="min-height: 400px;" id="ipvols-list" placeholder="92.118.151.116:2600
+92.118.151.11:2500
+92.118.151.111:2400"></textarea>
+                        <small style="display: block; margin-top: 5px; color: #64748b;">
+                            Format: IP:Volume or IP[Tab]Volume (one per line)
+                        </small>
+                    </div>
+                    <div id="ipvols-list-container" class="field" style="overflow-y: auto; max-height: 500px;">
+                        <label>VoIP IPs Preview</label>
+                        <div style="margin-top: 8px;"></div>
+                    </div>
+                </div>
+                <div class="show-more-container" id="show-more-container" style="display: none;">
+                    <div class="count-info">Showing 5 of <span id="total-ipvols-count">0</span> VoIP IPs</div>
+                    <button id="show-more-btn" class="info" style="height: 36px; padding: 0 15px;">📖 Show All</button>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-header">
+                    <h3>📱 Telegram Notifications</h3>
+                </div>
+                <div class="grid">
+                    <div class="field">
+                        <label>Bot Token</label>
+                        <input type="password" id="bottoken" placeholder="Enter bot token">
+                    </div>
+                    <div class="field">
+                        <label>Chat ID</label>
+                        <input type="text" id="chatid" placeholder="Enter chat ID">
+                    </div>
+                </div>
+                <div style="text-align: center; margin-top: 15px;">
+                    <button id="test-notification-btn-2" class="info" style="width: auto;">📱 Test Telegram Notification</button>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-header">
+                    <h3>💻 Generated Code</h3>
+                    <button id="copy-btn-2" style="height: 36px; padding: 0 15px;">📋 Copy</button>
+                </div>
+                <textarea id="output" readonly></textarea>
             </div>
         </div>
-        
-        <div style="overflow-x: auto;">
-            <table id="entries-table">
-                <thead>
-                    <tr>
-                        <th width="15%">Prod Name</th>
-                        <th width="15%">Time</th>
-                        <th>URL</th>
-                        <th width="10%">Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="entries-body">
-                    <!-- Entries will be added here -->
-                </tbody>
-            </table>
-        </div>
-        
-        <h3>JavaScript Code Preview:</h3>
-        <textarea id="output-code" readonly></textarea>
     </div>
-
-    <!-- Notification container -->
-    <div class="notification-container" id="notification-container"></div>
 
     <script>
         let fileHandle = null;
         let originalContent = '';
-        let pmtaListEntries = [];
-        let idmailer = "";
-        let timefinish = "22:00:50";
-        let geoApiKey = "67749947756e4891ad0fa24fae372533";
-        let scheduleRepeats = 2;
-        let waitSeconds = 2;
-        let send = "send-gmail-";
-        let test = "test_ips-gmail-";
-        let methodType = "send"; // default to send
-        let enableFinishTime = true; // default to enabled
+        let config = {
+            pmtaList: [],
+            ipList: ["92.118.151.116", "92.118.151.11", "92.118.151.111"],
+            ipvolsList: [{IP: "92.118.151.116", vol: "2600"}],
+            timefinish: "14:15:00",
+            enableFinishTime: false,
+            scheduleWait: 5,
+            scheduleRepeats: 360,
+            botToken: "",
+            chatId: ""
+        };
         
-        // DOM Elements
-        const openBtn = document.getElementById('open-btn');
-        const saveBtn = document.getElementById('save-btn');
-        const addEntryBtn = document.getElementById('add-entry-btn');
-        const entriesBody = document.getElementById('entries-body');
-        const outputCode = document.getElementById('output-code');
-        const idmailerInput = document.getElementById('idmailer-input');
-        const timefInput = document.getElementById('timef-input');
-        const enableFinishTimeCheckbox = document.getElementById('enable-finish-time');
-        const repeatTimesInput = document.getElementById('repeat-times-input');
-        const waitSecondsInput = document.getElementById('wait-seconds-input');
-        const methodSendRadio = document.getElementById('method-send');
-        const methodTestRadio = document.getElementById('method-test');
-        const notificationContainer = document.getElementById('notification-container');
-        const waitCalcDisplay = document.getElementById('wait-calc-display');
+        let showAllIPvols = false;
         
-        // Extract schedule configuration from JS file
-        function extractScheduleConfig(jsContent) {
-            try {
-                // Extract schedule repeats from the execute section
-                const executeSectionRegex = /\/\/execute\s*\n([\s\S]*?)\/\/delete\s*\n/;
-                const executeMatch = jsContent.match(executeSectionRegex);
-                
-                if (executeMatch && executeMatch[1]) {
-                    const executeSection = executeMatch[1];
-                    
-                    // Count the number of execute repetitions
-                    const executeCount = (executeSection.match(/macro\s*\+= "TAG POS=1 TYPE=BUTTON ATTR=ID:execute\\n";/g) || []).length;
-                    
-                    if (executeCount > 0) {
-                        scheduleRepeats = executeCount;
-                        repeatTimesInput.value = scheduleRepeats;
-                    }
-                    
-                    // Extract wait seconds from the first WAIT SECONDS command in execute section
-                    const waitSecondsMatch = executeSection.match(/macro\s*\+= "WAIT SECONDS=(\d+)\\n";/);
-                    if (waitSecondsMatch && waitSecondsMatch[1]) {
-                        waitSeconds = parseInt(waitSecondsMatch[1]);
-                        waitSecondsInput.value = waitSeconds;
-                    }
-                }
-            } catch (e) {
-                console.error("Error extracting schedule configuration:", e);
-            }
-        }
+        const $ = id => document.getElementById(id);
         
-        // Function to calculate total wait seconds between start and end procs comments
-        function calculateWaitSeconds() {
-            const content = outputCode.value || originalContent;
-            if (!content) return 0;
-            
-            // Find the start and end comments
-            const startIndex = content.indexOf('// start procs');
-            const endIndex = content.indexOf('//end proccs');
-            
-            if (startIndex === -1 || endIndex === -1 || startIndex >= endIndex) {
-                return 0;
-            }
-            
-            // Extract the content between the comments
-            const procContent = content.substring(startIndex, endIndex);
-            
-            // Find all WAIT SECONDS= occurrences and sum them up
-            const waitRegex = /WAIT SECONDS=(\d+)/g;
-            let totalWait = 0;
-            let match;
-            
-            while ((match = waitRegex.exec(procContent)) !== null) {
-                totalWait += parseInt(match[1]);
-            }
-            
-            return totalWait;
-        }
-
-        // Update wait calculation display with minutes and seconds format
-        function updateWaitCalculation() {
-            const totalWait = calculateWaitSeconds();
-            const minutes = Math.floor(totalWait / 60);
-            const seconds = totalWait % 60;
-            
-            // Format as "X minutes Y seconds"
-            let formattedTime = '';
-            if (minutes > 0 && seconds > 0) {
-                formattedTime = `${minutes} minutes ${seconds} seconds`;
-            } else if (minutes > 0) {
-                formattedTime = `${minutes} minutes`;
-            } else {
-                formattedTime = `${seconds} seconds`;
-            }
-            
-            waitCalcDisplay.textContent = `Duration of the procces: ${formattedTime}`;
-        }
+        // Event listeners
+        $('open-btn').onclick = openFile;
+        $('save-btn').onclick = saveFile;
+        $('add-btn').onclick = addEntry;
+        $('add-pmta-btn').onclick = addEntry;
+        $('copy-btn').onclick = copyCode;
+        $('copy-btn-2').onclick = copyCode;
+        $('test-notification-btn').onclick = testNotification;
+        $('test-notification-btn-2').onclick = testNotification;
+        $('add-ip-btn').onclick = addIPEntry;
+        $('add-ipvols-btn').onclick = addIPvolsEntry;
+        $('remove-all-ip-btn').onclick = removeAllIPs;
+        $('remove-all-ipvols-btn').onclick = removeAllIPvols;
+        $('show-more-btn').onclick = toggleShowAllIPvols;
+        $('ip-list').onchange = updateIPListFromTextarea;
+        $('ipvols-list').onchange = updateIPvolsListFromTextarea;
         
-        // Event Listeners
-        openBtn.addEventListener('click', openFile);
-        saveBtn.addEventListener('click', saveChanges);
-        addEntryBtn.addEventListener('click', addNewEntry);
-        idmailerInput.addEventListener('change', updateIdmailer);
-        timefInput.addEventListener('change', updateTimefinish);
-        enableFinishTimeCheckbox.addEventListener('change', updateEnableFinishTime);
-        methodSendRadio.addEventListener('change', updateMethod);
-        methodTestRadio.addEventListener('change', updateMethod);
-        
-        // Update event listeners for schedule config
-        repeatTimesInput.addEventListener('change', function() {
-            scheduleRepeats = parseInt(this.value) || 2;
-            updateOutput();
+        ['timefinish', 'enablefinish', 'schedulewait', 'schedulerepeats', 'bottoken', 'chatid'].forEach(id => {
+            $(id).onchange = update;
         });
-        
-        waitSecondsInput.addEventListener('change', function() {
-            waitSeconds = parseInt(this.value) || 2;
-            updateOutput();
-        });
-        
-        // Initialize time input
-        function formatTimeForInput(timeStr) {
-            if (!timeStr) return "22:00:50";
-            const parts = timeStr.split(':');
-            if (parts.length === 3) {
-                return `${parts[0]}:${parts[1]}`;
-            }
-            return timeStr;
-        }
-        
-        function updateEnableFinishTime() {
-            enableFinishTime = enableFinishTimeCheckbox.checked;
-            timefInput.disabled = !enableFinishTime;
-            updateOutput();
-        }
-        
-        function updateMethod() {
-            methodType = document.querySelector('input[name="method"]:checked').value;
-            updateOutput();
-        }
-        
-        function updateTimefinish() {
-            const value = timefInput.value;
-            if (value) {
-                // Add seconds if not present
-                timefinish = value.includes(':') ? 
-                    (value.split(':').length === 2 ? `${value}:00` : value) : 
-                    "22:00:50";
-            }
-            updateOutput();
-        }
-        
-        function updateIdmailer() {
-            idmailer = idmailerInput.value;
-            updateOutput();
-        }
         
         async function openFile() {
             try {
                 [fileHandle] = await window.showOpenFilePicker({
-                    types: [{
-                        description: 'JavaScript Files',
-                        accept: {'application/javascript': ['.js']}
-                    }],
-                    multiple: false
+                    types: [{description: 'JavaScript', accept: {'application/javascript': ['.js']}}]
                 });
                 
                 const file = await fileHandle.getFile();
                 originalContent = await file.text();
                 
-                extractPmtaList(originalContent);
-                extractVariables(originalContent);
-                extractScheduleConfig(originalContent); // Extract schedule config from JS file
-                renderEntriesTable();
-                updateOutput();
+                parse();
+                loadInputs();
+                renderTable();
+                renderIPList();
+                renderIPvolsList();
+                generate();
                 
-                showNotification('File loaded successfully!', 'success');
-            } catch (err) {
-                if (err.name !== 'AbortError') {
-                    showNotification(`Error opening file: ${err.message}`, 'error');
-                }
-            }
-        }
-        
-        function extractPmtaList(jsContent) {
-            try {
-                const pmtaListRegex = /var pmtaList = (\[[\s\S]*?\];)/;
-                const match = jsContent.match(pmtaListRegex);
-                
-                if (match && match[1]) {
-                    pmtaListEntries = (new Function(`return ${match[1].replace(/;$/, '')}`))();
-                    // Ensure each entry has a nameprod property
-                    pmtaListEntries.forEach(entry => {
-                        if (!entry.nameprod) {
-                            entry.nameprod = '';
-                        }
-                    });
-                } else {
-                    showNotification('No pmtaList found in the file', 'error');
-                }
+                status('✅ File loaded successfully!', 'success');
             } catch (e) {
-                showNotification(`Error parsing pmtaList: ${e.message}`, 'error');
-                console.error(e);
-            }
-        }
-        
-        function extractVariables(jsContent) {
-            try {
-                // Extract idmailer
-                const idmailerMatch = jsContent.match(/var idmailer = "([^"]+)"/);
-                if (idmailerMatch && idmailerMatch[1]) {
-                    idmailer = idmailerMatch[1];
-                    idmailerInput.value = idmailer;
-                }
-                
-                // Extract timefinish
-                const timefinishMatch = jsContent.match(/var timefinish = "([^"]+)"/);
-                if (timefinishMatch && timefinishMatch[1]) {
-                    timefinish = timefinishMatch[1];
-                    timefInput.value = formatTimeForInput(timefinish);
-                }
-                
-                // Extract geoApiKey
-                const geoApiKeyMatch = jsContent.match(/var geoApiKey = "([^"]+)"/);
-                if (geoApiKeyMatch && geoApiKeyMatch[1]) {
-                    geoApiKey = geoApiKeyMatch[1];
-                }
-                
-                // Extract send
-                const sendMatch = jsContent.match(/var send = "([^"]+)"/);
-                if (sendMatch && sendMatch[1]) {
-                    send = sendMatch[1];
-                }
-                
-                // Extract test
-                const testMatch = jsContent.match(/var test = "([^"]+)"/);
-                if (testMatch && testMatch[1]) {
-                    test = testMatch[1];
-                }
-                
-                // Extract enableFinishTime
-                const enableFinishTimeMatch = jsContent.match(/var enableFinishTime = (true|false);/);
-                if (enableFinishTimeMatch) {
-                    enableFinishTime = enableFinishTimeMatch[1] === 'true';
-                    enableFinishTimeCheckbox.checked = enableFinishTime;
-                    timefInput.disabled = !enableFinishTime;
-                }
-                
-                // Extract method to determine radio button state
-                const methodMatch = jsContent.match(/var method="([^"]*)"/);
-                if (methodMatch) {
-                    const methodValue = methodMatch[1];
-                    // Check if method contains "test" or "send"
-                    if (methodValue.includes(test.replace('-', ''))) {
-                        methodType = "test";
-                        methodTestRadio.checked = true;
-                    } else {
-                        methodType = "send";
-                        methodSendRadio.checked = true;
-                    }
-                }
-            } catch (e) {
-                console.error("Error extracting variables:", e);
-            }
-        }
-        
-        function renderEntriesTable() {
-            entriesBody.innerHTML = '';
-            
-            pmtaListEntries.forEach((entry, index) => {
-                const row = document.createElement('tr');
-                
-                row.innerHTML = `
-                    <td class="edit-cell">
-                        <input type="text" value="${entry.nameprod || ''}" class="nameprod-input" 
-                               data-index="${index}" placeholder="Prod name">
-                    </td>
-                    <td class="edit-cell">
-                        <input type="time" value="${entry.targetTime}" step="1" 
-                               class="time-input" data-index="${index}">
-                    </td>
-                    <td class="edit-cell">
-                        <input type="text" value="${entry.url}" class="url-input" 
-                               data-index="${index}" placeholder="http://example.com">
-                    </td>
-                    <td class="action-buttons">
-                        <button class="remove-btn" data-index="${index}">🗑️ Remove</button>
-                    </td>
-                `;
-                
-                entriesBody.appendChild(row);
-            });
-            
-            // Add event listeners to all inputs
-            document.querySelectorAll('.nameprod-input').forEach(input => {
-                input.addEventListener('change', handleInputChange);
-            });
-            
-            document.querySelectorAll('.time-input').forEach(input => {
-                input.addEventListener('change', handleInputChange);
-            });
-            
-            document.querySelectorAll('.url-input').forEach(input => {
-                input.addEventListener('change', handleInputChange);
-            });
-            
-            document.querySelectorAll('.remove-btn').forEach(button => {
-                button.addEventListener('click', handleRemoveEntry);
-            });
-        }
-        
-        function handleInputChange(e) {
-            const index = parseInt(e.target.dataset.index);
-            const field = e.target.classList.contains('nameprod-input') ? 'nameprod' : 
-                         e.target.classList.contains('time-input') ? 'targetTime' : 'url';
-            
-            pmtaListEntries[index][field] = e.target.value;
-            updateOutput();
-        }
-        
-        function handleRemoveEntry(e) {
-            const index = parseInt(e.target.dataset.index);
-            if (confirm('Are you sure you want to remove this entry?')) {
-                pmtaListEntries.splice(index, 1);
-                renderEntriesTable();
-                updateOutput();
-            }
-        }
-        
-        function addNewEntry() {
-            const newEntry = {
-                nameprod: '',
-                targetTime: '00:00:00',
-                url: 'http://example.com'
-            };
-            pmtaListEntries.push(newEntry);
-            renderEntriesTable();
-            updateOutput();
-            
-            // Scroll to the new entry
-            const lastRow = entriesBody.lastChild;
-            lastRow.scrollIntoView({ behavior: 'smooth' });
-            
-            // Focus on the prod name field of the new entry
-            const newIndex = pmtaListEntries.length - 1;
-            setTimeout(() => {
-                document.querySelector(`.nameprod-input[data-index="${newIndex}"]`).focus();
-            }, 100);
-        }
-        
-        function updateOutput() {
-            if (!originalContent) return;
-            
-            // Generate the pmtaList section with exact iMacros syntax
-            let pmtaListString = 'var pmtaList = [\n';
-            
-            pmtaListEntries.forEach((entry, index) => {
-                pmtaListString += `    {\n        url: "${entry.url}"\n        ,targetTime: "${entry.targetTime}"`;
-                
-                if (entry.nameprod) {
-                    pmtaListString += `\n        ,nameprod: "${entry.nameprod}"`;
-                }
-                
-                pmtaListString += `\n    }`;
-                if (index < pmtaListEntries.length - 1) {
-                    pmtaListString += ',';
-                }
-                pmtaListString += '\n';
-            });
-            
-            pmtaListString += '];\n';
-            pmtaListString += `var idmailer = "${idmailer}";\n`;
-            pmtaListString += `var send = "${send}";\n`;
-            pmtaListString += `var test = "${test}";\n`;
-            pmtaListString += `var timefinish = "${timefinish}";\n`;
-            pmtaListString += `var geoApiKey = "${geoApiKey}";\n`;
-            pmtaListString += `var enableFinishTime = ${enableFinishTime};\n`;
-            
-            // First replace the variables in original content
-            let modifiedContent = originalContent;
-            
-            // Remove ALL variable declarations at once using a single regex
-            const variableBlockRegex = /var\s+(pmtaList|idmailer|send|test|timefinish|geoApiKey|enableFinishTime|method)\s*=[^;]+;/g;
-            modifiedContent = modifiedContent.replace(variableBlockRegex, '');
-            
-            // Remove multiple empty lines that might result from replacements
-            modifiedContent = modifiedContent.replace(/\n\s*\n\s*\n/g, '\n\n');
-            
-            // Combine the new variables with rest of content
-            let finalContent = pmtaListString + modifiedContent;
-            
-            // Now find and replace the jobid line based on radio button selection
-            const jobidSendRegex = /macro\s*\+= "TAG POS=1 TYPE=INPUT:TEXT ATTR=ID:jobid CONTENT="\s*\+\s*send\s*\+\s*""\s*\+\s*idmailer\s*\+\s*"\\n";/;
-            const jobidTestRegex = /macro\s*\+= "TAG POS=1 TYPE=INPUT:TEXT ATTR=ID:jobid CONTENT="\s*\+\s*test\s*\+\s*""\s*\+\s*idmailer\s*\+\s*"\\n";/;
-            
-            // Generate the correct jobid line based on radio button selection
-            const correctJobidLine = methodType === "send" 
-                ? `macro += "TAG POS=1 TYPE=INPUT:TEXT ATTR=ID:jobid CONTENT=" + send + "" + idmailer + "\\n";`
-                : `macro += "TAG POS=1 TYPE=INPUT:TEXT ATTR=ID:jobid CONTENT=" + test + "" + idmailer + "\\n";`;
-            
-            // Replace whichever jobid line exists with the correct one
-            if (jobidSendRegex.test(finalContent)) {
-                finalContent = finalContent.replace(jobidSendRegex, correctJobidLine);
-            } else if (jobidTestRegex.test(finalContent)) {
-                finalContent = finalContent.replace(jobidTestRegex, correctJobidLine);
-            } else {
-                // If no jobid line found, insert it at the appropriate location
-                const deleteSectionRegex = /(\/\/delete\s*\n[\s\S]*?macro\s*\+= "TAG POS=1 TYPE=BUTTON ATTR=ID:execute\\n";\s*\n\s*macro\s*\+= "WAIT SECONDS=\d+\\n";\s*\n)/;
-                const match = finalContent.match(deleteSectionRegex);
-                if (match) {
-                    const insertPosition = finalContent.indexOf(match[1]) + match[1].indexOf('macro += "WAIT SECONDS=');
-                    finalContent = finalContent.substring(0, insertPosition) + 
-                                   correctJobidLine + '\n        ' + 
-                                   finalContent.substring(insertPosition);
+                if (e.name !== 'AbortError') {
+                    status('❌ Error: ' + e.message, 'error');
                 }
             }
-            
-            // Now find and replace the schedule execution block between //execute and //delete
-            const executeCommentRegex = /\/\/execute\s*\n/;
-            const deleteCommentRegex = /\/\/delete\s*\n/;
-            
-            const executeMatch = finalContent.match(executeCommentRegex);
-            const deleteMatch = finalContent.match(deleteCommentRegex);
-            
-            if (executeMatch && deleteMatch) {
-                const executeIndex = finalContent.indexOf(executeMatch[0]) + executeMatch[0].length;
-                const deleteIndex = finalContent.indexOf(deleteMatch[0]);
-                
-                // Generate the new schedule block
-                let newScheduleBlock = '';
-                for (let i = 0; i < scheduleRepeats; i++) {
-                    newScheduleBlock += '        macro += "TAG POS=1 TYPE=BUTTON ATTR=ID:execute\\n";\n';
-                    newScheduleBlock += `        macro += "WAIT SECONDS=${waitSeconds}\\n";\n`;
-                }
-                
-                // Replace only the block between //execute and //delete
-                finalContent = finalContent.substring(0, executeIndex) + 
-                                newScheduleBlock + 
-                                finalContent.substring(deleteIndex);
-            }
-            
-            outputCode.value = finalContent;
-            
-            // Update wait calculation display
-            updateWaitCalculation();
         }
         
-        // Function to remove empty lines from content
-        function removeEmptyLines(content) {
-            return content
-                .split('\n')
-                .filter(line => line.trim() !== '')
-                .join('\n');
-        }
-        
-        // Function to show notification
-        function showNotification(message, type = 'info') {
-            const notification = document.createElement('div');
-            notification.className = `notification ${type}`;
-            
-            // Set icon based on notification type
-            let icon = 'ℹ️';
-            if (type === 'success') icon = '✅';
-            else if (type === 'error') icon = '❌';
-            else if (type === 'warning') icon = '⚠️';
-            
-            notification.innerHTML = `
-                <span class="notification-icon">${icon}</span>
-                <span>${message}</span>
-            `;
-            
-            notificationContainer.appendChild(notification);
-            
-            // Trigger animation
-            setTimeout(() => {
-                notification.classList.add('show');
-            }, 10);
-            
-            // Auto-hide after 2 seconds
-            setTimeout(() => {
-                notification.classList.remove('show');
-                setTimeout(() => {
-                    if (notification.parentNode) {
-                        notification.parentNode.removeChild(notification);
-                    }
-                }, 400);
-            }, 2000);
-        }
-        
-        async function saveChanges() {
+        async function saveFile() {
             if (!fileHandle) {
-                showNotification('No file opened to save', 'error');
+                status('❌ No file open', 'error');
                 return;
             }
             
             try {
-                updateOutput(); // Ensure we have the latest changes
-                
-                // Remove empty lines from the content
-                const cleanedContent = removeEmptyLines(outputCode.value);
-                
                 const writable = await fileHandle.createWritable();
-                await writable.write(cleanedContent);
+                await writable.write($('output').value);
                 await writable.close();
+                status('✅ File saved successfully!', 'success');
+            } catch (e) {
+                status('❌ Save failed: ' + e.message, 'error');
+            }
+        }
+        
+        async function copyCode() {
+            try {
+                await navigator.clipboard.writeText($('output').value);
+                status('✅ Code copied to clipboard!', 'success');
+            } catch (e) {
+                status('❌ Copy failed: ' + e.message, 'error');
+            }
+        }
+        
+        async function testNotification() {
+            if (!config.botToken || !config.chatId) {
+                status('⚠️ Please enter Bot Token and Chat ID first', 'warning');
+                return;
+            }
+            
+            try {
+                const message = encodeURIComponent("✅ Test notification from PMTA Editor Pro\n\nYour Telegram integration is working correctly!");
+                const url = `https://api.telegram.org/bot${config.botToken}/sendMessage?chat_id=${config.chatId}&text=${message}`;
                 
-                // Update originalContent to match saved version
-                originalContent = cleanedContent;
+                const response = await fetch(url);
+                const result = await response.json();
                 
-                showNotification('File saved successfully!', 'success');
-            } catch (err) {
-                showNotification(`Error saving file: ${err.message}`, 'error');
+                if (result.ok) {
+                    status('✅ Test notification sent!', 'success');
+                } else {
+                    status('❌ Failed: ' + result.description, 'error');
+                }
+            } catch (e) {
+                status('❌ Error: ' + e.message, 'error');
             }
         }
         
-        // Initialize inputs
-        idmailerInput.value = idmailer;
-        timefInput.value = formatTimeForInput(timefinish);
-        enableFinishTimeCheckbox.checked = enableFinishTime;
-        timefInput.disabled = !enableFinishTime;
-        repeatTimesInput.value = scheduleRepeats;
-        waitSecondsInput.value = waitSeconds;
-        
-        // Show initial notification
-        setTimeout(() => {
-            showNotification('For direct file saving, use Chrome/Edge and allow file access when prompted.', 'info');
-        }, 500);
-		// Prevent keyboard shortcuts for developer tools
-document.addEventListener('keydown', function(e) {
-    // Disable F12
-    if (e.key === 'F12') {
-        e.preventDefault();
-        return false;
-    }
-    
-    // Disable Ctrl+Shift+I (Chrome, Firefox)
-    if (e.ctrlKey && e.shiftKey && e.key === 'I') {
-        e.preventDefault();
-        return false;
-    }
-    
-    // Disable Ctrl+Shift+J (Chrome)
-    if (e.ctrlKey && e.shiftKey && e.key === 'J') {
-        e.preventDefault();
-        return false;
-    }
-    
-    // Disable Ctrl+U (View source)
-    if (e.ctrlKey && e.key === 'u') {
-        e.preventDefault();
-        return false;
-    }
-    
-    // Disable Ctrl+Shift+C (Inspect element)
-    if (e.ctrlKey && e.shiftKey && e.key === 'C') {
-        e.preventDefault();
-        return false;
-    }
-    
-    // Disable Ctrl+S (Save page)
-    if (e.ctrlKey && e.key === 's') {
-        e.preventDefault();
-        return false;
-    }
-});
-
-// Detect and prevent developer tools opening
-(function() {
-    let devtools = {
-        open: false,
-        orientation: null
-    };
-    
-    let threshold = 160;
-    
-    let emitEvent = function(state, orientation) {
-        window.dispatchEvent(new CustomEvent('devtoolschange', {
-            detail: {
-                open: state,
-                orientation: orientation
-            }
-        }));
-    };
-    
-    setInterval(function() {
-        let widthThreshold = window.outerWidth - window.innerWidth > threshold;
-        let heightThreshold = window.outerHeight - window.innerHeight > threshold;
-        let orientation = widthThreshold ? 'vertical' : 'horizontal';
-        
-        if (!(heightThreshold && widthThreshold) &&
-            ((window.Firebug && window.Firebug.chrome && window.Firebug.chrome.isInitialized) || widthThreshold || heightThreshold)) {
+        function parse() {
+            config.pmtaList = [];
+            config.ipList = ["92.118.151.116", "92.118.151.11", "92.118.151.111"];
+            config.ipvolsList = [{IP: "92.118.151.116", vol: "2600"}];
             
-            if (!devtools.open || devtools.orientation !== orientation) {
-                emitEvent(true, orientation);
+            // Parse pmtaList array
+            const pmtaMatch = originalContent.match(/var pmtaList = (\[[\s\S]*?\]);/);
+            if (pmtaMatch) {
+                try {
+                    config.pmtaList = eval(pmtaMatch[1]);
+                } catch (e) {
+                    console.error('Parse error:', e);
+                }
             }
             
-            devtools.open = true;
-            devtools.orientation = orientation;
-        } else {
-            if (devtools.open) {
-                emitEvent(false, null);
+            // Parse IP list from dataExtractor
+            const ipMatch = originalContent.match(/IP:\s*(\[[\s\S]*?\])/);
+            if (ipMatch) {
+                try {
+                    config.ipList = eval(ipMatch[1]);
+                } catch (e) {
+                    console.error('IP parse error:', e);
+                }
             }
             
-            devtools.open = false;
-            devtools.orientation = null;
+            // Parse IPvols list
+            const ipvolsMatch = originalContent.match(/var IPvols = (\[[\s\S]*?\]);/);
+            if (ipvolsMatch) {
+                try {
+                    config.ipvolsList = eval(ipvolsMatch[1]);
+                } catch (e) {
+                    console.error('IPvols parse error:', e);
+                }
+            }
+            
+            // Parse config object (new format)
+            const configMatch = originalContent.match(/var config = \{([\s\S]*?)\};/);
+            if (configMatch) {
+                try {
+                    // Parse timefinish
+                    const timeMatch = configMatch[1].match(/timefinish:\s*"([^"]*)"/);
+                    if (timeMatch) config.timefinish = timeMatch[1];
+                    
+                    // Parse enableFinishTime
+                    const enableMatch = configMatch[1].match(/enableFinishTime:\s*(true|false)/);
+                    if (enableMatch) config.enableFinishTime = enableMatch[1] === "true";
+                    
+                    // Parse telegram settings
+                    const botMatch = configMatch[1].match(/botToken:\s*"([^"]*)"/);
+                    if (botMatch) config.botToken = botMatch[1];
+                    
+                    const chatMatch = configMatch[1].match(/chatId:\s*"([^"]*)"/);
+                    if (chatMatch) config.chatId = chatMatch[1];
+                    
+                    // Parse macro settings
+                    const repeatsMatch = configMatch[1].match(/scheduleRepeats:\s*(\d+)/);
+                    if (repeatsMatch) config.scheduleRepeats = parseInt(repeatsMatch[1]);
+                    
+                    const waitMatch = configMatch[1].match(/scheduleWait:\s*(\d+)/);
+                    if (waitMatch) config.scheduleWait = parseInt(waitMatch[1]);
+                } catch (e) {
+                    console.error('Config parse error:', e);
+                }
+            } else {
+                // Fallback: Parse old format with separate variables
+                const parseVar = (name) => {
+                    const match = originalContent.match(new RegExp(`var ${name} = "([^"]*)"`));
+                    return match ? match[1] : "";
+                };
+                
+                config.timefinish = parseVar("timefinish") || "14:15:00";
+                
+                const enableMatch = originalContent.match(/var enableFinishTime = (true|false);/);
+                config.enableFinishTime = enableMatch ? enableMatch[1] === "true" : false;
+                
+                // Try to count schedule repeats from old format
+                const executePattern = /TAG POS=1 TYPE=BUTTON ATTR=ID:execute/g;
+                const matches = originalContent.match(executePattern);
+                config.scheduleRepeats = matches ? Math.min(matches.length, 360) : 3;
+                
+                const waitMatch = originalContent.match(/WAIT SECONDS=(\d+)/);
+                config.scheduleWait = waitMatch ? parseInt(waitMatch[1]) : 5;
+                
+                const botMatch = originalContent.match(/var botToken = "([^"]*)"/);
+                const chatMatch = originalContent.match(/var chatId = "([^"]*)"/);
+                
+                config.botToken = botMatch ? botMatch[1] : "";
+                config.chatId = chatMatch ? chatMatch[1] : "";
+            }
         }
-    }, 500);
-    
-    window.addEventListener('devtoolschange', function(event) {
-        if (event.detail.open) {
-            // Developer tools opened - redirect or show warning
-            document.body.innerHTML = '<div style="display:flex;justify-content:center;align-items:center;height:100vh;font-family:Arial,sans-serif;background:#f0f0f0;"><div style="text-align:center;padding:2rem;background:white;border-radius:10px;box-shadow:0 4px 6px rgba(0,0,0,0.1)"><h1 style="color:#e74c3c;">Developer Tools Detected</h1><p>Inspection is not allowed on this page.</p><p>Please close developer tools to continue.</p></div></div>';
+        
+        function loadInputs() {
+            $('timefinish').value = config.timefinish;
+            $('enablefinish').value = config.enableFinishTime.toString();
+            $('schedulewait').value = config.scheduleWait;
+            $('schedulerepeats').value = config.scheduleRepeats;
+            $('bottoken').value = config.botToken;
+            $('chatid').value = config.chatId;
+            $('ip-list').value = config.ipList.join('\n');
+            $('ipvols-list').value = config.ipvolsList.map(item => `${item.IP}:${item.vol}`).join('\n');
         }
-    });
-})();
-
-// Enable full text selection and editing capabilities
-document.addEventListener('DOMContentLoaded', function() {
-    // Enable text selection for the whole document
-    document.body.style.userSelect = 'text';
-    document.body.style.webkitUserSelect = 'text';
-    document.body.style.mozUserSelect = 'text';
-    document.body.style.msUserSelect = 'text';
-    
-    // Ensure textareas and inputs allow selection
-    const textInputs = document.querySelectorAll('textarea, input[type="text"], input[type="email"]');
-    textInputs.forEach(input => {
-        input.style.userSelect = 'text';
-        input.style.webkitUserSelect = 'text';
-        input.style.mozUserSelect = 'text';
-        input.style.msUserSelect = 'text';
-    });
-});
-
+        
+        function update() {
+            config.timefinish = $('timefinish').value;
+            config.enableFinishTime = $('enablefinish').value === "true";
+            config.scheduleWait = parseInt($('schedulewait').value) || 5;
+            config.scheduleRepeats = parseInt($('schedulerepeats').value) || 360;
+            config.botToken = $('bottoken').value;
+            config.chatId = $('chatid').value;
+            generate();
+        }
+        
+        function updateIPListFromTextarea() {
+            const text = $('ip-list').value.trim();
+            if (!text) {
+                config.ipList = [];
+                renderIPList();
+                generate();
+                return;
+            }
+            
+            // Split by new lines or commas, filter out empty strings, trim whitespace
+            config.ipList = text.split(/[\n,]+/)
+                .map(ip => ip.trim())
+                .filter(ip => ip.length > 0);
+            
+            renderIPList();
+            generate();
+        }
+        
+        function updateIPvolsListFromTextarea() {
+            const text = $('ipvols-list').value.trim();
+            if (!text) {
+                config.ipvolsList = [];
+                renderIPvolsList();
+                generate();
+                return;
+            }
+            
+            config.ipvolsList = [];
+            const lines = text.split(/[\n,]+/);
+            
+            for (const line of lines) {
+                const trimmed = line.trim();
+                if (trimmed.length === 0) continue;
+                
+                // Parse format: IP:Volume or IP\tVolume (using tab or colon as separator)
+                const parts = trimmed.split(/[: \t]+/); // Split by colon, space, or tab
+                
+                if (parts.length >= 2) {
+                    const ip = parts[0].trim();
+                    const vol = parts[1].trim();
+                    if (ip && vol) {
+                        config.ipvolsList.push({IP: ip, vol: vol});
+                    }
+                } else if (parts.length === 1 && parts[0].trim()) {
+                    // If there's only one part, treat it as IP with empty volume
+                    const ip = parts[0].trim();
+                    if (ip) {
+                        config.ipvolsList.push({IP: ip, vol: ''});
+                    }
+                }
+            }
+            
+            renderIPvolsList();
+            generate();
+        }
+        
+        function renderIPList() {
+            const container = $('ip-list-container');
+            const innerContainer = container.querySelector('div');
+            innerContainer.innerHTML = '';
+            
+            if (config.ipList.length === 0) {
+                innerContainer.innerHTML = '<div style="color: #64748b; font-style: italic; padding: 10px; text-align: center;">No IP addresses added</div>';
+                $('ip-count').textContent = '0';
+                return;
+            }
+            
+            config.ipList.forEach((ip, index) => {
+                const item = document.createElement('div');
+                item.className = 'ip-list-item';
+                item.innerHTML = `
+                    <input type="text" value="${ip}" data-index="${index}" placeholder="e.g., 92.118.151.116">
+                    <button class="danger" data-index="${index}">🗑️</button>
+                `;
+                innerContainer.appendChild(item);
+                
+                // Add event listeners
+                const input = item.querySelector('input');
+                const button = item.querySelector('button');
+                
+                input.onchange = (e) => {
+                    const idx = parseInt(e.target.dataset.index);
+                    config.ipList[idx] = e.target.value.trim();
+                    $('ip-list').value = config.ipList.join('\n');
+                    generate();
+                };
+                
+                button.onclick = (e) => {
+                    const idx = parseInt(e.target.dataset.index);
+                    if (confirm('Remove this IP address?')) {
+                        config.ipList.splice(idx, 1);
+                        $('ip-list').value = config.ipList.join('\n');
+                        renderIPList();
+                        generate();
+                    }
+                };
+            });
+            
+            $('ip-count').textContent = config.ipList.length;
+        }
+        
+        function renderIPvolsList() {
+            const container = $('ipvols-list-container');
+            const innerContainer = container.querySelector('div');
+            innerContainer.innerHTML = '';
+            
+            if (config.ipvolsList.length === 0) {
+                innerContainer.innerHTML = '<div style="color: #64748b; font-style: italic; padding: 10px; text-align: center;">No VoIP IPs added</div>';
+                $('ipvols-count').textContent = '0';
+                $('show-more-container').style.display = 'none';
+                return;
+            }
+            
+            const totalCount = config.ipvolsList.length;
+            const showCount = showAllIPvols ? totalCount : Math.min(5, totalCount);
+            
+            // Update show more container
+            const showMoreContainer = $('show-more-container');
+            const totalCountSpan = $('total-ipvols-count');
+            const showMoreBtn = $('show-more-btn');
+            
+            if (totalCount > 5) {
+                showMoreContainer.style.display = 'block';
+                totalCountSpan.textContent = totalCount;
+                showMoreBtn.textContent = showAllIPvols ? '👆 Show 5 Only' : '📖 Show All';
+            } else {
+                showMoreContainer.style.display = 'none';
+            }
+            
+            // Render items
+            config.ipvolsList.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = 'ipvols-list-item';
+                
+                // Hide items beyond the first 5 if not showing all
+                if (index >= 5 && !showAllIPvols) {
+                    div.classList.add('hidden');
+                }
+                
+                div.innerHTML = `
+                    <input type="text" value="${item.IP}" data-index="${index}" data-field="IP" placeholder="IP Address">
+                    <input type="text" value="${item.vol}" data-index="${index}" data-field="vol" placeholder="Volume">
+                    <button class="danger" data-index="${index}">🗑️</button>
+                `;
+                innerContainer.appendChild(div);
+                
+                // Add event listeners
+                const inputs = div.querySelectorAll('input');
+                const button = div.querySelector('button');
+                
+                inputs.forEach(input => {
+                    input.onchange = (e) => {
+                        const idx = parseInt(e.target.dataset.index);
+                        const field = e.target.dataset.field;
+                        config.ipvolsList[idx][field] = e.target.value.trim();
+                        // Update textarea with colon separator for consistency
+                        $('ipvols-list').value = config.ipvolsList.map(item => `${item.IP}:${item.vol}`).join('\n');
+                        generate();
+                    };
+                });
+                
+                button.onclick = (e) => {
+                    const idx = parseInt(e.target.dataset.index);
+                    if (confirm('Remove this VoIP IP?')) {
+                        config.ipvolsList.splice(idx, 1);
+                        $('ipvols-list').value = config.ipvolsList.map(item => `${item.IP}:${item.vol}`).join('\n');
+                        renderIPvolsList();
+                        generate();
+                    }
+                };
+            });
+            
+            $('ipvols-count').textContent = config.ipvolsList.length;
+        }
+        
+        function toggleShowAllIPvols() {
+            showAllIPvols = !showAllIPvols;
+            renderIPvolsList();
+        }
+        
+        function addIPEntry() {
+            config.ipList.push('');
+            $('ip-list').value = config.ipList.join('\n');
+            renderIPList();
+            generate();
+        }
+        
+        function addIPvolsEntry() {
+            config.ipvolsList.push({IP: '', vol: ''});
+            $('ipvols-list').value = config.ipvolsList.map(item => `${item.IP}:${item.vol}`).join('\n');
+            renderIPvolsList();
+            generate();
+        }
+        
+        function removeAllIPs() {
+            if (config.ipList.length === 0) {
+                status('⚠️ IP list is already empty', 'warning');
+                return;
+            }
+            
+            if (confirm('Are you sure you want to remove ALL IP addresses?')) {
+                config.ipList = [];
+                $('ip-list').value = '';
+                renderIPList();
+                generate();
+                status('✅ All IP addresses removed', 'success');
+            }
+        }
+        
+        function removeAllIPvols() {
+            if (config.ipvolsList.length === 0) {
+                status('⚠️ VoIP IP list is already empty', 'warning');
+                return;
+            }
+            
+            if (confirm('Are you sure you want to remove ALL VoIP IP addresses?')) {
+                config.ipvolsList = [];
+                $('ipvols-list').value = '';
+                showAllIPvols = false; // Reset to default view
+                renderIPvolsList();
+                generate();
+                status('✅ All VoIP IP addresses removed', 'success');
+            }
+        }
+        
+        function renderTable() {
+            const tbody = $('table-body');
+            tbody.innerHTML = '';
+            
+            if (config.pmtaList.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 20px; color: #64748b; font-style: italic;">
+                            No PMTA entries added. Click "Add" to create your first entry.
+                        </td>
+                    </tr>
+                `;
+                $('entry-count').textContent = '0';
+                return;
+            }
+            
+            config.pmtaList.forEach((item, i) => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td style="text-align:center;font-weight:bold">${i + 1}</td>
+                    <td class="edit-cell">
+                        <input type="time" step="1" value="${item.targetTime || '12:08:30'}" 
+                               data-index="${i}" data-field="targetTime">
+                    </td>
+                    <td class="edit-cell">
+                        <input type="text" value="${item.url || ''}" 
+                               data-index="${i}" data-field="url">
+                    </td>
+                    <td class="edit-cell">
+                        <input type="text" value="${item.nameprod || 'product' + (i + 1)}" 
+                               data-index="${i}" data-field="nameprod">
+                    </td>
+                    <td style="text-align:center">
+                        <button class="danger" data-index="${i}" style="height: 32px; padding: 0 10px;">🗑️</button>
+                    </td>
+                `;
+            });
+            
+            tbody.querySelectorAll('input').forEach(input => {
+                input.onchange = (e) => {
+                    const i = parseInt(e.target.dataset.index);
+                    const field = e.target.dataset.field;
+                    config.pmtaList[i][field] = e.target.value;
+                    generate();
+                };
+            });
+            
+            tbody.querySelectorAll('button.danger').forEach(button => {
+                button.onclick = (e) => {
+                    const i = parseInt(e.target.dataset.index);
+                    if (confirm('Remove this entry?')) {
+                        config.pmtaList.splice(i, 1);
+                        renderTable();
+                        generate();
+                    }
+                };
+            });
+            
+            updateStats();
+        }
+        
+        function addEntry() {
+            config.pmtaList.push({
+                url: "http://95.216.72.6:90/multi_monitor/list?q=example",
+                targetTime: "12:08:30",
+                nameprod: "product" + (config.pmtaList.length + 1)
+            });
+            renderTable();
+            generate();
+        }
+        
+        function updateStats() {
+            $('entry-count').textContent = config.pmtaList.length;
+            $('code-lines').textContent = $('output').value.split('\n').length;
+            $('ip-count').textContent = config.ipList.length;
+            $('ipvols-count').textContent = config.ipvolsList.length;
+            
+            const totalMinutes = config.pmtaList.length * config.scheduleRepeats * config.scheduleWait / 60;
+            $('total-time').textContent = Math.round(totalMinutes / 60 * 10) / 10 + 'h';
+        }
+        
+        function generate() {
+            let newContent = originalContent;
+            
+            // Replace pmtaList
+            const pmtaListStr = `var pmtaList = [
+    ${config.pmtaList.map(item => `{
+        url: "${item.url}",
+        targetTime: "${item.targetTime}",
+        nameprod: "${item.nameprod}"
+    }`).join(',\n    ')}
+];`;
+            
+            newContent = newContent.replace(/var pmtaList = \[[\s\S]*?\];/, pmtaListStr);
+            
+            // Replace IPvols list
+            const ipvolsListStr = `var IPvols = [
+    ${config.ipvolsList.map(item => `{
+        IP: "${item.IP}",
+        vol: "${item.vol}"
+    }`).join(',\n    ')}
+];`;
+            
+            // Check if IPvols list exists in original content
+            if (newContent.includes('var IPvols = [')) {
+                newContent = newContent.replace(/var IPvols = \[[\s\S]*?\];/, ipvolsListStr);
+            } else {
+                // Find the position after pmtaList and before config
+                const afterPmtaList = newContent.indexOf('var pmtaList = [');
+                if (afterPmtaList !== -1) {
+                    const pmtaListEnd = newContent.indexOf('];', afterPmtaList) + 2;
+                    const beforeConfig = newContent.substring(0, pmtaListEnd);
+                    const afterConfig = newContent.substring(pmtaListEnd);
+                    newContent = beforeConfig + '\n\n' + ipvolsListStr + afterConfig;
+                }
+            }
+            
+            // Replace IP list in dataExtractor
+            const ipListStr = `    IP: [
+        ${config.ipList.map(ip => `"${ip}"`).join(',\n        ')}
+    ],`;
+            
+            // Find and replace the IP array in dataExtractor
+            const ipRegex = /IP:\s*\[[\s\S]*?\],/;
+            if (ipRegex.test(newContent)) {
+                newContent = newContent.replace(ipRegex, ipListStr);
+            }
+            
+            // Check if new format (config object) exists
+            const hasConfigObject = newContent.includes('var config = {');
+            
+            if (hasConfigObject) {
+                // Replace config object
+                const configStr = `var config = {
+    timefinish: "${config.timefinish}",
+    geoApiKey: "67749947756e4891ad0fa24fae372533",
+    enableFinishTime: ${config.enableFinishTime},
+    telegram: {
+        botToken: "${config.botToken}",
+        chatId: "${config.chatId}"
+    },
+    macro: {
+        scheduleRepeats: ${config.scheduleRepeats},
+        scheduleWait: ${config.scheduleWait}
+    }
+};`;
+                
+                newContent = newContent.replace(/var config = \{[\s\S]*?\};/, configStr);
+            } else {
+                // Old format - replace individual variables
+                newContent = newContent.replace(/var timefinish = "[^"]*";/, `var timefinish = "${config.timefinish}";`);
+                newContent = newContent.replace(/var enableFinishTime = (true|false);/, `var enableFinishTime = ${config.enableFinishTime};`);
+                
+                if (newContent.includes('var botToken =')) {
+                    newContent = newContent.replace(/var botToken = "[^"]*";/, `var botToken = "${config.botToken}";`);
+                }
+                if (newContent.includes('var chatId =')) {
+                    newContent = newContent.replace(/var chatId = "[^"]*";/, `var chatId = "${config.chatId}";`);
+                }
+            }
+            
+            $('output').value = newContent;
+            updateStats();
+        }
+        
+        function status(msg, type) {
+            const el = $('status');
+            el.textContent = msg;
+            el.className = 'status ' + type;
+        }
+        
+        // Initialize
+        if (config.pmtaList.length === 0) {
+            config.pmtaList = [{
+                url: "http://95.216.72.6:90/multi_monitor/list?q=example",
+                targetTime: "12:08:30",
+                nameprod: "product1"
+            }];
+        }
+        
+        loadInputs();
+        renderTable();
+        renderIPList();
+        renderIPvolsList();
+        generate();
     </script>
 </body>
 </html>
