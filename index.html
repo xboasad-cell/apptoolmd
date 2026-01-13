@@ -5,128 +5,244 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GitHub Dashboard</title>
     <style>
+        /* RESET & BASE STYLES */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
         }
 
         :root {
-            --primary: #2a9d8f;
-            --secondary: #264653;
-            --accent: #e9c46a;
-            --accent2: #f4a261;
-            --accent3: #e76f51;
-            --text-light: #f8f9fa;
-            --text-dark: #343a40;
-            --card-bg: rgba(255, 255, 255, 0.1);
-            --hover-glow: 0 0 15px rgba(42, 157, 143, 0.5);
+            --primary: #FF6B6B;
+            --primary-light: #FF8E8E;
+            --secondary: #4ECDC4;
+            --accent: #FFD166;
+            --accent2: #06D6A0;
+            --accent3: #118AB2;
+            --bg-primary: #F7F9FC;
+            --bg-secondary: #FFFFFF;
+            --glass-bg: rgba(255, 255, 255, 0.9);
+            --glass-border: rgba(255, 255, 255, 0.3);
+            --text-dark: #2D3436;
+            --text-medium: #636E72;
+            --text-light: #B2BEC3;
+            --shadow-sm: 0 4px 6px rgba(50, 50, 93, 0.05), 0 1px 3px rgba(0, 0, 0, 0.08);
+            --shadow-md: 0 10px 20px rgba(50, 50, 93, 0.1), 0 6px 6px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 20px 40px rgba(50, 50, 93, 0.15), 0 15px 15px rgba(0, 0, 0, 0.1);
+            --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            --radius-sm: 8px;
+            --radius-md: 16px;
+            --radius-lg: 24px;
+            --radius-xl: 32px;
         }
 
         body {
-            background: linear-gradient(135deg, #1a2a3a, #0d1b2a);
-            color: var(--text-light);
-            line-height: 1.6;
+            background: linear-gradient(135deg, #F7F9FC 0%, #E3F2FD 50%, #F1F8FF 100%);
+            color: var(--text-dark);
             min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
         }
 
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(255, 107, 107, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(78, 205, 196, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(255, 209, 102, 0.1) 0%, transparent 50%);
+            z-index: -1;
+        }
+
+        /* CONTAINER */
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 30px;
+            position: relative;
+            z-index: 1;
         }
 
+        /* HEADER */
         header {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-bottom: 60px;
             padding: 20px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            margin-bottom: 30px;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 20px;
         }
 
         .logo {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 20px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            justify-content: center;
+            box-shadow: var(--shadow-md);
+            position: relative;
+            overflow: hidden;
         }
 
-        .logo img {
-            width: 40px;
-            height: 40px;
+        .logo::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: shimmer 3s infinite;
         }
 
-        .logo h1 {
-            font-size: 24px;
-            font-weight: 600;
-            background: linear-gradient(90deg, var(--primary), var(--accent2));
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo-text h1 {
+            font-size: 32px;
+            font-weight: 800;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
+            line-height: 1;
         }
 
+        .logo-text p {
+            color: var(--text-medium);
+            font-size: 14px;
+            margin-top: 5px;
+            font-weight: 500;
+        }
+
+        /* USER INFO */
         .user-info {
             display: flex;
             align-items: center;
-            gap: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            padding: 8px 15px;
-            border-radius: 20px;
+            gap: 15px;
+            background: var(--glass-bg);
             backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-xl);
+            padding: 12px 25px;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+        }
+
+        .user-info:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
         }
 
         .user-avatar {
-            width: 40px;
-            height: 40px;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary), var(--accent2));
             border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary), var(--accent3));
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-weight: bold;
+            font-weight: 700;
+            font-size: 20px;
+            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
         }
 
-        .dashboard-title {
-            margin-bottom: 30px;
+        .user-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-weight: 700;
+            color: var(--text-dark);
+            font-size: 16px;
+        }
+
+        .user-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 4px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--accent2);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .user-role {
+            font-size: 13px;
+            color: var(--text-medium);
+        }
+
+        /* HERO SECTION */
+        .hero-section {
             text-align: center;
+            margin-bottom: 70px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
-        .dashboard-title h2 {
-            font-size: 32px;
-            margin-bottom: 10px;
-            background: linear-gradient(90deg, var(--primary), var(--accent2));
+        .hero-title {
+            font-size: 56px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            line-height: 1.1;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent3));
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
+            background-size: 300% 300%;
+            animation: gradient 8s ease infinite;
         }
 
-        .dashboard-title p {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 18px;
-            max-width: 600px;
-            margin: 0 auto;
+        .hero-subtitle {
+            font-size: 20px;
+            color: var(--text-medium);
+            line-height: 1.6;
+            margin-bottom: 30px;
         }
 
+        /* CARDS GRID */
         .cards-container {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 25px;
-            margin-bottom: 40px;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 35px;
+            margin-bottom: 80px;
         }
 
+        /* CARD STYLES */
         .card {
-            background: var(--card-bg);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            padding: 25px;
-            transition: all 0.3s ease;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-lg);
+            padding: 35px;
+            transition: var(--transition);
             cursor: pointer;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             position: relative;
             overflow: hidden;
+            box-shadow: var(--shadow-md);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
         }
 
         .card::before {
@@ -134,186 +250,304 @@
             position: absolute;
             top: 0;
             left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, var(--primary), var(--accent2));
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
         }
 
         .card:nth-child(2)::before {
-            background: linear-gradient(90deg, var(--accent2), var(--accent3));
+            background: linear-gradient(90deg, var(--secondary), var(--accent2));
         }
 
         .card:nth-child(3)::before {
-            background: linear-gradient(90deg, var(--accent3), var(--primary));
-        }
-        
-        .card:nth-child(4)::before {
-            background: linear-gradient(90deg, var(--primary), var(--accent2));
+            background: linear-gradient(90deg, var(--accent), var(--primary));
         }
 
         .card:hover {
-            transform: translateY(-8px);
-            box-shadow: var(--hover-glow);
-            border-color: var(--primary);
+            transform: translateY(-15px) scale(1.02);
+            box-shadow: var(--shadow-lg);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
         }
 
         .card-icon {
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            border-radius: 12px;
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary), var(--accent2));
+            border-radius: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 20px;
-            color: white;
-            font-size: 28px;
+            margin-right: 20px;
+            box-shadow: 0 8px 20px rgba(255, 107, 107, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-icon::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
+        }
+
+        .card:hover .card-icon::after {
+            transform: translateX(100%);
         }
 
         .card:nth-child(2) .card-icon {
-            background: linear-gradient(135deg, var(--accent2), var(--accent3));
+            background: linear-gradient(135deg, var(--secondary), var(--accent3));
+            box-shadow: 0 8px 20px rgba(78, 205, 196, 0.3);
         }
 
         .card:nth-child(3) .card-icon {
-            background: linear-gradient(135deg, var(--accent3), var(--primary));
-        }
-        
-        .card:nth-child(4) .card-icon {
-            background: linear-gradient(135deg, var(--accent2), var(--primary));
+            background: linear-gradient(135deg, var(--accent), var(--primary));
+            box-shadow: 0 8px 20px rgba(255, 209, 102, 0.3);
         }
 
-        .card h3 {
-            font-size: 20px;
-            margin-bottom: 12px;
-            color: var(--text-light);
+        .card-title h3 {
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+        }
+
+        .card-tag {
+            display: inline-block;
+            padding: 6px 15px;
+            background: rgba(78, 205, 196, 0.1);
+            color: var(--secondary);
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .card:nth-child(2) .card-tag {
+            background: rgba(255, 209, 102, 0.1);
+            color: var(--accent);
+        }
+
+        .card:nth-child(3) .card-tag {
+            background: rgba(255, 107, 107, 0.1);
+            color: var(--primary);
+        }
+
+        .card-content {
+            margin-bottom: 30px;
+            flex-grow: 1;
         }
 
         .card p {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 15px;
-            margin-bottom: 20px;
-            line-height: 1.5;
+            color: var(--text-medium);
+            font-size: 16px;
+            line-height: 1.7;
+            margin-bottom: 25px;
         }
 
-        .card-link {
-            color: var(--accent);
-            text-decoration: none;
-            font-weight: 500;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.3s;
+        .card-features {
+            list-style: none;
+            margin-top: 20px;
         }
 
-        .card-link:hover {
-            color: var(--primary);
-            gap: 12px;
-        }
-
-        .recent-activity {
-            background: var(--card-bg);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            padding: 25px;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        .recent-activity h3 {
-            font-size: 20px;
-            margin-bottom: 20px;
-            color: var(--text-light);
+        .card-features li {
             display: flex;
             align-items: center;
             gap: 10px;
+            margin-bottom: 12px;
+            color: var(--text-medium);
+            font-size: 15px;
         }
 
-        .recent-activity h3::before {
-            content: '';
-            width: 6px;
-            height: 20px;
-            background: var(--primary);
-            border-radius: 3px;
-        }
-
-        .activity-list {
-            list-style-type: none;
-        }
-
-        .activity-item {
-            padding: 15px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            transition: all 0.3s;
-        }
-
-        .activity-item:hover {
-            background: rgba(255, 255, 255, 0.05);
-            padding-left: 10px;
-            border-radius: 6px;
-        }
-
-        .activity-item:last-child {
-            border-bottom: none;
-        }
-
-        .activity-icon {
+        .card-features li::before {
+            content: '✓';
+            color: var(--accent2);
+            font-weight: bold;
+            font-size: 14px;
             width: 24px;
             height: 24px;
-            background: var(--primary);
+            background: rgba(6, 214, 160, 0.1);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-size: 12px;
-            flex-shrink: 0;
         }
 
-        .activity-item:nth-child(2) .activity-icon {
-            background: var(--accent2);
+        .card-actions {
+            margin-top: auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        .activity-item:nth-child(3) .activity-icon {
-            background: var(--accent3);
-        }
-        
-        .activity-item:nth-child(4) .activity-icon {
-            background: var(--primary);
+        .card-link {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: var(--transition);
+            padding: 12px 25px;
+            background: rgba(255, 107, 107, 0.1);
+            border-radius: var(--radius-sm);
         }
 
-        footer {
-            margin-top: 40px;
-            padding: 20px 0;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        .card-link:hover {
+            background: rgba(255, 107, 107, 0.2);
+            transform: translateX(5px);
+        }
+
+        .card-link svg {
+            transition: var(--transition);
+        }
+
+        .card-link:hover svg {
+            transform: translateX(8px);
+        }
+
+        /* STATS SECTION */
+        .stats-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 60px;
+        }
+
+        .stat-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-lg);
+            padding: 30px;
             text-align: center;
-            color: rgba(255, 255, 255, 0.6);
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary-light), var(--primary));
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            color: white;
+            font-size: 24px;
+        }
+
+        .stat-card:nth-child(2) .stat-icon {
+            background: linear-gradient(135deg, var(--secondary), var(--accent3));
+        }
+
+        .stat-card:nth-child(3) .stat-icon {
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+        }
+
+        .stat-value {
+            font-size: 42px;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 10px;
+            line-height: 1;
+        }
+
+        .stat-label {
+            color: var(--text-medium);
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        /* FOOTER */
+        footer {
+            margin-top: 80px;
+            padding: 40px 0;
+            text-align: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .footer-content {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-lg);
+            padding: 40px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .footer-logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .footer-logo span {
+            font-size: 24px;
+            font-weight: 800;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .footer-text {
+            color: var(--text-medium);
+            font-size: 16px;
+            line-height: 1.7;
+            max-width: 600px;
+            margin: 0 auto 25px;
+        }
+
+        .footer-copyright {
+            color: var(--text-light);
             font-size: 14px;
+            margin-top: 20px;
         }
 
-        @media (max-width: 768px) {
-            .cards-container {
-                grid-template-columns: 1fr;
-            }
-            
-            header {
-                flex-direction: column;
-                gap: 15px;
-                text-align: center;
-            }
-            
-            .dashboard-title h2 {
-                font-size: 28px;
-            }
+        /* ANIMATIONS */
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
-        /* Animation for page load */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
         @keyframes fadeInUp {
             from {
                 opacity: 0;
-                transform: translateY(20px);
+                transform: translateY(40px);
             }
             to {
                 opacity: 1;
@@ -321,138 +555,417 @@
             }
         }
 
-        .card, .recent-activity {
-            animation: fadeInUp 0.5s ease forwards;
+        /* RESPONSIVE DESIGN */
+        @media (max-width: 1200px) {
+            .cards-container {
+                grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            }
+            
+            .hero-title {
+                font-size: 48px;
+            }
         }
 
-        .card:nth-child(2) {
-            animation-delay: 0.1s;
+        @media (max-width: 992px) {
+            .cards-container {
+                grid-template-columns: 1fr;
+                max-width: 600px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+            
+            header {
+                flex-direction: column;
+                gap: 25px;
+                text-align: center;
+            }
+            
+            .logo-section {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .hero-title {
+                font-size: 40px;
+            }
         }
 
-        .card:nth-child(3) {
-            animation-delay: 0.2s;
-        }
-        
-        .card:nth-child(4) {
-            animation-delay: 0.3s;
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .hero-title {
+                font-size: 36px;
+            }
+            
+            .hero-subtitle {
+                font-size: 18px;
+            }
+            
+            .card {
+                padding: 25px;
+            }
+            
+            .card-header {
+                flex-direction: column;
+                text-align: center;
+                gap: 20px;
+            }
+            
+            .card-icon {
+                margin-right: 0;
+            }
         }
 
-        .recent-activity {
-            animation-delay: 0.4s;
+        @media (max-width: 480px) {
+            .hero-title {
+                font-size: 32px;
+            }
+            
+            .user-info {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .stat-value {
+                font-size: 36px;
+            }
+        }
+
+        /* ANIMATION CLASSES */
+        .card, .stat-card, .hero-section {
+            animation: fadeInUp 0.8s ease forwards;
+            opacity: 0;
+        }
+
+        .card:nth-child(1) { animation-delay: 0.1s; }
+        .card:nth-child(2) { animation-delay: 0.2s; }
+        .card:nth-child(3) { animation-delay: 0.3s; }
+        .stat-card:nth-child(1) { animation-delay: 0.4s; }
+        .stat-card:nth-child(2) { animation-delay: 0.5s; }
+        .stat-card:nth-child(3) { animation-delay: 0.6s; }
+
+        /* FLOATING ELEMENTS */
+        .floating-element {
+            position: absolute;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            opacity: 0.1;
+            z-index: 0;
+            animation: float 20s ease-in-out infinite;
+        }
+
+        .floating-element:nth-child(1) {
+            width: 300px;
+            height: 300px;
+            top: -150px;
+            right: -150px;
+            animation-delay: 0s;
+        }
+
+        .floating-element:nth-child(2) {
+            width: 200px;
+            height: 200px;
+            bottom: 100px;
+            left: -100px;
+            animation-delay: -5s;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+        }
+
+        .floating-element:nth-child(3) {
+            width: 150px;
+            height: 150px;
+            bottom: -50px;
+            right: 20%;
+            animation-delay: -10s;
+            background: linear-gradient(135deg, var(--secondary), var(--accent3));
         }
     </style>
 </head>
 <body>
+    <!-- Floating Background Elements -->
+    <div class="floating-element"></div>
+    <div class="floating-element"></div>
+    <div class="floating-element"></div>
+    
     <div class="container">
         <header>
-            <div class="logo">
-                <svg height="32" aria-hidden="true" viewBox="0 0 16 16" version="1.1" width="32" data-view-component="true" fill="#2a9d8f">
-                    <path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"></path>
-                </svg>
-                <h1>GitHub Dashboard</h1>
+            <div class="logo-section">
+                <div class="logo">
+                    <svg height="36" aria-hidden="true" viewBox="0 0 16 16" version="1.1" width="36" fill="white">
+                        <path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"></path>
+                    </svg>
+                </div>
+                <div class="logo-text">
+                    <h1>GitHub Tools</h1>
+                    <p>Development Suite</p>
+                </div>
             </div>
-           
+
+            <div class="user-info">
+                <div class="user-avatar">MH</div>
+                <div class="user-details">
+                    <div class="user-name">Mohamed Htiti</div>
+                    <div class="user-status">
+                        <div class="status-dot"></div>
+                        <div class="user-role">Developer</div>
+                    </div>
+                </div>
+            </div>
         </header>
 
-        <section class="dashboard-title">
-            <h2>Welcome to Your Dashboard</h2>
+        <section class="hero-section">
+            <h1 class="hero-title">Developer Productivity Suite</h1>
+            <p class="hero-subtitle">Streamline your workflow with our powerful development tools. Everything you need in one beautiful dashboard.</p>
         </section>
+
+       
 
         <section class="cards-container">
             <!-- Clean Headers -->
             <div class="card" onclick="window.location.href='cleanheaders.html'">
-                <div class="card-icon">
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M14 2V8H20" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M16 13H8" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M16 17H8" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M10 9H9H8" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
+                <div class="card-header">
+                    <div class="card-icon">
+                        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M14 2V8H20" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M16 13H8" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M16 17H8" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div class="card-title">
+                        <h3>Clean Headers</h3>
+                        <span class="card-tag">Security</span>
+                    </div>
                 </div>
-                <h3>Clean Headers</h3>
-                <a href="cleanheaders.html" class="card-link">
-                    Open Clean Headers
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                </a>
+                <div class="card-content">
+                    <p>Optimize and secure your HTTP headers. Remove unnecessary headers and enhance security for your web applications.</p>
+                    <ul class="card-features">
+                        <li>Header validation & optimization</li>
+                        <li>Security enhancement tools</li>
+                        <li>Performance improvements</li>
+                    </ul>
+                </div>
+                <div class="card-actions">
+                    <a href="cleanheaders.html" class="card-link">
+                        Launch Tool
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </a>
+                </div>
             </div>
 
             <!-- Domain & Email Generator -->
             <div class="card" onclick="window.location.href='verification_email_and_open_web_site.html'">
-                <div class="card-icon">
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M9 10h6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M9 14h4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
+                <div class="card-header">
+                    <div class="card-icon">
+                        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M9 10h6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M9 14h4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div class="card-title">
+                        <h3>Domain & Email Generator</h3>
+                        <span class="card-tag">Utility</span>
+                    </div>
                 </div>
-                <h3>Domain & Email Generator</h3>
-                <a href="verification_email_and_open_web_site.html" class="card-link">
-                    Open Domain & Email Generator
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                </a>
+                <div class="card-content">
+                    <p>Generate domains and email addresses for testing purposes. Create realistic test data for your development projects.</p>
+                    <ul class="card-features">
+                        <li>Domain name generation</li>
+                        <li>Email address creation</li>
+                        <li>Test data validation</li>
+                    </ul>
+                </div>
+                <div class="card-actions">
+                    <a href="verification_email_and_open_web_site.html" class="card-link">
+                        Launch Tool
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </a>
+                </div>
             </div>
 
             <!-- PMTA List Editor -->
             <div class="card" onclick="window.location.href='PMTA_List_Editor.html'">
-                <div class="card-icon">
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M11 5H6C5.46957 5 4.96086 5.21071 4.58579 5.58579C4.21071 5.96086 4 6.46957 4 7V19C4 19.5304 4.21071 20.0391 4.58579 20.4142C4.96086 20.7893 5.46957 21 6 21H17C17.5304 21 18.0391 20.7893 18.4142 20.4142C18.7893 20.0391 19 19.5304 19 19V14" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M18.375 2.625C18.8973 2.10268 19.6027 1.8125 20.335 1.8125C21.0673 1.8125 21.7727 2.10268 22.295 2.625C22.8173 3.14732 23.1075 3.85268 23.1075 4.585C23.1075 5.31732 22.8173 6.02268 22.295 6.545L12 16.84L8 17.84L9 13.84L18.375 2.625Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
+                <div class="card-header">
+                    <div class="card-icon">
+                        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M11 5H6C5.46957 5 4.96086 5.21071 4.58579 5.58579C4.21071 5.96086 4 6.46957 4 7V19C4 19.5304 4.21071 20.0391 4.58579 20.4142C4.96086 20.7893 5.46957 21 6 21H17C17.5304 21 18.0391 20.7893 18.4142 20.4142C18.7893 20.0391 19 19.5304 19 19V14" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M18.375 2.625C18.8973 2.10268 19.6027 1.8125 20.335 1.8125C21.0673 1.8125 21.7727 2.10268 22.295 2.625C22.8173 3.14732 23.1075 3.85268 23.1075 4.585C23.1075 5.31732 22.8173 6.02268 22.295 6.545L12 16.84L8 17.84L9 13.84L18.375 2.625Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div class="card-title">
+                        <h3>PMTA List Editor</h3>
+                        <span class="card-tag">Email Tools</span>
+                    </div>
                 </div>
-                <h3>PMTA List Editor</h3>
-                <a href="PMTA_List_Editor.html" class="card-link">
-                    Open PMTA List Editor
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                </a>
-            </div>
-
-            <!-- Management Seeds -->
-            <div class="card" onclick="window.location.href='managementseeds.html'">
-                <div class="card-icon">
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M12 8v4l2 2" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M12 16h.01" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
+                <div class="card-content">
+                    <p>Edit and manage PowerMTA configuration lists. Organize and optimize your email server settings with this powerful editor.</p>
+                    <ul class="card-features">
+                        <li>Configuration management</li>
+                        <li>Bulk editing capabilities</li>
+                        <li>Syntax validation</li>
+                    </ul>
                 </div>
-                <h3>Management Seeds</h3>                <a href="managementseeds.html" class="card-link">
-                    Open Management Seeds
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                </a>
+                <div class="card-actions">
+                    <a href="PMTA_List_Editor.html" class="card-link">
+                        Launch Tool
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </a>
+                </div>
             </div>
         </section>
 
-        
-
         <footer>
-            <p>GitHub Dashboard &copy; 2025 mohamed htiti | All tools are available for your projects</p>
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <svg height="28" aria-hidden="true" viewBox="0 0 16 16" version="1.1" width="28" fill="#FF6B6B">
+                        <path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"></path>
+                    </svg>
+                    <span>GitHub Tools Suite</span>
+                </div>
+                <p class="footer-text">A comprehensive suite of developer tools designed to enhance productivity and streamline workflows. All tools are free to use and open for contributions.</p>
+                <p class="footer-copyright">© 2025 Mohamed Htiti | Developer Tools Dashboard</p>
+            </div>
         </footer>
     </div>
 
     <script>
-        // Add some interactivity
         document.addEventListener('DOMContentLoaded', function() {
+            // Card hover effects
             const cards = document.querySelectorAll('.card');
             
             cards.forEach(card => {
                 card.addEventListener('mouseenter', function() {
-                    this.style.transform = 'translateY(-8px)';
+                    this.style.transform = 'translateY(-15px) scale(1.02)';
+                    this.style.boxShadow = 'var(--shadow-lg)';
                 });
                 
                 card.addEventListener('mouseleave', function() {
-                    this.style.transform = 'translateY(0)';
+                    this.style.transform = 'translateY(0) scale(1)';
+                    this.style.boxShadow = 'var(--shadow-md)';
+                });
+                
+                // Click handling
+                card.addEventListener('click', function(e) {
+                    if (!e.target.closest('a')) {
+                        const link = this.querySelector('a');
+                        if (link) {
+                            window.location.href = link.href;
+                        }
+                    }
                 });
             });
+            
+            // Animate stats counters
+            const statValues = document.querySelectorAll('.stat-value');
+            statValues.forEach(stat => {
+                const target = stat.textContent;
+                let current = 0;
+                
+                // Handle different target values
+                let increment;
+                if (target === '3') {
+                    increment = 1;
+                } else if (target === '24/7') {
+                    stat.textContent = '0/0';
+                    increment = 1;
+                } else if (target === '100%') {
+                    increment = 5;
+                }
+                
+                const updateCounter = () => {
+                    if (current < 100) {
+                        if (target === '24/7') {
+                            stat.textContent = Math.round(current/4) + '/' + Math.round(current/3);
+                        } else if (target === '100%') {
+                            current += increment;
+                            stat.textContent = Math.round(current) + '%';
+                        } else {
+                            current += increment;
+                            stat.textContent = Math.round(current);
+                        }
+                        
+                        if (current < 100) {
+                            setTimeout(updateCounter, 50);
+                        } else {
+                            // Final values
+                            if (target === '24/7') {
+                                stat.textContent = '24/7';
+                            } else if (target === '100%') {
+                                stat.textContent = '100%';
+                            } else {
+                                stat.textContent = target;
+                            }
+                        }
+                    }
+                };
+                
+                setTimeout(updateCounter, 1000);
+            });
+            
+            // Add floating animation to cards on scroll
+            const observerOptions = {
+                threshold: 0.2,
+                rootMargin: '0px 0px -50px 0px'
+            };
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.animationPlayState = 'running';
+                    }
+                });
+            }, observerOptions);
+            
+            cards.forEach(card => {
+                observer.observe(card);
+            });
+            
+            // Add ripple effect to buttons
+            const links = document.querySelectorAll('.card-link');
+            links.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    
+                    const x = e.clientX - e.target.getBoundingClientRect().left;
+                    const y = e.clientY - e.target.getBoundingClientRect().top;
+                    
+                    const ripple = document.createElement('span');
+                    ripple.style.position = 'absolute';
+                    ripple.style.background = 'rgba(255, 255, 255, 0.5)';
+                    ripple.style.borderRadius = '50%';
+                    ripple.style.transform = 'scale(0)';
+                    ripple.style.animation = 'ripple 0.6s linear';
+                    ripple.style.left = x + 'px';
+                    ripple.style.top = y + 'px';
+                    
+                    this.appendChild(ripple);
+                    
+                    setTimeout(() => {
+                        ripple.remove();
+                    }, 600);
+                });
+            });
+            
+            // Add CSS for ripple animation
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes ripple {
+                    to {
+                        transform: scale(4);
+                        opacity: 0;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
         });
     </script>
 </body>
