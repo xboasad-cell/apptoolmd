@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -583,7 +582,7 @@
                 <button id="add-btn">➕ Add Entry</button>
                 <button id="copy-btn">📋 Copy Code</button>
                 <button id="test-notification-btn">📱 Test Alert</button>
-                <button> <a href="https://xboasad-cell.github.io/apptoolmd/downloadscriptjs.html" style="color:#fff;text-decoration: none;"> Download script</a> </button>
+				<button> <a href="https://xboasad-cell.github.io/apptoolmd/downloadscriptjs.html" style="color:#fff;text-decoration: none;"> Download script</a> </button>
                 <div class="spacer"></div>
                 <span class="badge">v2.0</span>
             </div>
@@ -740,6 +739,10 @@
                         <label>Chat ID</label>
                         <input type="text" id="chatid" placeholder="Enter chat ID">
                     </div>
+                    <div class="field">
+                        <label>Geo API Key</label>
+                        <input type="text" id="geoapikey" placeholder="Enter Geo API key" value="">
+                    </div>
                 </div>
                 <div style="text-align: center; margin-top: 15px;">
                     <button id="test-notification-btn-2" class="info" style="width: auto;">📱 Test Telegram Notification</button>
@@ -768,7 +771,8 @@
             scheduleWait: 5,
             scheduleRepeats: 360,
             botToken: "",
-            chatId: ""
+            chatId: "",
+            geoApiKey: ""
         };
         
         let showAllIPvols = false;
@@ -792,7 +796,7 @@
         $('ip-list').onchange = updateIPListFromTextarea;
         $('ipvols-list').onchange = updateIPvolsListFromTextarea;
         
-        ['timefinish', 'enablefinish', 'schedulewait', 'schedulerepeats', 'bottoken', 'chatid'].forEach(id => {
+        ['timefinish', 'enablefinish', 'schedulewait', 'schedulerepeats', 'bottoken', 'chatid', 'geoapikey'].forEach(id => {
             $(id).onchange = update;
         });
         
@@ -915,6 +919,10 @@
                     const enableMatch = configMatch[1].match(/enableFinishTime:\s*(true|false)/);
                     if (enableMatch) config.enableFinishTime = enableMatch[1] === "true";
                     
+                    // Parse geoApiKey
+                    const geoMatch = configMatch[1].match(/geoApiKey:\s*"([^"]*)"/);
+                    if (geoMatch) config.geoApiKey = geoMatch[1];
+                    
                     // Parse telegram settings
                     const botMatch = configMatch[1].match(/botToken:\s*"([^"]*)"/);
                     if (botMatch) config.botToken = botMatch[1];
@@ -939,6 +947,7 @@
                 };
                 
                 config.timefinish = parseVar("timefinish") || "14:15:00";
+                config.geoApiKey = parseVar("geoApiKey") || "67749947756e4891ad0fa24fae372533";
                 
                 const enableMatch = originalContent.match(/var enableFinishTime = (true|false);/);
                 config.enableFinishTime = enableMatch ? enableMatch[1] === "true" : false;
@@ -966,6 +975,7 @@
             $('schedulerepeats').value = config.scheduleRepeats;
             $('bottoken').value = config.botToken;
             $('chatid').value = config.chatId;
+            $('geoapikey').value = config.geoApiKey;
             $('ip-list').value = config.ipList.join('\n');
             $('ipvols-list').value = config.ipvolsList.map(item => `${item.IP}:${item.vol}`).join('\n');
         }
@@ -977,6 +987,7 @@
             config.scheduleRepeats = parseInt($('schedulerepeats').value) || 360;
             config.botToken = $('bottoken').value;
             config.chatId = $('chatid').value;
+            config.geoApiKey = $('geoapikey').value;
             generate();
         }
         
@@ -1340,7 +1351,7 @@
                 // Replace config object
                 const configStr = `var config = {
     timefinish: "${config.timefinish}",
-    geoApiKey: "67749947756e4891ad0fa24fae372533",
+    geoApiKey: "${config.geoApiKey}",
     enableFinishTime: ${config.enableFinishTime},
     telegram: {
         botToken: "${config.botToken}",
@@ -1357,6 +1368,10 @@
                 // Old format - replace individual variables
                 newContent = newContent.replace(/var timefinish = "[^"]*";/, `var timefinish = "${config.timefinish}";`);
                 newContent = newContent.replace(/var enableFinishTime = (true|false);/, `var enableFinishTime = ${config.enableFinishTime};`);
+                
+                if (newContent.includes('var geoApiKey =')) {
+                    newContent = newContent.replace(/var geoApiKey = "[^"]*";/, `var geoApiKey = "${config.geoApiKey}";`);
+                }
                 
                 if (newContent.includes('var botToken =')) {
                     newContent = newContent.replace(/var botToken = "[^"]*";/, `var botToken = "${config.botToken}";`);
