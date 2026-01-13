@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PMTA Script Download</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github-dark.min.css">
+    <title>Bot Configuration Guide</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
             margin: 0;
@@ -14,653 +14,275 @@
         }
         
         body {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            color: #333;
-            line-height: 1.6;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #f0f0f0;
             min-height: 100vh;
             padding: 20px;
+            line-height: 1.6;
         }
         
         .container {
+            max-width: 1200px;
             margin: 0 auto;
-            background-color: rgba(255, 255, 255, 0.95);
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            overflow: hidden;
         }
         
         header {
-            background: linear-gradient(to right, #2c3e50, #4a6491);
-            color: white;
-            padding: 30px;
             text-align: center;
+            padding: 30px 0;
+            margin-bottom: 30px;
         }
         
         h1 {
-            font-size: 2.5rem;
+            font-size: 2.8rem;
+            background: linear-gradient(90deg, #00b4db, #0083b0);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
             margin-bottom: 10px;
+            text-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
         
         .subtitle {
             font-size: 1.2rem;
-            opacity: 0.9;
-            margin-bottom: 20px;
-        }
-        
-        .description {
-            max-width: 800px;
+            color: #b0b0d0;
+            max-width: 700px;
             margin: 0 auto;
-            font-size: 1.1rem;
-            line-height: 1.7;
         }
         
-        .content {
-            padding: 30px;
+        .configuration-steps {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
         }
         
-        @media (max-width: 768px) {
-            .content {
-                grid-template-columns: 1fr;
-            }
-        }
-        
-        .download-section {
-            background-color: #f8f9fa;
-            border-radius: 8px;
+        .step-card {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
             padding: 25px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
         
-        .preview-section {
-            background-color: #f8f9fa;
-            border-radius: 8px;
-            padding: 25px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        .step-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
         }
         
-        h2 {
-            color: #2c3e50;
+        .step-header {
+            display: flex;
+            align-items: center;
             margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #eaeaea;
+        }
+        
+        .step-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #00b4db, #0083b0);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 1.4rem;
+        }
+        
+        .step-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .step-content {
+            margin-bottom: 20px;
+        }
+        
+        .step-content ol, .step-content ul {
+            padding-left: 20px;
+            margin: 15px 0;
+        }
+        
+        .step-content li {
+            margin-bottom: 8px;
+        }
+        
+        .api-key-display {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 12px 15px;
+            margin: 15px 0;
+            font-family: monospace;
+            word-break: break-all;
+            border-left: 4px solid #00b4db;
+        }
+        
+        .button-container {
+            text-align: center;
+            margin: 40px 0;
         }
         
         .download-btn {
-            display: inline-block;
-            background: linear-gradient(to right, #3498db, #2980b9);
+            display: inline-flex;
+            align-items: center;
+            background: linear-gradient(90deg, #00b4db, #0083b0);
             color: white;
-            padding: 14px 28px;
-            border-radius: 50px;
             text-decoration: none;
+            font-size: 1.2rem;
             font-weight: 600;
-            font-size: 1.1rem;
+            padding: 16px 35px;
+            border-radius: 50px;
+            box-shadow: 0 6px 20px rgba(0, 180, 219, 0.4);
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
-            margin-top: 15px;
         }
         
         .download-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(0, 180, 219, 0.6);
         }
         
-        .download-btn i {
-            margin-right: 8px;
+        .download-icon {
+            margin-right: 10px;
+            font-size: 1.4rem;
         }
         
-        .file-info {
-            background-color: white;
-            border-radius: 8px;
-            padding: 20px;
-            margin-top: 20px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        .note {
+            background: rgba(255, 193, 7, 0.1);
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            border-radius: 0 8px 8px 0;
+            margin-top: 30px;
         }
         
-        .file-info h3 {
-            color: #2c3e50;
-            margin-bottom: 10px;
-        }
-        
-        .file-info ul {
-            list-style-type: none;
-            padding-left: 0;
-        }
-        
-        .file-info li {
-            padding: 8px 0;
-            border-bottom: 1px solid #f0f0f0;
-        }
-        
-        .file-info li:last-child {
-            border-bottom: none;
-        }
-        
-        .code-container {
-            background-color: #2d3748;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        
-        .code-header {
-            background-color: #1a202c;
-            color: #e2e8f0;
-            padding: 12px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .code-title {
+        .note-title {
             font-weight: 600;
-        }
-        
-        .copy-btn {
-            background-color: #4a5568;
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: background-color 0.2s;
-        }
-        
-        .copy-btn:hover {
-            background-color: #2d3748;
-        }
-        
-        pre {
-            margin: 0;
-            padding: 20px;
-            overflow-x: auto;
-            max-height: 700px;
-            font-size: 0.9rem;
-        }
-        
-        code {
-            font-family: 'Courier New', monospace;
+            color: #ffc107;
+            margin-bottom: 5px;
         }
         
         footer {
             text-align: center;
-            padding: 20px;
-            color: #7f8c8d;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #a0a0c0;
             font-size: 0.9rem;
-            border-top: 1px solid #eaeaea;
-            margin-top: 30px;
         }
         
-        .features {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-top: 30px;
-        }
-        
-        .feature {
-            background-color: white;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-            text-align: center;
-        }
-        
-        .feature i {
-            font-size: 2rem;
-            color: #3498db;
-            margin-bottom: 15px;
-        }
-        
-        .feature h3 {
-            color: #2c3e50;
-            margin-bottom: 10px;
+        @media (max-width: 768px) {
+            .configuration-steps {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .step-card {
+                padding: 20px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>PMTA Automation Script</h1>
-         
+            <h1>Bot Configuration Guide</h1>
+            <p class="subtitle">Follow these steps to configure your Telegram bot and Geo API key for the script to work properly.</p>
         </header>
         
-        <div class="content">
-            <div class="download-section">
-                <h2>Download Script</h2>
-                <p>Get the complete JavaScript file for automating your PMTA operations. This script includes time synchronization, queue management, and execution scheduling.</p>
-                
-                <a href="#" class="download-btn" id="downloadBtn">
-                    <i>↓</i> Download PMTA_Script.js
-                </a>
-                
-                <div class="file-info">
-                    <h3>File Information</h3>
-                    <ul>
-                        <li><strong>Filename:</strong> PMTA_Script.js</li>
-                        <li><strong>Size:</strong> ~5.2 KB</li>
-                        <li><strong>Type:</strong> JavaScript</li>
-						<li><strong>Path :</strong> \Documents\iMacros\Macros</li>
-                    </ul>
+        <div class="configuration-steps">
+            <!-- Step 1: Telegram Bot Configuration -->
+            <div class="step-card">
+                <div class="step-header">
+                    <div class="step-icon">
+                        <i class="fab fa-telegram"></i>
+                    </div>
+                    <h2 class="step-title">1. Telegram Bot Setup</h2>
                 </div>
-                
-                
+                <div class="step-content">
+                    <p>You need to configure your Telegram bot by setting the <strong>bot token</strong> and <strong>chat ID</strong>:</p>
+                    <ol>
+                        <li>Open Telegram and search for <strong>@BotFather</strong></li>
+                        <li>Create a new bot using the <code>/newbot</code> command</li>
+                        <li>Follow the instructions and save the <strong>API token</strong> provided</li>
+                        <li>To get your <strong>Chat ID</strong>, send a message to your bot</li>
+                        <li>Visit <code>https://api.telegram.org/bot&lt;YOUR_TOKEN&gt;/getUpdates</code></li>
+                        <li>Find your <strong>chat ID</strong> in the response JSON</li>
+                    </ol>
+                    <div class="api-key-display">
+                        Bot Token: YOUR_BOT_TOKEN_HERE<br>
+                        Chat ID: YOUR_CHAT_ID_HERE
+                    </div>
+                </div>
             </div>
             
-            <div class="preview-section">
-                <h2>Code Preview</h2>
-                <p>Preview the JavaScript code before downloading. The script includes comprehensive error handling and logging.</p>
-                
-                <div class="code-container">
-                    <div class="code-header">
-                        <span class="code-title">PMTA_Script.js</span>
-                        <button class="copy-btn" id="copyBtn">Copy Code</button>
+            <!-- Step 2: Geo API Configuration -->
+            <div class="step-card">
+                <div class="step-header">
+                    <div class="step-icon">
+                        <i class="fas fa-globe"></i>
                     </div>
-                    <pre><code class="language-javascript" id="codePreview">// JavaScript code will be displayed here</code></pre>
+                    <h2 class="step-title">2. Geo API Key Setup</h2>
+                </div>
+                <div class="step-content">
+                    <p>To get your Geo API key, follow these steps:</p>
+                    <ol>
+                        <li>Go to <a href="https://app.ipgeolocation.io/signup" target="_blank" style="color: #00b4db;">ipgeolocation.io/signup</a> and create an account</li>
+                        <li>After registration, visit <a href="https://app.ipgeolocation.io/requestApiLogs" target="_blank" style="color: #00b4db;">ipgeolocation.io/requestApiLogs</a></li>
+                        <li>Copy your <strong>API key</strong> from the dashboard</li>
+                        <li>Click the <strong>"Request Logs"</strong> button to activate your key</li>
+                        <li>Replace the placeholder in the script with your actual API key</li>
+                    </ol>
+                    <div class="api-key-display">
+                       geoApiKey: "YOUR_GEO_API_KEY_HERE" 
+                    </div>
                 </div>
             </div>
         </div>
         
+        <div class="button-container">
+            <a href="https://drive.google.com/file/d/1SNhv2nOcSKiFmUyZal8wDcs2b_5NNGw1/view" class="download-btn" target="_blank">
+                <i class="fas fa-download download-icon"></i> Download Script
+            </a>
+        </div>
+        
+        <div class="note">
+            <div class="note-title">Important Notes:</div>
+            <ul>
+                <li>Keep your API keys and tokens secure - never share them publicly</li>
+                <li>After downloading the script, open it in a text editor and replace the placeholder values with your actual keys</li>
+                <li>The script requires both the Telegram bot configuration and the Geo API key to function properly</li>
+                <li>Make sure to click "Request Logs" on the ipgeolocation website to activate your API key</li>
+            </ul>
+        </div>
+        
         <footer>
-            <p>PMTA Automation Script &copy; 2023 | For educational and testing purposes</p>
+            <p>Configuration Guide &copy; 2023 | Follow the steps carefully for proper setup</p>
         </footer>
     </div>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    
     <script>
-// The JavaScript code to display
-//--------------------------end script download
-        const scriptCode = `var pmtaList = [
-    {
-        url: "http://example.com"
-        ,targetTime: "00:00:00"
-        ,nameprod: "FF"
-    }
-];
-var idmailer = "1111";
-var send = "send-gmail-";
-var test = "test_ips-gmail-";
-var timefinish = "18:20:00";
-var geoApiKey = "67749947756e4891ad0fa24fae372533";
-var enableFinishTime = false;
-// Cache for current time to avoid repeated API calls
-var cachedTime = null;
-var lastTimeUpdate = 0;
-var timeCacheDuration = 30000; // Cache time for 30 seconds
-function zeroPad(num, length) {
-    var str = num.toString();
-    while (str.length < length) {
-        str = "0" + str;
-    }
-    return str;
-}
-// Simple alert replacement for logging
-function log(message) {
-    iimDisplay(message);
-    iimSet("message", message);
-    iimPlay("CODE:SET !EXTRACT {{message}}");
-}
-function getCurrentUTCTime() {
-    // Use cached time if it's still valid
-    var currentTime = new Date().getTime();
-    if (cachedTime && (currentTime - lastTimeUpdate) < timeCacheDuration) {
-        return cachedTime;
-    }
-    var apiUrl = "https://api.ipgeolocation.io/timezone?apiKey=" + geoApiKey + "&lat=33.5731&long=-7.5898"; // Coordinates for Morocco
-    try {
-        var macroGetTime = "";
-        macroGetTime += "CODE:\\n";
-        macroGetTime += "SET !ERRORIGNORE YES\\n";
-        macroGetTime += "WAIT SECONDS=2\\n";
-        macroGetTime += "URL GOTO=" + apiUrl + "\\n";
-        macroGetTime += "WAIT SECONDS=2\\n";
-        macroGetTime += "TAG POS=1 TYPE=PRE ATTR=* EXTRACT=TXT\\n";
-        macroGetTime += "SET !ERRORIGNORE NO\\n";
-        iimPlay(macroGetTime);
-        var apiResponse = iimGetLastExtract();
-        if (apiResponse) {
-            // Clean up the response
-            var jsonString = apiResponse.trim();
-            var jsonStart = jsonString.indexOf('{');
-            var jsonEnd = jsonString.lastIndexOf('}') + 1;
-            jsonString = jsonString.substring(jsonStart, jsonEnd);
-            try {
-                var timeData = JSON.parse(jsonString);
-                // Extract UTC time directly from the response
-                var utcTime = new Date(timeData.date_time_wti).toUTCString();
-                var utcTimeParts = utcTime.match(/(\\d{2}:\\d{2}:\\d{2})/);
-                if (utcTimeParts && utcTimeParts[0]) {
-                    cachedTime = utcTimeParts[0];
-                    lastTimeUpdate = currentTime;
-                    return cachedTime;
-                }
-            } catch (e) {
-                log("Error parsing time data: " + e);
-            }
-        }
-    } catch (e) {
-        log("Error getting time from ipgeolocation.io: " + e);
-    }
-    // Fallback to local time if API fails
-    var now = new Date();
-    cachedTime = zeroPad(now.getUTCHours(), 2) + ":" + 
-                 zeroPad(now.getUTCMinutes(), 2) + ":" + 
-                 zeroPad(now.getUTCSeconds(), 2);
-    lastTimeUpdate = currentTime;
-    return cachedTime;
-}
-// Function to add hours to a time string
-function addHoursToTime(timeString, hoursToAdd) {
-    // Split the time string into hours, minutes, seconds
-    var parts = timeString.split(':');
-    var hours = parseInt(parts[0]);
-    var minutes = parts[1];
-    var seconds = parts[2];
-    // Add hours, handling overflow (24-hour format)
-    hours = (hours + hoursToAdd) % 24;
-    if (hours < 0) hours += 24;
-    // Format hours back to two digits
-    hours = zeroPad(hours, 2);
-    // Return the new time string
-    return hours + ":" + minutes + ":" + seconds;
-}
-// Check if current time has reached timefinish
-function hasReachedTimeFinish() {
-    var currentTime = getCurrentUTCTime();
-    var currentParts = currentTime.split(":");
-    var finishParts = timefinish.split(":");
-    if (currentParts.length < 2 || finishParts.length < 2) return false;
-    var currentDate = new Date();
-    currentDate.setUTCHours(parseInt(currentParts[0]));
-    currentDate.setUTCMinutes(parseInt(currentParts[1]));
-    currentDate.setUTCSeconds(parseInt(currentParts[2] || "0"));
-    var finishDate = new Date();
-    finishDate.setUTCHours(parseInt(finishParts[0]));
-    finishDate.setUTCMinutes(parseInt(finishParts[1]));
-    finishDate.setUTCSeconds(parseInt(finishParts[2] || "0"));
-    return currentDate >= finishDate;
-}
-// Calculate time remaining until target time (in seconds)
-function calculateTimeRemaining(target) {
-    var currentTimeStr = getCurrentUTCTime();
-    log("Current UTC time: " + currentTimeStr);
-    log("Target time: " + target);
-    var currentParts = currentTimeStr.split(":");
-    var targetParts = target.split(":");
-    // Validate time format
-    if (currentParts.length < 2 || targetParts.length < 2) {
-        throw new Error("Invalid time format");
-    }
-    // Create date objects using current time
-    var currentDate = new Date();
-    currentDate.setUTCHours(parseInt(currentParts[0]));
-    currentDate.setUTCMinutes(parseInt(currentParts[1]));
-    currentDate.setUTCSeconds(parseInt(currentParts[2] || "0"));
-    var targetDate = new Date();
-    targetDate.setUTCHours(parseInt(targetParts[0]));
-    targetDate.setUTCMinutes(parseInt(targetParts[1]));
-    targetDate.setUTCSeconds(parseInt(targetParts[2] || "0"));
-    // If target time is earlier than current time, add one day
-    if (targetDate <= currentDate) {
-        targetDate.setUTCDate(targetDate.getUTCDate() + 1);
-    }
-    var diffMs = targetDate - currentDate;
-    return Math.floor(diffMs / 1000); // Return seconds
-}
-// Helper function to check if we should stop execution
-function shouldStopExecution() {
-    if (!enableFinishTime) return false;
-    if (hasReachedTimeFinish()) {
-        log("Finish time reached. Stopping execution.");
-        return true;
-    }
-    var timeRemaining = calculateTimeRemaining(timefinish);
-    // STOP if remaining time is LESS than 3600 seconds (1 hour)
-    if (timeRemaining < 3600) {
-        log("Finish time is less than 1 hour away (" + timeRemaining + " seconds). Stopping execution.");
-        return true;
-    }
-    return false;
-}
-// Execute the PMTA macro with optimized time checking
-function executeMacro(pmtaUrl, targetTime, prod, lastpmta) {
-    try {
-        // Get time once at the beginning and reuse it
-        var currentTimeStr = getCurrentUTCTime();
-        log("Current UTC time: " + currentTimeStr);
-        log("Target time: " + targetTime);
-        var currentParts = currentTimeStr.split(":");
-        var targetParts = targetTime.split(":");
-        // Create date objects using current time
-        var currentDate = new Date();
-        currentDate.setUTCHours(parseInt(currentParts[0]));
-        currentDate.setUTCMinutes(parseInt(currentParts[1]));
-        currentDate.setUTCSeconds(parseInt(currentParts[2] || "0"));
-        var targetDate = new Date();
-        targetDate.setUTCHours(parseInt(targetParts[0]));
-        targetDate.setUTCMinutes(parseInt(targetParts[1]));
-        targetDate.setUTCSeconds(parseInt(targetParts[2] || "0"));
-        // If target time is earlier than current time, add one day
-        if (targetDate <= currentDate) {
-            targetDate.setUTCDate(targetDate.getUTCDate() + 1);
-        }
-        var diffMs = targetDate - currentDate;
-        var timeRemaining = Math.floor(diffMs / 1000);
-        var waitSeconds = timeRemaining - 3640; 
-        if (waitSeconds < 0) {
-            log("Target time has already passed or is within the preparation window. Executing immediately.");
-            waitSeconds = 0;
-        }
-        var namep = "Prod__:__" + prod + "__" + targetTime;
-        // Format the wait time for display
-        var hours = Math.floor(waitSeconds / 3600);
-        var minutes = Math.floor((waitSeconds % 3600) / 60);
-        var seconds = waitSeconds % 60;
-        log("Waiting " + waitSeconds + " seconds (" + hours + "h " + minutes + "m " + seconds + "s) until execution... \\n"+currentDate+"\\n"+"Prod : "+prod+"\\n"+"Time : "+targetTime);
-        var macro = "";
-        macro += "CODE:\\n";
-        macro += "SET !ERRORIGNORE YES\\n";
-        macro += "TAB T=1\\n"; 
-        macro += "WAIT SECONDS=3\\n"; 
-        macro += "URL GOTO=" + lastpmta + "\\n"; 
-\t\tmacro += "WAIT SECONDS=2\\n"; 
-        // Use single WAIT command instead of breaking into chunks to avoid interruptions
-        if (waitSeconds > 0) {
-            macro += "WAIT SECONDS=" + waitSeconds + "\\n";
-        }
-        macro += "URL GOTO=" + pmtaUrl + "\\n"; 
-\t\t// start procs
-        macro += "WAIT SECONDS=2\\n";     
-        macro += "TAG POS=1 TYPE=A ATTR=TXT:Run<SP>Cmds\\n";
-        macro += "WAIT SECONDS=1\\n";     
-        macro += "FRAME F=1\\n";
-        macro += "WAIT SECONDS=1\\n"; 
-        macro += "TAG POS=1 TYPE=SPAN ATTR=TXT:delete<SP>--queue=[domain]/[vmta]\\n";
-        macro += "WAIT SECONDS=1\\n"; 
-        macro += "TAG POS=3 TYPE=INPUT:CHECKBOX ATTR=NAME:cmds[] CONTENT=YES\\n";
-        macro += "WAIT SECONDS=1\\n";    
-        macro += "TAG POS=1 TYPE=SPAN ATTR=TXT:reset<SP>counters\\n";
-        macro += "WAIT SECONDS=1\\n"; \t
-        macro += "TAG POS=6 TYPE=INPUT:CHECKBOX ATTR=NAME:cmds[] CONTENT=YES\\n";
-        macro += "WAIT SECONDS=1\\n"; \t\t
-        macro += "TAG POS=1 TYPE=BUTTON ATTR=ID:execute\\n";
-\t\tmacro += "WAIT SECONDS=1\\n";
-\t\tmacro += "TAG POS=1 TYPE=SPAN ATTR=TXT:set<SP>queue<SP>--mode=normal<SP>[domain]/[vmta]\\n";
-\t\tmacro += "TAG POS=8 TYPE=INPUT:CHECKBOX ATTR=NAME:cmds[] CONTENT=YES\\n";
-\t\tmacro += "WAIT SECONDS=1\\n";
-\t\tmacro += "TAG POS=1 TYPE=BUTTON ATTR=ID:execute\\n";
-\t\tmacro += "WAIT SECONDS=1\\n";
-\t\tmacro += "TAG POS=1 TYPE=BUTTON ATTR=ID:execute\\n";
-\t\tmacro += "TAG POS=8 TYPE=SPAN ATTR=*\\n";
-\t\tmacro += "TAG POS=1 TYPE=INPUT:CHECKBOX ATTR=TYPE:checkbox&&CLASS:pmta&&NAME:cmds[]&&VALUE:QUEUE_MODE_NORMAL CONTENT=NO\\n";
-        macro += "WAIT SECONDS=20\\n";  
-        //------------------------------------
-        macro += "TAG POS=1 TYPE=SPAN ATTR=TXT:delete<SP>--queue=[domain]/[vmta]\\n";
-        macro += "WAIT SECONDS=1\\n"; 
-        macro += "TAG POS=3 TYPE=INPUT:CHECKBOX ATTR=NAME:cmds[] CONTENT=NO\\n";
-        macro += "WAIT SECONDS=1\\n"; 
-        macro += "TAG POS=1 TYPE=SPAN ATTR=TXT:reset<SP>counters\\n";
-        macro += "WAIT SECONDS=1\\n"; 
-        macro += "TAG POS=6 TYPE=INPUT:CHECKBOX ATTR=NAME:cmds[] CONTENT=NO\\n";
-        macro += "WAIT SECONDS=1\\n"; 
-        macro += "TAG POS=1 TYPE=SPAN ATTR=TXT:schedule<SP>[domain]/[vmta]\\n";
-        macro += "WAIT SECONDS=1\\n"; 
-        macro += "TAG POS=5 TYPE=INPUT:CHECKBOX ATTR=NAME:cmds[] CONTENT=YES\\n";
-        macro += "WAIT SECONDS=3\\n"; 
-        //------------------------------------------
-        //execute
-        macro += "TAG POS=1 TYPE=BUTTON ATTR=ID:execute\\n";
-        macro += "WAIT SECONDS=1\\n";
-//delete
-\t\tmacro += "WAIT SECONDS=60\\n";
-\t\tmacro += "TAG POS=1 TYPE=SPAN ATTR=TXT:set<SP>queue<SP>--mode=normal<SP>[domain]/[vmta]\\n";
-\t\tmacro += "TAG POS=8 TYPE=INPUT:CHECKBOX ATTR=NAME:cmds[] CONTENT=YES\\n";
-\t\tmacro += "WAIT SECONDS=1\\n";
-\t\tmacro += "TAG POS=1 TYPE=BUTTON ATTR=ID:execute\\n";
-\t\tmacro += "WAIT SECONDS=1\\n";
-\t\tmacro += "TAG POS=1 TYPE=BUTTON ATTR=ID:execute\\n";
-\t\tmacro += "WAIT SECONDS=60\\n";
-        macro += "FRAME F=1\\n";
-        macro += "WAIT SECONDS=2\\n";  
-        macro += "TAG POS=1 TYPE=SPAN ATTR=TXT:delete<SP>--jobId=[jobid] EXTRACT=HTM\\n"; 
-        macro += "WAIT SECONDS=2\\n"; 
-        macro += "TAG POS=4 TYPE=INPUT:CHECKBOX ATTR=NAME:cmds[] CONTENT=YES\\n";       
-        macro += "WAIT SECONDS=2\\n"; 
-        macro += "TAG POS=1 TYPE=INPUT:TEXT ATTR=ID:jobid CONTENT=" + send + "" + idmailer + "\\n";
-        macro += "WAIT SECONDS=2\\n"; 
-        macro += "TAG POS=1 TYPE=BUTTON ATTR=ID:execute\\n";
-        macro += "WAIT SECONDS=2\\n";
-        macro += "TAG POS=1 TYPE=BUTTON ATTR=ID:execute\\n";
-        macro += "WAIT SECONDS=2\\n";     
-        macro += "TAG POS=1 TYPE=BUTTON ATTR=ID:execute\\n";
-\t\t//end proccs
-        macro += "WAIT SECONDS=5\\n";  
-        macro += "URL GOTO=" + pmtaUrl + "\\n"; 
-        macro += "SET !ERRORIGNORE NO\\n";
-        iimPlay(macro);
-    } catch (e) {
-        log("Error in executeMacro: " + e);
-    }
-}
-// Show prompt message using iMacros
-function showPrompt(message) {
-    var promptMacro = "CODE:\\n";
-    promptMacro += "PROMPT \\"" + message + "\\"\\n";
-    iimPlay(promptMacro);
-}
-// Main execution with auto-repeat
-function main() {
-    try {
-        log("Script started");
-        var utcTime = getCurrentUTCTime();
-        log("Current UTC time: " + utcTime);
-        var iteration = 0;
-        var shouldContinue = true;
-        while (shouldContinue) {
-            iteration++;
-            log("Starting iteration " + iteration);
-            // Check if finish time is enabled and condition is met
-            if (enableFinishTime) {
-                log("Finish time is enabled. Checking finish time condition.");
-                // Check if finish time has already passed
-                if (hasReachedTimeFinish()) {
-                    log("Finish time has already passed. Exiting script.");
-                    showPrompt("Finish time has already passed. Script stopped.");
-                    shouldContinue = false;
-                    break;
-                }
-                var timeRemaining = calculateTimeRemaining(timefinish);
-                // STOP if remaining time is LESS than 3600 seconds (1 hour)
-                if (timeRemaining < 7200) {
-                    log("Finish time is less than 1 hour away (" + timeRemaining + " seconds). Exiting script.");
-                    showPrompt("Finish time is less than 1 hour away. Script stopped.");
-                    shouldContinue = false;
-                    break;
-                }
-                log("Finish time is " + timeRemaining + " seconds away (more than 1 hour). Continuing execution.");
-            } else {
-                log("Finish time is disabled. Will run only once.");
-                shouldContinue = false; // Run only once if finish time is disabled
-            }
-            // Process all PMTA entries for this iteration
-            for (var i = 0; i < pmtaList.length; i++) {
-                var item = pmtaList[i];
-                // For enabled finish time, add hours to target time based on iteration
-                var executionTime = enableFinishTime ? 
-                    addHoursToTime(item.targetTime, iteration - 1) : 
-                    item.targetTime;
-                var lastpmta = (i == 0) ? item.url : pmtaList[i-1].url;
-                log("Processing item " + (i+1) + " with target time: " + executionTime);
-                try {
-                    executeMacro(item.url, executionTime, item.nameprod, lastpmta);
-                    // Check again after each execution (only if finish time is enabled)
-                    if (enableFinishTime && shouldStopExecution()) {
-                        log("Stopping script due to finish time condition after execution.");
-                        shouldContinue = false;
-                        break;
-                    }
-                } catch (e) {
-                    log("Error processing item " + (i+1) + ": " + e);
-                }
-            }
-            // If we're continuing, wait before next iteration (optional)
-            if (shouldContinue) {
-                log("Waiting before next iteration...");
-                // You can add a wait here if needed between iterations
-                // iimPlay("CODE:WAIT SECONDS=60"); // Wait 60 seconds between iterations
-            }
-        }
-        log("Script execution completed.");
-    } catch (e) {
-        log("Error in main function: " + e);
-    }
-}
-main();`;
-//--------------------------end script download
-        // Display the code with syntax highlighting
-        document.getElementById('codePreview').textContent = scriptCode;
-        hljs.highlightAll();
-        
-        // Download functionality
-        document.getElementById('downloadBtn').addEventListener('click', function(e) {
-            e.preventDefault();
-            
-            // Create a blob with the JavaScript content
-            const blob = new Blob([scriptCode], { type: 'application/javascript' });
-            const url = URL.createObjectURL(blob);
-            
-            // Create a temporary link to trigger the download
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'PMTA_Script.js';
-            document.body.appendChild(a);
-            a.click();
-            
-            // Clean up
-            setTimeout(() => {
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-            }, 100);
-            
-            // Show a confirmation
-            alert('PMTA_Script.js has been downloaded!');
-        });
-        
-        // Copy code functionality
-        document.getElementById('copyBtn').addEventListener('click', function() {
-            navigator.clipboard.writeText(scriptCode).then(() => {
-                // Change button text temporarily
-                const originalText = this.textContent;
-                this.textContent = 'Copied!';
+        // Simple animation for step cards on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.step-card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                
                 setTimeout(() => {
-                    this.textContent = originalText;
-                }, 2000);
-            }).catch(err => {
-                console.error('Failed to copy: ', err);
-                alert('Failed to copy code to clipboard');
+                    card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 200);
+            });
+            
+            // Add click animation for download button
+            const downloadBtn = document.querySelector('.download-btn');
+            downloadBtn.addEventListener('click', function() {
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = 'scale(1.05)';
+                }, 150);
             });
         });
     </script>
