@@ -413,6 +413,49 @@
             margin-bottom: 0;
         }
 
+        /* NEW: Compact controls for single line layout */
+        .compact-controls {
+            display: flex;
+            flex-wrap: nowrap;
+            gap: 15px;
+            align-items: flex-end;
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .compact-field {
+            flex: 1;
+            min-width: 0;
+            margin-bottom: 0;
+        }
+
+        .compact-field label {
+            margin-bottom: 5px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+        }
+
+        .compact-field input,
+        .compact-field select {
+            width: 100%;
+            padding: 8px 10px;
+            font-size: 13px;
+        }
+
+        .compact-field.time-input {
+            flex: 0.8;
+        }
+
+        .compact-field.select-input {
+            flex: 0.7;
+        }
+
+        .compact-field.number-input {
+            flex: 0.6;
+        }
+
         /* Apply URL section style */
         .apply-url-section {
             background: linear-gradient(135deg, rgba(14, 165, 233, 0.08) 0%, rgba(59, 130, 246, 0.08) 100%);
@@ -556,6 +599,17 @@
             transform: translateY(-2px);
         }
 
+        @media (max-width: 1024px) {
+            .compact-controls {
+                flex-wrap: wrap;
+                gap: 12px;
+            }
+            
+            .compact-field {
+                flex: 1 0 calc(50% - 12px);
+            }
+        }
+
         @media (max-width: 768px) {
             .content {
                 padding: 20px;
@@ -596,6 +650,15 @@
             
             .section {
                 padding: 16px;
+            }
+            
+            .compact-controls {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .compact-field {
+                flex: 1 0 100%;
             }
             
             .dual-container {
@@ -705,37 +768,29 @@
                 </div>
             </div>
             
+            <!-- MODIFIED: Combined Core Configuration and Macro Optimization in one line -->
             <div class="section">
-                <div class="section-header">
-                    <h3>⚙️ Core Configuration</h3>
-                </div>
-                <div class="grid">
-                    <div class="field">
+                <h3>⚙️ Core Configuration & Optimization</h3>
+                <div class="compact-controls">
+                    <div class="compact-field time-input">
                         <label>Finish Time (UTC)</label>
                         <input type="time" id="timefinish" step="1">
                     </div>
                     
-                    <div class="field">
+                    <div class="compact-field select-input">
                         <label>Enable Auto-Loop</label>
                         <select id="enablefinish">
                             <option value="false">Disabled</option>
                             <option value="true">Enabled</option>
                         </select>
                     </div>
-                </div>
-            </div>
-            
-            <div class="section">
-                <div class="section-header">
-                    <h3>🔧 Macro Optimization</h3>
-                </div>
-                <div class="grid">
-                    <div class="field">
+                    
+                    <div class="compact-field number-input">
                         <label>Schedule Repeats</label>
                         <input type="number" id="schedulerepeats" value="360" min="1" max="1000">
                     </div>
                     
-                    <div class="field">
+                    <div class="compact-field number-input">
                         <label>Wait Time (seconds)</label>
                         <input type="number" id="schedulewait" value="5" min="1" max="60">
                     </div>
