@@ -754,7 +754,7 @@
                         </div>
                         <!-- ADDED: Button group with Add and Remove All buttons -->
                         <div class="button-group">
-                            <input type="number" id="add-quantity" class="quantity-input" value="1" min="1" max="50" title="Number of rows to add">
+                            <input type="number" id="add-quantity" class="quantity-input" value="1" min="1" max="40" title="Number of rows to add">
                             <button id="add-pmta-btn" style="height: 36px; padding: 0 15px;">➕ Add</button>
                             <button id="remove-all-btn" class="danger remove-all-btn">🗑️ Remove All</button>
                         </div>
@@ -1127,8 +1127,8 @@
             const newUrl = $('apply-url-input').value.trim();
             const applyToAll = $('apply-url-checkbox').checked;
             
-            if (quantity < 1 || quantity > 20) {
-                status('❌ Please enter a quantity between 1 and 20', 'error', 4000);
+            if (quantity < 1 || quantity > 40) {
+                status('❌ Please enter a quantity between 1 and 40', 'error', 4000);
                 return;
             }
             
