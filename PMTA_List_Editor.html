@@ -422,15 +422,6 @@
             border: 1px solid rgba(14, 165, 233, 0.15);
         }
 
-        .apply-url-section h4 {
-            margin-bottom: 12px;
-            color: #0ea5e9;
-            font-size: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
         .apply-url-container {
             display: flex;
             gap: 15px;
@@ -501,6 +492,34 @@
             margin: 0;
             padding: 5px 10px;
             background: rgba(255, 255, 255, 0.7);
+        }
+
+        /* Quantity input style */
+        .quantity-input {
+            width: 60px !important;
+            text-align: center;
+            padding: 8px !important;
+            border: 1px solid #cbd5e1 !important;
+            border-radius: 6px !important;
+            font-size: 13px !important;
+        }
+
+        /* Button group style */
+        .button-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        /* Remove All button style */
+        .remove-all-btn {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+            height: 36px !important;
+            padding: 0 15px !important;
+        }
+
+        .remove-all-btn:hover {
+            box-shadow: 0 8px 20px rgba(239, 68, 68, 0.25) !important;
         }
 
         /* Dual container */
@@ -603,6 +622,11 @@
                 width: 100%;
             }
             
+            .button-group {
+                width: 100%;
+                justify-content: center;
+            }
+            
             /* Mobile adjustments for status notifications */
             .status {
                 right: 10px;
@@ -624,6 +648,14 @@
             .status {
                 padding: 12px 14px;
                 font-size: 13px;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            .button-group button {
+                width: 100%;
             }
         }
     </style>
@@ -665,11 +697,11 @@
                 </div>
                 <div class="stat-card">
                     <div class="stat-value" id="ip-count">0</div>
-                    <div class="stat-label">IP Addresses</div>
+                    <div class="stat-label">Servers</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-value" id="ipvols-count">0</div>
-                    <div class="stat-label">VoIP IPs</div>
+                    <div class="stat-label">IPs</div>
                 </div>
             </div>
             
@@ -720,7 +752,12 @@
                             <input checked type="checkbox" id="apply-url-checkbox">
                             <label for="apply-url-checkbox" >Auto apply to new entries</label>
                         </div>
-                        <button id="add-pmta-btn" style="height: 36px; padding: 0 15px;">➕ Add (+1h)</button>
+                        <!-- ADDED: Button group with Add and Remove All buttons -->
+                        <div class="button-group">
+                            <input type="number" id="add-quantity" class="quantity-input" value="1" min="1" max="20" title="Number of rows to add">
+                            <button id="add-pmta-btn" style="height: 36px; padding: 0 15px;">➕ Add</button>
+                            <button id="remove-all-btn" class="danger remove-all-btn">🗑️ Remove All</button>
+                        </div>
                     </div>
                 </div>
                 
@@ -731,7 +768,7 @@
                                 <th style="width: 50px">#</th>
                                 <th style="width: 120px">Time (UTC)</th>
                                 <th>URL</th>
-                                <th style="width: 150px">Product</th>
+                                <th style="width: 150px">Prod</th>
                                 <th style="width: 100px">Actions</th>
                             </tr>
                         </thead>
@@ -825,7 +862,8 @@
         $('open-btn').onclick = openFile;
         $('save-btn').onclick = saveFile;
        
-        $('add-pmta-btn').onclick = addEntry;
+        $('add-pmta-btn').onclick = addMultipleEntries;
+        $('remove-all-btn').onclick = removeAllEntries; // NEW: Remove All button
         $('copy-btn').onclick = copyCode;
         $('copy-btn-2').onclick = copyCode;
         $('test-notification-btn').onclick = testNotification;
@@ -912,6 +950,23 @@
                 }
             } catch (e) {
                 status('❌ Error: ' + e.message, 'error', 4000);
+            }
+        }
+        
+        // NEW: Function to remove all entries
+        function removeAllEntries() {
+            if (config.pmtaList.length === 0) {
+                status('⚠️ No entries to remove', 'warning', 4000);
+                return;
+            }
+            
+            // Show confirmation dialog
+            if (confirm(`Are you sure you want to remove all ${config.pmtaList.length} entries? This action cannot be undone.`)) {
+                const removedCount = config.pmtaList.length;
+                config.pmtaList = [];
+                renderTable();
+                generate();
+                status(`✅ Removed all ${removedCount} entries`, 'success', 4000);
             }
         }
         
@@ -1063,6 +1118,49 @@
                 renderTable();
                 generate();
                 status(`✅ URL auto-applied to all ${config.pmtaList.length} entries`, 'success', 4000);
+            }
+        }
+        
+        // UPDATED: Modified addEntries function to add multiple entries at once
+        function addMultipleEntries() {
+            const quantity = parseInt($('add-quantity').value) || 1;
+            const newUrl = $('apply-url-input').value.trim();
+            const applyToAll = $('apply-url-checkbox').checked;
+            
+            if (quantity < 1 || quantity > 20) {
+                status('❌ Please enter a quantity between 1 and 20', 'error', 4000);
+                return;
+            }
+            
+            for (let j = 0; j < quantity; j++) {
+                // Calculate next time (current last time + 1 hour for each entry)
+                let nextTime = "12:08:30";
+                if (config.pmtaList.length > 0) {
+                    const lastTime = config.pmtaList[config.pmtaList.length - 1].targetTime;
+                    if (lastTime) {
+                        const [hours, minutes, seconds] = lastTime.split(':').map(Number);
+                        let nextHours = hours + 1;
+                        if (nextHours >= 24) nextHours -= 24;
+                        nextTime = `${nextHours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                    }
+                }
+                
+                const newEntry = {
+                    url: (applyToAll && newUrl) ? newUrl : "http://95.216.72.6:90/multi_monitor/list?q=example",
+                    targetTime: nextTime,
+                    nameprod: "prod " + (config.pmtaList.length + 1 + j)
+                };
+                
+                config.pmtaList.push(newEntry);
+            }
+            
+            renderTable();
+            generate();
+            
+            if (applyToAll && newUrl) {
+                status(`✅ ${quantity} new entries added with auto-applied URL`, 'success', 4000);
+            } else {
+                status(`✅ ${quantity} new entries added (+1 hour each)`, 'success', 4000);
             }
         }
         
@@ -1316,39 +1414,6 @@
 });
             
             updateStats();
-        }
-        
-        function addEntry() {
-            const newUrl = $('apply-url-input').value.trim();
-            const applyToAll = $('apply-url-checkbox').checked;
-            
-            // Calculate next time (current last time + 1 hour)
-            let nextTime = "12:08:30";
-            if (config.pmtaList.length > 0) {
-                const lastTime = config.pmtaList[config.pmtaList.length - 1].targetTime;
-                if (lastTime) {
-                    const [hours, minutes, seconds] = lastTime.split(':').map(Number);
-                    let nextHours = hours + 1;
-                    if (nextHours >= 24) nextHours -= 24;
-                    nextTime = `${nextHours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-                }
-            }
-            
-            const newEntry = {
-                url: (applyToAll && newUrl) ? newUrl : "http://95.216.72.6:90/multi_monitor/list?q=example",
-                targetTime: nextTime,
-                nameprod: "product" + (config.pmtaList.length + 1)
-            };
-            
-            config.pmtaList.push(newEntry);
-            renderTable();
-            generate();
-            
-            if (applyToAll && newUrl) {
-                status(`✅ New entry added with auto-applied URL`, 'success', 4000);
-            } else {
-                status('✅ New entry added (+1 hour)', 'success', 4000);
-            }
         }
         
         function updateStats() {
