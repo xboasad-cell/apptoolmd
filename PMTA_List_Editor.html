@@ -137,25 +137,46 @@
 
         .status {
             padding: 14px 16px;
-            margin-bottom: 20px;
             border-radius: 10px;
             font-weight: 500;
-            border-left: 5px solid;
             font-size: 14px;
             display: flex;
             align-items: center;
             gap: 10px;
-            animation: slideIn 0.3s ease-out;
+            animation: slideInRight 0.3s ease-out;
+            max-height: 100px;
+            overflow: hidden;
+            transition: all 0.5s ease;
+            
+            /* Position to the right */
+            position: fixed;
+            right: 40px;
+            top: 40px;
+            z-index: 1000;
+            max-width: 400px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border-right: 5px solid;
+            border-left: none;
         }
 
-        @keyframes slideIn {
+        .status.hidden {
+            opacity: 0;
+            max-height: 0;
+            padding-top: 0;
+            padding-bottom: 0;
+            border-width: 0;
+            overflow: hidden;
+            transform: translateX(30px);
+        }
+
+        @keyframes slideInRight {
             from {
                 opacity: 0;
-                transform: translateY(-8px);
+                transform: translateX(30px);
             }
             to {
                 opacity: 1;
-                transform: translateY(0);
+                transform: translateX(0);
             }
         }
 
@@ -381,85 +402,108 @@
             flex-grow: 1;
         }
 
-        .ip-list-item {
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .section-header h3 {
+            margin-bottom: 0;
+        }
+
+        /* Apply URL section style */
+        .apply-url-section {
+            background: linear-gradient(135deg, rgba(14, 165, 233, 0.08) 0%, rgba(59, 130, 246, 0.08) 100%);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(14, 165, 233, 0.15);
+        }
+
+        .apply-url-section h4 {
+            margin-bottom: 12px;
+            color: #0ea5e9;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .apply-url-container {
+            display: flex;
+            gap: 15px;
+            align-items: flex-start;
+        }
+
+        .apply-url-container .field {
+            flex: 1;
+            margin: 0;
+        }
+
+        /* New checkbox style */
+        .checkbox-group {
             display: flex;
             align-items: center;
             gap: 10px;
-            margin-bottom: 8px;
-            padding: 10px;
-            background: #f8fafc;
-            border-radius: 8px;
-            border: 1px solid #e2e8f0;
-        }
-
-        .ip-list-item input {
-            flex: 1;
-            padding: 8px 12px;
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
-            font-size: 13px;
-        }
-
-        .ip-list-item button {
-            padding: 6px 12px;
-            font-size: 12px;
-        }
-
-        .ipvols-list-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 8px;
-            padding: 10px;
-            background: #f8fafc;
-            border-radius: 8px;
-            border: 1px solid #e2e8f0;
-            animation: slideIn 0.2s ease-out;
-        }
-
-        .ipvols-list-item.hidden {
-            display: none;
-        }
-
-        .ipvols-list-item input {
-            flex: 1;
-            padding: 8px 12px;
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
-            font-size: 13px;
-        }
-
-        .ipvols-list-item input:nth-child(1) {
-            min-width: 150px;
-        }
-
-        .ipvols-list-item input:nth-child(2) {
-            min-width: 100px;
-        }
-
-        .ipvols-list-item button {
-            padding: 6px 12px;
-            font-size: 12px;
-        }
-
-        .ip-controls {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .show-more-container {
             margin-top: 10px;
-            text-align: center;
             padding: 10px;
+            background: rgba(14, 165, 233, 0.05);
+            border-radius: 8px;
+            border: 1px solid rgba(14, 165, 233, 0.1);
         }
 
-        .show-more-container .count-info {
-            font-size: 12px;
-            color: #64748b;
-            margin-bottom: 8px;
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+            transform: scale(1.2);
         }
 
+        .checkbox-group label {
+            margin-bottom: 0;
+            font-size: 0.85rem;
+            color: #475569;
+        }
+
+        /* Table header with apply URL */
+        .table-header-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .table-header-wrapper h3 {
+            margin-bottom: 0;
+        }
+
+        .apply-url-inline {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(135deg, rgba(14, 165, 233, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%);
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(14, 165, 233, 0.2);
+        }
+
+        .apply-url-inline input[type="text"] {
+            width: 250px;
+            padding: 8px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+
+        .apply-url-inline .checkbox-group {
+            margin: 0;
+            padding: 5px 10px;
+            background: rgba(255, 255, 255, 0.7);
+        }
+
+        /* Dual container */
         .dual-container {
             display: flex;
             gap: 20px;
@@ -474,15 +518,23 @@
             height: 100%;
         }
 
-        .section-header {
+        /* Syntax check button */
+        .syntax-check-container {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
+            justify-content: center;
+            margin-top: 20px;
         }
 
-        .section-header h3 {
-            margin-bottom: 0;
+        .syntax-check-btn {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            padding: 12px 30px;
+            font-size: 16px;
+            height: auto;
+        }
+
+        .syntax-check-btn:hover {
+            box-shadow: 0 8px 20px rgba(245, 158, 11, 0.25);
+            transform: translateY(-2px);
         }
 
         @media (max-width: 768px) {
@@ -532,28 +584,31 @@
                 gap: 15px;
             }
             
-            .ip-list-item,
-            .ipvols-list-item {
+            .apply-url-container {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .table-header-wrapper {
                 flex-direction: column;
                 align-items: stretch;
             }
             
-            .ip-list-item input,
-            .ipvols-list-item input {
-                width: 100%;
-            }
-            
-            .ip-list-item button,
-            .ipvols-list-item button {
-                width: 100%;
-            }
-            
-            .ip-controls {
+            .apply-url-inline {
                 flex-direction: column;
+                align-items: stretch;
             }
             
-            .ip-controls button {
+            .apply-url-inline input[type="text"] {
                 width: 100%;
+            }
+            
+            /* Mobile adjustments for status notifications */
+            .status {
+                right: 10px;
+                left: 10px;
+                max-width: calc(100% - 20px);
+                top: 100px;
             }
         }
 
@@ -564,6 +619,11 @@
             
             .grid {
                 grid-template-columns: 1fr;
+            }
+            
+            .status {
+                padding: 12px 14px;
+                font-size: 13px;
             }
         }
     </style>
@@ -579,15 +639,14 @@
             <div class="toolbar">
                 <button id="open-btn">📂 Open File</button>
                 <button id="save-btn" class="success">💾 Save Changes</button>
-                <button id="add-btn">➕ Add Entry</button>
                 <button id="copy-btn">📋 Copy Code</button>
                 <button id="test-notification-btn">📱 Test Alert</button>
-				<button> <a href="https://xboasad-cell.github.io/apptoolmd/downloadscriptjs.html" style="color:#fff;text-decoration: none;"> Download script</a> </button>
+                <button> <a href="https://xboasad-cell.github.io/apptoolmd/downloadscriptjs.html" style="color:#fff;text-decoration: none;"> Download script</a> </button>
                 <div class="spacer"></div>
                 <span class="badge">v2.0</span>
             </div>
             
-            <div id="status" class="status warning">
+            <div id="status" class="status warning hidden">
                 ⚠️ Ready. Load your JavaScript file to begin editing.
             </div>
             
@@ -652,10 +711,19 @@
             </div>
             
             <div class="section">
-                <div class="section-header">
+                <!-- UPDATED: Table header with inline Apply URL section -->
+                <div class="table-header-wrapper">
                     <h3>📋 PMTA Entries</h3>
-                    <button id="add-pmta-btn" style="height: 36px; padding: 0 15px;">➕ Add</button>
+                    <div class="apply-url-inline">
+                        <input type="text" style="width:600px" id="apply-url-input" placeholder="Enter URL for all entries">
+                        <div class="checkbox-group">
+                            <input checked type="checkbox" id="apply-url-checkbox">
+                            <label for="apply-url-checkbox" >Auto apply to new entries</label>
+                        </div>
+                        <button id="add-pmta-btn" style="height: 36px; padding: 0 15px;">➕ Add (+1h)</button>
+                    </div>
                 </div>
+                
                 <div class="table-wrapper">
                     <table>
                         <thead>
@@ -674,55 +742,30 @@
             
             <div class="section">
                 <div class="section-header">
-                    <h3>🌐 IP Addresses for Data Extraction</h3>
-                    <div class="ip-controls" style="margin-top: 0;">
-                        <button id="add-ip-btn" style="height: 36px; padding: 0 15px;">➕ Add</button>
-                        <button id="remove-all-ip-btn" class="danger" style="height: 36px; padding: 0 15px;">🗑️ All</button>
-                    </div>
-                </div>
-                <div class="dual-container">
-                    <div class="field">
-                        <label>IP Addresses (one per line or comma-separated)</label>
-                        <textarea id="ip-list" placeholder="92.118.151.116
-92.118.151.11
-92.118.151.111"></textarea>
-                        <small style="display: block; margin-top: 5px; color: #64748b;">
-                            Enter IP addresses that will be used for data extraction.
-                        </small>
-                    </div>
-                    <div id="ip-list-container" class="field" style="overflow-y: auto; max-height: 200px;">
-                        <label>IP List Preview</label>
-                        <div style="margin-top: 8px;"></div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="section">
-                <div class="section-header">
-                    <h3>Volume /IP Configuration</h3>
-                    <div class="ip-controls" style="margin-top: 0;">
-                        <button id="add-ipvols-btn" style="height: 36px; padding: 0 15px;">➕ Add</button>
-                        <button id="remove-all-ipvols-btn" class="danger" style="height: 36px; padding: 0 15px;">🗑️ All</button>
-                    </div>
+                    <h3>🌐 IP Configuration</h3>
                 </div>
                 <div class="dual-container">
                     <div class="field">
                         <label>VoIP IPs with Volume (IP:Volume or IP[tab]Volume)</label>
-                        <textarea style="min-height: 400px;" id="ipvols-list" placeholder="92.118.151.116:2600
+                        <textarea style="min-height: 300px;" id="ipvols-list" placeholder="92.118.151.116:2600
 92.118.151.11:2500
 92.118.151.111:2400"></textarea>
                         <small style="display: block; margin-top: 5px; color: #64748b;">
                             Format: IP:Volume or IP[Tab]Volume (one per line)
                         </small>
                     </div>
-                    <div id="ipvols-list-container" class="field" style="overflow-y: auto; max-height: 500px;">
-                        <label>VoIP IPs Preview</label>
-                        <div style="margin-top: 8px;"></div>
+                    <div class="field">
+                        <label>IP Addresses for Data Extraction (one per line or comma-separated)</label>
+                        <textarea style="min-height: 300px;" id="ip-list" placeholder="92.118.151.116
+92.118.151.11
+92.118.151.111"></textarea>
+                        <small style="display: block; margin-top: 5px; color: #64748b;">
+                            Enter IP addresses that will be used for data extraction.
+                        </small>
                     </div>
                 </div>
-                <div class="show-more-container" id="show-more-container" style="display: none;">
-                    <div class="count-info">Showing 5 of <span id="total-ipvols-count">0</span> VoIP IPs</div>
-                    <button id="show-more-btn" class="info" style="height: 36px; padding: 0 15px;">📖 Show All</button>
+                <div class="syntax-check-container">
+                    <button id="check-syntax-btn" class="syntax-check-btn">🔍 Check Syntax for All IPs</button>
                 </div>
             </div>
             
@@ -775,30 +818,32 @@
             geoApiKey: ""
         };
         
-        let showAllIPvols = false;
-        
         const $ = id => document.getElementById(id);
+        let statusTimeout = null;
         
         // Event listeners
         $('open-btn').onclick = openFile;
         $('save-btn').onclick = saveFile;
-        $('add-btn').onclick = addEntry;
+       
         $('add-pmta-btn').onclick = addEntry;
         $('copy-btn').onclick = copyCode;
         $('copy-btn-2').onclick = copyCode;
         $('test-notification-btn').onclick = testNotification;
         $('test-notification-btn-2').onclick = testNotification;
-        $('add-ip-btn').onclick = addIPEntry;
-        $('add-ipvols-btn').onclick = addIPvolsEntry;
-        $('remove-all-ip-btn').onclick = removeAllIPs;
-        $('remove-all-ipvols-btn').onclick = removeAllIPvols;
-        $('show-more-btn').onclick = toggleShowAllIPvols;
+        $('check-syntax-btn').onclick = checkAllSyntax;
         $('ip-list').onchange = updateIPListFromTextarea;
         $('ipvols-list').onchange = updateIPvolsListFromTextarea;
+        $('apply-url-checkbox').onchange = applyUrlToAllIfChecked;
+        $('apply-url-input').onchange = applyUrlToAllIfChecked;
         
         ['timefinish', 'enablefinish', 'schedulewait', 'schedulerepeats', 'bottoken', 'chatid', 'geoapikey'].forEach(id => {
             $(id).onchange = update;
         });
+        
+        // Show initial status message
+        setTimeout(() => {
+            status('⚠️ Ready. Load your JavaScript file to begin editing.', 'warning', 4000);
+        }, 500);
         
         async function openFile() {
             try {
@@ -812,21 +857,19 @@
                 parse();
                 loadInputs();
                 renderTable();
-                renderIPList();
-                renderIPvolsList();
                 generate();
                 
-                status('✅ File loaded successfully!', 'success');
+                status('✅ File loaded successfully!', 'success', 4000);
             } catch (e) {
                 if (e.name !== 'AbortError') {
-                    status('❌ Error: ' + e.message, 'error');
+                    status('❌ Error: ' + e.message, 'error', 4000);
                 }
             }
         }
         
         async function saveFile() {
             if (!fileHandle) {
-                status('❌ No file open', 'error');
+                status('❌ No file open', 'error', 4000);
                 return;
             }
             
@@ -834,24 +877,24 @@
                 const writable = await fileHandle.createWritable();
                 await writable.write($('output').value);
                 await writable.close();
-                status('✅ File saved successfully!', 'success');
+                status('✅ File saved successfully!', 'success', 4000);
             } catch (e) {
-                status('❌ Save failed: ' + e.message, 'error');
+                status('❌ Save failed: ' + e.message, 'error', 4000);
             }
         }
         
         async function copyCode() {
             try {
                 await navigator.clipboard.writeText($('output').value);
-                status('✅ Code copied to clipboard!', 'success');
+                status('✅ Code copied to clipboard!', 'success', 4000);
             } catch (e) {
-                status('❌ Copy failed: ' + e.message, 'error');
+                status('❌ Copy failed: ' + e.message, 'error', 4000);
             }
         }
         
         async function testNotification() {
             if (!config.botToken || !config.chatId) {
-                status('⚠️ Please enter Bot Token and Chat ID first', 'warning');
+                status('⚠️ Please enter Bot Token and Chat ID first', 'warning', 4000);
                 return;
             }
             
@@ -863,12 +906,183 @@
                 const result = await response.json();
                 
                 if (result.ok) {
-                    status('✅ Test notification sent!', 'success');
+                    status('✅ Test notification sent!', 'success', 4000);
                 } else {
-                    status('❌ Failed: ' + result.description, 'error');
+                    status('❌ Failed: ' + result.description, 'error', 4000);
                 }
             } catch (e) {
-                status('❌ Error: ' + e.message, 'error');
+                status('❌ Error: ' + e.message, 'error', 4000);
+            }
+        }
+        
+        // NEW: Function to check all syntax
+        function checkAllSyntax() {
+            let allValid = true;
+            let results = [];
+            
+            // Check IP list syntax
+            const ipText = $('ip-list').value.trim();
+            if (ipText) {
+                const ipResult = checkIPSyntaxInternal(ipText);
+                if (!ipResult.valid) {
+                    allValid = false;
+                    results.push(`❌ IP Addresses: ${ipResult.invalidCount} invalid`);
+                } else {
+                    results.push(`✅ IP Addresses: ${ipResult.validCount} valid`);
+                }
+            } else {
+                results.push('⚠️ IP Addresses: Empty');
+            }
+            
+            // Check IPvols list syntax
+            const ipvolsText = $('ipvols-list').value.trim();
+            if (ipvolsText) {
+                const ipvolsResult = checkIPvolsSyntaxInternal(ipvolsText);
+                if (!ipvolsResult.valid) {
+                    allValid = false;
+                    results.push(`❌ VoIP IPs: ${ipvolsResult.invalidCount} invalid`);
+                } else {
+                    results.push(`✅ VoIP IPs: ${ipvolsResult.validCount} valid`);
+                }
+            } else {
+                results.push('⚠️ VoIP IPs: Empty');
+            }
+            
+            // Show combined results
+            if (allValid) {
+                status(`✅ All syntax checks passed!\n${results.join('\n')}`, 'success', 4000);
+            } else {
+                status(`❌ Syntax errors found:\n${results.join('\n')}`, 'error', 4000);
+            }
+        }
+        
+        // Internal function to check IP syntax
+        function checkIPSyntaxInternal(text) {
+            const lines = text.split(/[\n,]+/);
+            const validIPs = [];
+            const invalidIPs = [];
+            
+            const ipRegex = /^(\d{1,3}\.){3}\d{1,3}$/;
+            
+            lines.forEach((line) => {
+                const ip = line.trim();
+                if (ip) {
+                    if (ipRegex.test(ip)) {
+                        // Check each octet is between 0-255
+                        const octets = ip.split('.');
+                        const isValid = octets.every(octet => {
+                            const num = parseInt(octet, 10);
+                            return num >= 0 && num <= 255;
+                        });
+                        
+                        if (isValid) {
+                            validIPs.push(ip);
+                        } else {
+                            invalidIPs.push({ip, reason: "Octet out of range (0-255)"});
+                        }
+                    } else {
+                        invalidIPs.push({ip, reason: "Invalid IP format"});
+                    }
+                }
+            });
+            
+            return {
+                valid: invalidIPs.length === 0,
+                validCount: validIPs.length,
+                invalidCount: invalidIPs.length,
+                validIPs: validIPs,
+                invalidIPs: invalidIPs
+            };
+        }
+        
+        // Internal function to check IPvols syntax
+        function checkIPvolsSyntaxInternal(text) {
+            const lines = text.split(/[\n,]+/);
+            const validEntries = [];
+            const invalidEntries = [];
+            
+            const ipRegex = /^(\d{1,3}\.){3}\d{1,3}$/;
+            
+            lines.forEach((line) => {
+                const trimmed = line.trim();
+                if (trimmed.length === 0) return;
+                
+                // Parse format: IP:Volume or IP\tVolume
+                const parts = trimmed.split(/[: \t]+/);
+                
+                if (parts.length >= 2) {
+                    const ip = parts[0].trim();
+                    const vol = parts[1].trim();
+                    
+                    // Check IP
+                    let ipValid = false;
+                    if (ipRegex.test(ip)) {
+                        const octets = ip.split('.');
+                        ipValid = octets.every(octet => {
+                            const num = parseInt(octet, 10);
+                            return num >= 0 && num <= 255;
+                        });
+                    }
+                    
+                    // Check volume (should be a number)
+                    const volNum = parseInt(vol, 10);
+                    const volValid = !isNaN(volNum) && volNum >= 0;
+                    
+                    if (ipValid && volValid) {
+                        validEntries.push({ip, vol});
+                    } else {
+                        const reasons = [];
+                        if (!ipValid) reasons.push("Invalid IP address");
+                        if (!volValid) reasons.push("Invalid volume (must be a positive number)");
+                        invalidEntries.push({entry: trimmed, reason: reasons.join(", ")});
+                    }
+                } else {
+                    invalidEntries.push({entry: trimmed, reason: "Invalid format. Use IP:Volume or IP[Tab]Volume"});
+                }
+            });
+            
+            return {
+                valid: invalidEntries.length === 0,
+                validCount: validEntries.length,
+                invalidCount: invalidEntries.length,
+                validEntries: validEntries,
+                invalidEntries: invalidEntries
+            };
+        }
+        
+        // Function to apply URL to all entries if checkbox is checked
+        function applyUrlToAllIfChecked() {
+            const newUrl = $('apply-url-input').value.trim();
+            const applyToAll = $('apply-url-checkbox').checked;
+            
+            if (applyToAll && newUrl) {
+                // Apply URL to all existing entries
+                for (let i = 0; i < config.pmtaList.length; i++) {
+                    config.pmtaList[i].url = newUrl;
+                }
+                renderTable();
+                generate();
+                status(`✅ URL auto-applied to all ${config.pmtaList.length} entries`, 'success', 4000);
+            }
+        }
+        
+        // UPDATED: status function with auto-hide
+        function status(msg, type, duration = 4000) {
+            const el = $('status');
+            el.textContent = msg;
+            el.className = 'status ' + type;
+            el.classList.remove('hidden');
+            
+            // Clear any existing timeout
+            if (statusTimeout) {
+                clearTimeout(statusTimeout);
+            }
+            
+            // Set new timeout to hide the status
+            if (duration > 0) {
+                statusTimeout = setTimeout(() => {
+                    el.classList.add('hidden');
+                }, duration);
             }
         }
         
@@ -995,7 +1209,6 @@
             const text = $('ip-list').value.trim();
             if (!text) {
                 config.ipList = [];
-                renderIPList();
                 generate();
                 return;
             }
@@ -1005,7 +1218,6 @@
                 .map(ip => ip.trim())
                 .filter(ip => ip.length > 0);
             
-            renderIPList();
             generate();
         }
         
@@ -1013,7 +1225,6 @@
             const text = $('ipvols-list').value.trim();
             if (!text) {
                 config.ipvolsList = [];
-                renderIPvolsList();
                 generate();
                 return;
             }
@@ -1043,177 +1254,7 @@
                 }
             }
             
-            renderIPvolsList();
             generate();
-        }
-        
-        function renderIPList() {
-            const container = $('ip-list-container');
-            const innerContainer = container.querySelector('div');
-            innerContainer.innerHTML = '';
-            
-            if (config.ipList.length === 0) {
-                innerContainer.innerHTML = '<div style="color: #64748b; font-style: italic; padding: 10px; text-align: center;">No IP addresses added</div>';
-                $('ip-count').textContent = '0';
-                return;
-            }
-            
-            config.ipList.forEach((ip, index) => {
-                const item = document.createElement('div');
-                item.className = 'ip-list-item';
-                item.innerHTML = `
-                    <input type="text" value="${ip}" data-index="${index}" placeholder="e.g., 92.118.151.116">
-                    <button class="danger" data-index="${index}">🗑️</button>
-                `;
-                innerContainer.appendChild(item);
-                
-                // Add event listeners
-                const input = item.querySelector('input');
-                const button = item.querySelector('button');
-                
-                input.onchange = (e) => {
-                    const idx = parseInt(e.target.dataset.index);
-                    config.ipList[idx] = e.target.value.trim();
-                    $('ip-list').value = config.ipList.join('\n');
-                    generate();
-                };
-                
-                button.onclick = (e) => {
-                    const idx = parseInt(e.target.dataset.index);
-                    if (confirm('Remove this IP address?')) {
-                        config.ipList.splice(idx, 1);
-                        $('ip-list').value = config.ipList.join('\n');
-                        renderIPList();
-                        generate();
-                    }
-                };
-            });
-            
-            $('ip-count').textContent = config.ipList.length;
-        }
-        
-        function renderIPvolsList() {
-            const container = $('ipvols-list-container');
-            const innerContainer = container.querySelector('div');
-            innerContainer.innerHTML = '';
-            
-            if (config.ipvolsList.length === 0) {
-                innerContainer.innerHTML = '<div style="color: #64748b; font-style: italic; padding: 10px; text-align: center;">No VoIP IPs added</div>';
-                $('ipvols-count').textContent = '0';
-                $('show-more-container').style.display = 'none';
-                return;
-            }
-            
-            const totalCount = config.ipvolsList.length;
-            const showCount = showAllIPvols ? totalCount : Math.min(5, totalCount);
-            
-            // Update show more container
-            const showMoreContainer = $('show-more-container');
-            const totalCountSpan = $('total-ipvols-count');
-            const showMoreBtn = $('show-more-btn');
-            
-            if (totalCount > 5) {
-                showMoreContainer.style.display = 'block';
-                totalCountSpan.textContent = totalCount;
-                showMoreBtn.textContent = showAllIPvols ? '👆 Show 5 Only' : '📖 Show All';
-            } else {
-                showMoreContainer.style.display = 'none';
-            }
-            
-            // Render items
-            config.ipvolsList.forEach((item, index) => {
-                const div = document.createElement('div');
-                div.className = 'ipvols-list-item';
-                
-                // Hide items beyond the first 5 if not showing all
-                if (index >= 5 && !showAllIPvols) {
-                    div.classList.add('hidden');
-                }
-                
-                div.innerHTML = `
-                    <input type="text" value="${item.IP}" data-index="${index}" data-field="IP" placeholder="IP Address">
-                    <input type="text" value="${item.vol}" data-index="${index}" data-field="vol" placeholder="Volume">
-                    <button class="danger" data-index="${index}">🗑️</button>
-                `;
-                innerContainer.appendChild(div);
-                
-                // Add event listeners
-                const inputs = div.querySelectorAll('input');
-                const button = div.querySelector('button');
-                
-                inputs.forEach(input => {
-                    input.onchange = (e) => {
-                        const idx = parseInt(e.target.dataset.index);
-                        const field = e.target.dataset.field;
-                        config.ipvolsList[idx][field] = e.target.value.trim();
-                        // Update textarea with colon separator for consistency
-                        $('ipvols-list').value = config.ipvolsList.map(item => `${item.IP}:${item.vol}`).join('\n');
-                        generate();
-                    };
-                });
-                
-                button.onclick = (e) => {
-                    const idx = parseInt(e.target.dataset.index);
-                    if (confirm('Remove this VoIP IP?')) {
-                        config.ipvolsList.splice(idx, 1);
-                        $('ipvols-list').value = config.ipvolsList.map(item => `${item.IP}:${item.vol}`).join('\n');
-                        renderIPvolsList();
-                        generate();
-                    }
-                };
-            });
-            
-            $('ipvols-count').textContent = config.ipvolsList.length;
-        }
-        
-        function toggleShowAllIPvols() {
-            showAllIPvols = !showAllIPvols;
-            renderIPvolsList();
-        }
-        
-        function addIPEntry() {
-            config.ipList.push('');
-            $('ip-list').value = config.ipList.join('\n');
-            renderIPList();
-            generate();
-        }
-        
-        function addIPvolsEntry() {
-            config.ipvolsList.push({IP: '', vol: ''});
-            $('ipvols-list').value = config.ipvolsList.map(item => `${item.IP}:${item.vol}`).join('\n');
-            renderIPvolsList();
-            generate();
-        }
-        
-        function removeAllIPs() {
-            if (config.ipList.length === 0) {
-                status('⚠️ IP list is already empty', 'warning');
-                return;
-            }
-            
-            if (confirm('Are you sure you want to remove ALL IP addresses?')) {
-                config.ipList = [];
-                $('ip-list').value = '';
-                renderIPList();
-                generate();
-                status('✅ All IP addresses removed', 'success');
-            }
-        }
-        
-        function removeAllIPvols() {
-            if (config.ipvolsList.length === 0) {
-                status('⚠️ VoIP IP list is already empty', 'warning');
-                return;
-            }
-            
-            if (confirm('Are you sure you want to remove ALL VoIP IP addresses?')) {
-                config.ipvolsList = [];
-                $('ipvols-list').value = '';
-                showAllIPvols = false; // Reset to default view
-                renderIPvolsList();
-                generate();
-                status('✅ All VoIP IP addresses removed', 'success');
-            }
         }
         
         function renderTable() {
@@ -1263,28 +1304,51 @@
                 };
             });
             
-            tbody.querySelectorAll('button.danger').forEach(button => {
-                button.onclick = (e) => {
-                    const i = parseInt(e.target.dataset.index);
-                    if (confirm('Remove this entry?')) {
-                        config.pmtaList.splice(i, 1);
-                        renderTable();
-                        generate();
-                    }
-                };
-            });
+           tbody.querySelectorAll('button.danger').forEach(button => {
+    button.onclick = (e) => {
+        const i = parseInt(e.target.dataset.index);
+        // Remove without confirmation
+        config.pmtaList.splice(i, 1);
+        renderTable();
+        generate();
+        status('Entry removed', 'warning', 3000);
+    };
+});
             
             updateStats();
         }
         
         function addEntry() {
-            config.pmtaList.push({
-                url: "http://95.216.72.6:90/multi_monitor/list?q=example",
-                targetTime: "12:08:30",
+            const newUrl = $('apply-url-input').value.trim();
+            const applyToAll = $('apply-url-checkbox').checked;
+            
+            // Calculate next time (current last time + 1 hour)
+            let nextTime = "12:08:30";
+            if (config.pmtaList.length > 0) {
+                const lastTime = config.pmtaList[config.pmtaList.length - 1].targetTime;
+                if (lastTime) {
+                    const [hours, minutes, seconds] = lastTime.split(':').map(Number);
+                    let nextHours = hours + 1;
+                    if (nextHours >= 24) nextHours -= 24;
+                    nextTime = `${nextHours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                }
+            }
+            
+            const newEntry = {
+                url: (applyToAll && newUrl) ? newUrl : "http://95.216.72.6:90/multi_monitor/list?q=example",
+                targetTime: nextTime,
                 nameprod: "product" + (config.pmtaList.length + 1)
-            });
+            };
+            
+            config.pmtaList.push(newEntry);
             renderTable();
             generate();
+            
+            if (applyToAll && newUrl) {
+                status(`✅ New entry added with auto-applied URL`, 'success', 4000);
+            } else {
+                status('✅ New entry added (+1 hour)', 'success', 4000);
+            }
         }
         
         function updateStats() {
@@ -1385,12 +1449,6 @@
             updateStats();
         }
         
-        function status(msg, type) {
-            const el = $('status');
-            el.textContent = msg;
-            el.className = 'status ' + type;
-        }
-        
         // Initialize
         if (config.pmtaList.length === 0) {
             config.pmtaList = [{
@@ -1402,117 +1460,114 @@
         
         loadInputs();
         renderTable();
-        renderIPList();
-        renderIPvolsList();
         generate();
 
-		// Prevent keyboard shortcuts for developer tools
-document.addEventListener('keydown', function(e) {
-    // Disable F12
-    if (e.key === 'F12') {
-        e.preventDefault();
-        return false;
-    }
-    
-    // Disable Ctrl+Shift+I (Chrome, Firefox)
-    if (e.ctrlKey && e.shiftKey && e.key === 'I') {
-        e.preventDefault();
-        return false;
-    }
-    
-    // Disable Ctrl+Shift+J (Chrome)
-    if (e.ctrlKey && e.shiftKey && e.key === 'J') {
-        e.preventDefault();
-        return false;
-    }
-    
-    // Disable Ctrl+U (View source)
-    if (e.ctrlKey && e.key === 'u') {
-        e.preventDefault();
-        return false;
-    }
-    
-    // Disable Ctrl+Shift+C (Inspect element)
-    if (e.ctrlKey && e.shiftKey && e.key === 'C') {
-        e.preventDefault();
-        return false;
-    }
-    
-    // Disable Ctrl+S (Save page)
-    if (e.ctrlKey && e.key === 's') {
-        e.preventDefault();
-        return false;
-    }
-});
-
-// Detect and prevent developer tools opening
-(function() {
-    let devtools = {
-        open: false,
-        orientation: null
-    };
-    
-    let threshold = 160;
-    
-    let emitEvent = function(state, orientation) {
-        window.dispatchEvent(new CustomEvent('devtoolschange', {
-            detail: {
-                open: state,
-                orientation: orientation
-            }
-        }));
-    };
-    
-    setInterval(function() {
-        let widthThreshold = window.outerWidth - window.innerWidth > threshold;
-        let heightThreshold = window.outerHeight - window.innerHeight > threshold;
-        let orientation = widthThreshold ? 'vertical' : 'horizontal';
-        
-        if (!(heightThreshold && widthThreshold) &&
-            ((window.Firebug && window.Firebug.chrome && window.Firebug.chrome.isInitialized) || widthThreshold || heightThreshold)) {
-            
-            if (!devtools.open || devtools.orientation !== orientation) {
-                emitEvent(true, orientation);
+        // Prevent keyboard shortcuts for developer tools
+        document.addEventListener('keydown', function(e) {
+            // Disable F12
+            if (e.key === 'F12') {
+                e.preventDefault();
+                return false;
             }
             
-            devtools.open = true;
-            devtools.orientation = orientation;
-        } else {
-            if (devtools.open) {
-                emitEvent(false, null);
+            // Disable Ctrl+Shift+I (Chrome, Firefox)
+            if (e.ctrlKey && e.shiftKey && e.key === 'I') {
+                e.preventDefault();
+                return false;
             }
             
-            devtools.open = false;
-            devtools.orientation = null;
-        }
-    }, 500);
-    
-    window.addEventListener('devtoolschange', function(event) {
-        if (event.detail.open) {
-            // Developer tools opened - redirect or show warning
-            document.body.innerHTML = '<div style="display:flex;justify-content:center;align-items:center;height:100vh;font-family:Arial,sans-serif;background:#f0f0f0;"><div style="text-align:center;padding:2rem;background:white;border-radius:10px;box-shadow:0 4px 6px rgba(0,0,0,0.1)"><h1 style="color:#e74c3c;">Developer Tools Detected</h1><p>Inspection is not allowed on this page.</p><p>Please close developer tools to continue.</p></div></div>';
-        }
-    });
-})();
+            // Disable Ctrl+Shift+J (Chrome)
+            if (e.ctrlKey && e.shiftKey && e.key === 'J') {
+                e.preventDefault();
+                return false;
+            }
+            
+            // Disable Ctrl+U (View source)
+            if (e.ctrlKey && e.key === 'u') {
+                e.preventDefault();
+                return false;
+            }
+            
+            // Disable Ctrl+Shift+C (Inspect element)
+            if (e.ctrlKey && e.shiftKey && e.key === 'C') {
+                e.preventDefault();
+                return false;
+            }
+            
+            // Disable Ctrl+S (Save page)
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                return false;
+            }
+        });
 
-// Enable full text selection and editing capabilities
-document.addEventListener('DOMContentLoaded', function() {
-    // Enable text selection for the whole document
-    document.body.style.userSelect = 'text';
-    document.body.style.webkitUserSelect = 'text';
-    document.body.style.mozUserSelect = 'text';
-    document.body.style.msUserSelect = 'text';
-    
-    // Ensure textareas and inputs allow selection
-    const textInputs = document.querySelectorAll('textarea, input[type="text"], input[type="email"]');
-    textInputs.forEach(input => {
-        input.style.userSelect = 'text';
-        input.style.webkitUserSelect = 'text';
-        input.style.mozUserSelect = 'text';
-        input.style.msUserSelect = 'text';
-    });
-});
+        // Detect and prevent developer tools opening
+        (function() {
+            let devtools = {
+                open: false,
+                orientation: null
+            };
+            
+            let threshold = 160;
+            
+            let emitEvent = function(state, orientation) {
+                window.dispatchEvent(new CustomEvent('devtoolschange', {
+                    detail: {
+                        open: state,
+                        orientation: orientation
+                    }
+                }));
+            };
+            
+            setInterval(function() {
+                let widthThreshold = window.outerWidth - window.innerWidth > threshold;
+                let heightThreshold = window.outerHeight - window.innerHeight > threshold;
+                let orientation = widthThreshold ? 'vertical' : 'horizontal';
+                
+                if (!(heightThreshold && widthThreshold) &&
+                    ((window.Firebug && window.Firebug.chrome && window.Firebug.chrome.isInitialized) || widthThreshold || heightThreshold)) {
+                    
+                    if (!devtools.open || devtools.orientation !== orientation) {
+                        emitEvent(true, orientation);
+                    }
+                    
+                    devtools.open = true;
+                    devtools.orientation = orientation;
+                } else {
+                    if (devtools.open) {
+                        emitEvent(false, null);
+                    }
+                    
+                    devtools.open = false;
+                    devtools.orientation = null;
+                }
+            }, 500);
+            
+            window.addEventListener('devtoolschange', function(event) {
+                if (event.detail.open) {
+                    // Developer tools opened - redirect or show warning
+                    document.body.innerHTML = '<div style="display:flex;justify-content:center;align-items:center;height:100vh;font-family:Arial,sans-serif;background:#f0f0f0;"><div style="text-align:center;padding:2rem;background:white;border-radius:10px;box-shadow:0 4px 6px rgba(0,0,0,0.1)"><h1 style="color:#e74c3c;">Developer Tools Detected</h1><p>Inspection is not allowed on this page.</p><p>Please close developer tools to continue.</p></div></div>';
+                }
+            });
+        })();
 
+        // Enable full text selection and editing capabilities
+        document.addEventListener('DOMContentLoaded', function() {
+            // Enable text selection for the whole document
+            document.body.style.userSelect = 'text';
+            document.body.style.webkitUserSelect = 'text';
+            document.body.style.mozUserSelect = 'text';
+            document.body.style.msUserSelect = 'text';
+            
+            // Ensure textareas and inputs allow selection
+            const textInputs = document.querySelectorAll('textarea, input[type="text"], input[type="email"]');
+            textInputs.forEach(input => {
+                input.style.userSelect = 'text';
+                input.style.webkitUserSelect = 'text';
+                input.style.mozUserSelect = 'text';
+                input.style.msUserSelect = 'text';
+            });
+        });
     </script>
 </body>
 </html>
