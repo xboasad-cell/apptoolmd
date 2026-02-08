@@ -1183,7 +1183,7 @@
     <span id="toast-message">Operation completed successfully!</span>
   </div>
 
-  <script>
+<script>
     // Default settings
     const DEFAULT_HEADERS_TO_REMOVE = [
       "arc-seal", "arc-message-signature", "arc-authentication-results", "return-path",
@@ -1668,10 +1668,10 @@
       
       localStorage.setItem('allowedHeaders', JSON.stringify(ALLOWED_HEADERS));
       localStorage.setItem('removeXHeaders', JSON.stringify(removeXHeaders.checked));
-      localStorage.setItem('combineSubjects', JSON.parse(combineSubjects.checked));
-      localStorage.setItem('replaceFromSubject', JSON.parse(replaceFromSubject.checked));
-      localStorage.setItem('fromRdns', JSON.parse(fromRdns.checked));
-      localStorage.setItem('replaceMailtoLinks', JSON.parse(replaceMailtoLinks.checked));
+      localStorage.setItem('combineSubjects', JSON.stringify(combineSubjects.checked));
+      localStorage.setItem('replaceFromSubject', JSON.stringify(replaceFromSubject.checked));
+      localStorage.setItem('fromRdns', JSON.stringify(fromRdns.checked));
+      localStorage.setItem('replaceMailtoLinks', JSON.stringify(replaceMailtoLinks.checked));
       
       // Save individual header checkbox states
       saveHeaderCheckboxStates();
@@ -2185,20 +2185,54 @@
       }
     });
 
-    // MANUAL Copy button (not automatic)
+    // MANUAL Copy button - clears inputs and resets layout
     copyBtn.addEventListener('click', async () => {
       const txt = outpre.textContent;
       if (!txt || txt === 'Cleaned email will appear here...') {
         showAlertInElement('No cleaned email content to copy.', 'error');
         return;
       }
-      await navigator.clipboard.writeText(txt);
-      copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
-      showToast('Cleaned email copied to clipboard!');
       
-      setTimeout(() => {
-        copyBtn.innerHTML = '<i class="far fa-copy"></i> Copy';
-      }, 2000);
+      try {
+        await navigator.clipboard.writeText(txt);
+        copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+        showToast('Cleaned email copied to clipboard!');
+        
+        // Auto-save to history with name from From + Subject + Date
+        const fromValue = newFrom.value.trim();
+        const subjectValue = newSubject.value.trim();
+        const currentDate = new Date().toLocaleString();
+        
+        // Create name from From + Subject + Date
+        let nameParts = [];
+        if (fromValue) nameParts.push(fromValue);
+        if (subjectValue) nameParts.push(subjectValue);
+        nameParts.push(currentDate);
+        
+        const autoName = nameParts.join(' - ');
+        addToHistory(inputEl.value, autoName);
+        
+        // 1. Clean input source textarea
+        inputEl.value = '';
+        inputCount.textContent = "0 characters";
+        
+        // 2. Clean output area
+        outpre.textContent = 'Cleaned email will appear here...';
+        outputCount.textContent = "0 characters";
+        
+        // 3. Clear the alert
+        clearAlert();
+        
+        // 4. Restore layout to default state (remove cleaned layout)
+        resetLayout();
+        
+        setTimeout(() => {
+          copyBtn.innerHTML = '<i class="far fa-copy"></i> Copy';
+        }, 2000);
+      } catch (err) {
+        console.error('Failed to copy: ', err);
+        showAlertInElement('Failed to copy to clipboard.', 'error');
+      }
     });
 
     // MANUAL Download button (not automatic)
