@@ -2002,7 +2002,7 @@
       outputCount.textContent = cleaned.length + " characters";
       
       // Auto-save to history when cleaning
-      const historyItem = addToHistory(src);
+      addToHistory(src);
       
       // Check for mailto links ONLY in <a href=""> tags in the HTML body
       const mailtoLinks = checkMailtoLinksInEmail(cleaned);
@@ -2020,13 +2020,7 @@
         showToast('Email headers cleaned automatically!');
       }
       
-      // Auto-show history modal after cleaning (with 1 second delay)
-      setTimeout(() => {
-        if (historyItem) {
-          displayHistory();
-          historyModal.style.display = 'flex';
-        }
-      }, 1000);
+      // NO AUTO-SHOW HISTORY - History only shows when button is clicked
     }
 
     // Layout management functions
