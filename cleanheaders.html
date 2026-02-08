@@ -1026,11 +1026,8 @@
             <!-- Divider -->
             <div class="divider"></div>
             
-            <!-- Action buttons -->
+            <!-- Action buttons - KEPT Copy and Download buttons as manual -->
             <div class="buttons-group">
-              <button class="btn-primary" id="cleanBtn">
-                <i class="fas fa-broom"></i> Clean Headers
-              </button>
               <button class="btn-secondary" id="copyBtn">
                 <i class="far fa-copy"></i> Copy
               </button>
@@ -1207,7 +1204,6 @@
     // DOM elements
     const inputEl = document.getElementById('input');
     const outpre = document.getElementById('outpre');
-    const cleanBtn = document.getElementById('cleanBtn');
     const copyBtn = document.getElementById('copyBtn');
     const downloadBtn = document.getElementById('downloadBtn');
     const historyBtn = document.getElementById('historyBtn');
@@ -1481,8 +1477,6 @@
     }
 
     // Display history items in modal with search
-	//*********************************************************
-     // Display history items in modal with search
     function displayHistory(searchTerm = '') {
       historyItems.innerHTML = '';
       
@@ -1574,22 +1568,12 @@
       if (item) {
         inputEl.value = item.fullContent;
         inputCount.textContent = item.fullContent.length + " characters";
+        
+        // Auto-clean the email source when loaded from history
+        autoCleanHeaders();
+        
         historyModal.style.display = 'none';
         showToast('Email source loaded from history!');
-      }
-    }
-
-    // Use history fields (load From and Subject)
-    function useHistoryFields(id) {
-      const item = EMAIL_HISTORY.find(item => item.id === id);
-      if (item) {
-        if (item.from) {
-          newFrom.value = item.from;
-        }
-        if (item.subject) {
-          newSubject.value = item.subject;
-        }
-        showToast('From and Subject fields loaded from history!');
       }
     }
 
@@ -1607,26 +1591,6 @@
       saveEmailHistory();
       displayHistory();
       showToast('History cleared!');
-    }
-
-    // Save named entry
-    function saveNamedEntry() {
-      const emailSource = inputEl.value.trim();
-      if (!emailSource) {
-        showToast('Please paste email source first!', 'error');
-        return;
-      }
-      
-      const name = prompt('Enter a name for this email entry:');
-      if (name) {
-        const historyItem = addToHistory(emailSource, name);
-        showToast(`Saved as "${name}" in history!`);
-        
-        // If history modal is open, refresh it
-        if (historyModal.style.display === 'flex') {
-          displayHistory(historySearch.value);
-        }
-      }
     }
 
     // Load settings from localStorage
@@ -1704,10 +1668,10 @@
       
       localStorage.setItem('allowedHeaders', JSON.stringify(ALLOWED_HEADERS));
       localStorage.setItem('removeXHeaders', JSON.stringify(removeXHeaders.checked));
-      localStorage.setItem('combineSubjects', JSON.stringify(combineSubjects.checked));
-      localStorage.setItem('replaceFromSubject', JSON.stringify(replaceFromSubject.checked));
-      localStorage.setItem('fromRdns', JSON.stringify(fromRdns.checked));
-      localStorage.setItem('replaceMailtoLinks', JSON.stringify(replaceMailtoLinks.checked));
+      localStorage.setItem('combineSubjects', JSON.parse(combineSubjects.checked));
+      localStorage.setItem('replaceFromSubject', JSON.parse(replaceFromSubject.checked));
+      localStorage.setItem('fromRdns', JSON.parse(fromRdns.checked));
+      localStorage.setItem('replaceMailtoLinks', JSON.parse(replaceMailtoLinks.checked));
       
       // Save individual header checkbox states
       saveHeaderCheckboxStates();
@@ -1826,202 +1790,244 @@
       }
       return out;
     }
-//------------------------- clean Headers function start-----------------------------------
-  // Replace the cleanHeaders function with this version
-function cleanHeaders(rawSource) {
-  const splitIdx = rawSource.search(/\r?\n\r?\n/);
-  let headerPart = '', bodyPart = '';
-  if (splitIdx === -1) {
-    headerPart = rawSource;
-  } else {
-    headerPart = rawSource.slice(0, splitIdx);
-    // Keep the exact separation (blank line) and the entire body
-    bodyPart = rawSource.slice(splitIdx);
-  }
 
-  const unfolded = unfoldLines(headerPart);
-  const kept = [];
-  removedHeadersCount = 0;
-
-  const replaceChecked = document.getElementById("replaceFromSubject").checked;
-  const fromRdnsChecked = document.getElementById("fromRdns").checked;
-  const removeXHeadersChecked = document.getElementById("removeXHeaders").checked;
-  const combineSubjectsChecked = document.getElementById("combineSubjects").checked;
-  const replaceMailtoLinksChecked = document.getElementById("replaceMailtoLinks").checked;
-  const newFromValue = newFrom.value.trim();
-  const newSubjectValue = newSubject.value.trim();
-
-  const replacementHeadersMap = {};
-  REPLACEMENT_HEADERS.forEach(header => {
-    const colonIndex = header.indexOf(':');
-    if (colonIndex !== -1) {
-      const headerName = header.substring(0, colonIndex).trim().toLowerCase();
-      const headerValue = header.substring(colonIndex + 1).trim();
-      replacementHeadersMap[headerName] = headerValue;
-    }
-  });
-
-  for (const line of unfolded) {
-    if (!line.trim()) {
-      kept.push(line);
-      continue;
-    }
-
-    const colonIndex = line.indexOf(':');
-    if (colonIndex === -1) {
-      kept.push(line);
-      continue;
-    }
-
-    const headerName = line.substring(0, colonIndex).trim();
-    const headerValue = line.substring(colonIndex + 1).trim();
-    const headerNameLower = headerName.toLowerCase();
-
-    // Check if this is an X- header and should be removed
-    if (removeXHeadersChecked && headerNameLower.startsWith('x-')) {
-      removedHeadersCount++;
-      continue;
-    }
-
-    const isAllowed = ALLOWED_HEADERS.some(allowed => 
-      headerNameLower === allowed.toLowerCase()
-    );
-
-    // Handle From header
-    if (headerNameLower === "from") {
-      if (replaceChecked && newFromValue) {
-        kept.push(`From: ${newFromValue}`);
-        removedHeadersCount++;
+    // Clean Headers function
+    function cleanHeaders(rawSource) {
+      const splitIdx = rawSource.search(/\r?\n\r?\n/);
+      let headerPart = '', bodyPart = '';
+      if (splitIdx === -1) {
+        headerPart = rawSource;
       } else {
-        let modifiedFrom = line;
-        
-        // Handle both formats for From header:
-        // 1. With angle brackets: "Name <user@domain.com>"
-        // 2. Without angle brackets: "user@domain.com"
-        
-        if (fromRdnsChecked) {
-          // Use [P_FROM] when checkbox is checked
-          // Replace in angle brackets format
-          modifiedFrom = modifiedFrom.replace(/<([^>]*@)[^>]*>/g, '<$1[P_FROM]>');
-          // Replace in simple email format (no angle brackets)
-          modifiedFrom = modifiedFrom.replace(/(From:\s*)([^\s<]+@)([^\s>]+)/g, '$1$2[P_FROM]');
-        } else {
-          // Use [RDNS] when checkbox is NOT checked
-          // Replace in angle brackets format
-          modifiedFrom = modifiedFrom.replace(/<([^>]*@)[^>]*>/g, '<$1[RDNS]>');
-          // Replace in simple email format (no angle brackets)
-          modifiedFrom = modifiedFrom.replace(/(From:\s*)([^\s<]+@)([^\s>]+)/g, '$1$2[RDNS]');
+        headerPart = rawSource.slice(0, splitIdx);
+        // Keep the exact separation (blank line) and the entire body
+        bodyPart = rawSource.slice(splitIdx);
+      }
+
+      const unfolded = unfoldLines(headerPart);
+      const kept = [];
+      removedHeadersCount = 0;
+
+      const replaceChecked = document.getElementById("replaceFromSubject").checked;
+      const fromRdnsChecked = document.getElementById("fromRdns").checked;
+      const removeXHeadersChecked = document.getElementById("removeXHeaders").checked;
+      const combineSubjectsChecked = document.getElementById("combineSubjects").checked;
+      const replaceMailtoLinksChecked = document.getElementById("replaceMailtoLinks").checked;
+      const newFromValue = newFrom.value.trim();
+      const newSubjectValue = newSubject.value.trim();
+
+      const replacementHeadersMap = {};
+      REPLACEMENT_HEADERS.forEach(header => {
+        const colonIndex = header.indexOf(':');
+        if (colonIndex !== -1) {
+          const headerName = header.substring(0, colonIndex).trim().toLowerCase();
+          const headerValue = header.substring(colonIndex + 1).trim();
+          replacementHeadersMap[headerName] = headerValue;
         }
-        
-        kept.push(modifiedFrom);
-      }
-      continue;
-    }
+      });
 
-    // Handle Sender header
-    if (headerNameLower === "sender") {
-      let modifiedSender = line;
-      
-      // Handle all formats for Sender header:
-      // 1. Simple: "Sender: user@domain.com"
-      // 2. With name: "Sender: Name <user@domain.com>"
-      // 3. With quoted name: "Sender: \"Name\" <user@domain.com>"
-      // 4. Angle brackets only: "Sender: <user@domain.com>"
-      
-      if (fromRdnsChecked) {
-        // Use [P_FROM] when checkbox is checked
-        // Replace in angle brackets format
-        modifiedSender = modifiedSender.replace(/<([^>]*@)[^>]*>/g, '<$1[P_FROM]>');
-        // Replace in simple email format (no angle brackets)
-        modifiedSender = modifiedSender.replace(/(Sender:\s*)([^\s<]+@)([^\s>]+)/g, '$1$2[P_FROM]');
-      } else {
-        // Use [RDNS] when checkbox is NOT checked
-        // Replace in angle brackets format
-        modifiedSender = modifiedSender.replace(/<([^>]*@)[^>]*>/g, '<$1[RDNS]>');
-        // Replace in simple email format (no angle brackets)
-        modifiedSender = modifiedSender.replace(/(Sender:\s*)([^\s<]+@)([^\s>]+)/g, '$1$2[RDNS]');
-      }
-      
-      kept.push(modifiedSender);
-      continue;
-    }
-
-    // Handle Date header - replace with [date] if replacement headers are saved
-    if (headerNameLower === "date") {
-      if (replacementHeadersMap['date']) {
-        kept.push(`Date: ${replacementHeadersMap['date']}`);
-        removedHeadersCount++;
-      } else {
-        kept.push(line);
-      }
-      continue;
-    }
-
-    if (headerNameLower === "subject") {
-      if (combineSubjectsChecked && newSubjectValue) {
-        // Combine original subject with new subject
-        kept.push(`Subject: ${headerValue} ${newSubjectValue}`);
-        removedHeadersCount++;
-      } else if (replaceChecked && newSubjectValue) {
-        // Replace with new subject only
-        kept.push(`Subject: ${newSubjectValue}`);
-        removedHeadersCount++;
-      } else {
-        // Keep original subject
-        kept.push(line);
-      }
-      continue;
-    }
-
-    if (headerNameLower === "message-id") {
-      const messageIdModified = line.replace(/(<[^@<>]+)(@[^<>]+>)/, "$1[eid]$2");
-      kept.push(messageIdModified);
-      continue;
-    }
-
-    if (isAllowed) {
-      kept.push(line);
-    } else {
-      if (replacementHeadersMap[headerNameLower]) {
-        kept.push(`${headerName}: ${replacementHeadersMap[headerNameLower]}`);
-        removedHeadersCount++;
-      } else {
-        const shouldRemove = HEADERS_TO_REMOVE.includes(headerNameLower) && 
-          document.getElementById(`remove-${headerNameLower}`)?.checked;
-        
-        if (shouldRemove) {
-          removedHeadersCount++;
-        } else {
+      for (const line of unfolded) {
+        if (!line.trim()) {
           kept.push(line);
+          continue;
+        }
+
+        const colonIndex = line.indexOf(':');
+        if (colonIndex === -1) {
+          kept.push(line);
+          continue;
+        }
+
+        const headerName = line.substring(0, colonIndex).trim();
+        const headerValue = line.substring(colonIndex + 1).trim();
+        const headerNameLower = headerName.toLowerCase();
+
+        // Check if this is an X- header and should be removed
+        if (removeXHeadersChecked && headerNameLower.startsWith('x-')) {
+          removedHeadersCount++;
+          continue;
+        }
+
+        const isAllowed = ALLOWED_HEADERS.some(allowed => 
+          headerNameLower === allowed.toLowerCase()
+        );
+
+        // Handle From header
+        if (headerNameLower === "from") {
+          if (replaceChecked && newFromValue) {
+            kept.push(`From: ${newFromValue}`);
+            removedHeadersCount++;
+          } else {
+            let modifiedFrom = line;
+            
+            // Handle both formats for From header:
+            // 1. With angle brackets: "Name <user@domain.com>"
+            // 2. Without angle brackets: "user@domain.com"
+            
+            if (fromRdnsChecked) {
+              // Use [P_FROM] when checkbox is checked
+              // Replace in angle brackets format
+              modifiedFrom = modifiedFrom.replace(/<([^>]*@)[^>]*>/g, '<$1[P_FROM]>');
+              // Replace in simple email format (no angle brackets)
+              modifiedFrom = modifiedFrom.replace(/(From:\s*)([^\s<]+@)([^\s>]+)/g, '$1$2[P_FROM]');
+            } else {
+              // Use [RDNS] when checkbox is NOT checked
+              // Replace in angle brackets format
+              modifiedFrom = modifiedFrom.replace(/<([^>]*@)[^>]*>/g, '<$1[RDNS]>');
+              // Replace in simple email format (no angle brackets)
+              modifiedFrom = modifiedFrom.replace(/(From:\s*)([^\s<]+@)([^\s>]+)/g, '$1$2[RDNS]');
+            }
+            
+            kept.push(modifiedFrom);
+          }
+          continue;
+        }
+
+        // Handle Sender header
+        if (headerNameLower === "sender") {
+          let modifiedSender = line;
+          
+          // Handle all formats for Sender header:
+          // 1. Simple: "Sender: user@domain.com"
+          // 2. With name: "Sender: Name <user@domain.com>"
+          // 3. With quoted name: "Sender: \"Name\" <user@domain.com>"
+          // 4. Angle brackets only: "Sender: <user@domain.com>"
+          
+          if (fromRdnsChecked) {
+            // Use [P_FROM] when checkbox is checked
+            // Replace in angle brackets format
+            modifiedSender = modifiedSender.replace(/<([^>]*@)[^>]*>/g, '<$1[P_FROM]>');
+            // Replace in simple email format (no angle brackets)
+            modifiedSender = modifiedSender.replace(/(Sender:\s*)([^\s<]+@)([^\s>]+)/g, '$1$2[P_FROM]');
+          } else {
+            // Use [RDNS] when checkbox is NOT checked
+            // Replace in angle brackets format
+            modifiedSender = modifiedSender.replace(/<([^>]*@)[^>]*>/g, '<$1[RDNS]>');
+            // Replace in simple email format (no angle brackets)
+            modifiedSender = modifiedSender.replace(/(Sender:\s*)([^\s<]+@)([^\s>]+)/g, '$1$2[RDNS]');
+          }
+          
+          kept.push(modifiedSender);
+          continue;
+        }
+
+        // Handle Date header - replace with [date] if replacement headers are saved
+        if (headerNameLower === "date") {
+          if (replacementHeadersMap['date']) {
+            kept.push(`Date: ${replacementHeadersMap['date']}`);
+            removedHeadersCount++;
+          } else {
+            kept.push(line);
+          }
+          continue;
+        }
+
+        if (headerNameLower === "subject") {
+          if (combineSubjectsChecked && newSubjectValue) {
+            // Combine original subject with new subject
+            kept.push(`Subject: ${headerValue} ${newSubjectValue}`);
+            removedHeadersCount++;
+          } else if (replaceChecked && newSubjectValue) {
+            // Replace with new subject only
+            kept.push(`Subject: ${newSubjectValue}`);
+            removedHeadersCount++;
+          } else {
+            // Keep original subject
+            kept.push(line);
+          }
+          continue;
+        }
+
+        if (headerNameLower === "message-id") {
+          const messageIdModified = line.replace(/(<[^@<>]+)(@[^<>]+>)/, "$1[eid]$2");
+          kept.push(messageIdModified);
+          continue;
+        }
+
+        if (isAllowed) {
+          kept.push(line);
+        } else {
+          if (replacementHeadersMap[headerNameLower]) {
+            kept.push(`${headerName}: ${replacementHeadersMap[headerNameLower]}`);
+            removedHeadersCount++;
+          } else {
+            const shouldRemove = HEADERS_TO_REMOVE.includes(headerNameLower) && 
+              document.getElementById(`remove-${headerNameLower}`)?.checked;
+            
+            if (shouldRemove) {
+              removedHeadersCount++;
+            } else {
+              kept.push(line);
+            }
+          }
         }
       }
-    }
-  }
 
-  REPLACEMENT_HEADERS.forEach(header => {
-    const colonIndex = header.indexOf(':');
-    if (colonIndex !== -1) {
-      const headerName = header.substring(0, colonIndex).trim().toLowerCase();
-      const headerExists = kept.some(line => 
-        line.toLowerCase().startsWith(headerName + ':')
-      );
-      if (!headerExists) {
-        kept.push(header);
+      REPLACEMENT_HEADERS.forEach(header => {
+        const colonIndex = header.indexOf(':');
+        if (colonIndex !== -1) {
+          const headerName = header.substring(0, colonIndex).trim().toLowerCase();
+          const headerExists = kept.some(line => 
+            line.toLowerCase().startsWith(headerName + ':')
+          );
+          if (!headerExists) {
+            kept.push(header);
+          }
+        }
+      });
+
+      // Only process mailto links if checkbox is checked
+      if (replaceMailtoLinksChecked && bodyPart) {
+        // Use a simple string replacement for mailto links in the entire body
+        // This preserves all line breaks and formatting exactly
+        bodyPart = bodyPart.replace(/mailto:/gi, 'mailtoo:');
       }
+
+      // Return the cleaned headers followed by the exact body (unchanged except for mailto processing)
+      return bodyPart ? kept.join('\r\n') + bodyPart : kept.join('\r\n');
     }
-  });
 
-  // Only process mailto links if checkbox is checked
-  if (replaceMailtoLinksChecked && bodyPart) {
-    // Use a simple string replacement for mailto links in the entire body
-    // This preserves all line breaks and formatting exactly
-    bodyPart = bodyPart.replace(/mailto:/gi, 'mailtoo:');
-  }
-
-  // Return the cleaned headers followed by the exact body (unchanged except for mailto processing)
-  return bodyPart ? kept.join('\r\n') + bodyPart : kept.join('\r\n');
-}
-//-----------------------------------------end------------------------------------------
+    // Auto-clean function that runs when email source is pasted
+    function autoCleanHeaders() {
+      const src = inputEl.value || '';
+      if (!src.trim()) {
+        outpre.textContent = 'Please paste email source first.';
+        outputCount.textContent = outpre.textContent.length + " characters";
+        showAlertInElement('Please paste email source first.', 'error');
+        resetLayout();
+        return;
+      }
+      
+      const cleaned = cleanHeaders(src);
+      outpre.textContent = cleaned;
+      outputCount.textContent = cleaned.length + " characters";
+      
+      // Auto-save to history when cleaning
+      const historyItem = addToHistory(src);
+      
+      // Check for mailto links ONLY in <a href=""> tags in the HTML body
+      const mailtoLinks = checkMailtoLinksInEmail(cleaned);
+      showMailtoAlerts(mailtoLinks);
+      
+      // Change layout to cleaned state
+      setCleanedLayout();
+      
+      // Custom toast message
+      if (combineSubjects.checked && newSubject.value.trim()) {
+        showToast('Email headers cleaned with combined subjects!');
+      } else if (replaceMailtoLinks.checked) {
+        showToast('Email headers cleaned with mailto changed to mailtoo!');
+      } else {
+        showToast('Email headers cleaned automatically!');
+      }
+      
+      // Auto-show history modal after cleaning (with 1 second delay)
+      setTimeout(() => {
+        if (historyItem) {
+          displayHistory();
+          historyModal.style.display = 'flex';
+        }
+      }, 1000);
+    }
 
     // Layout management functions
     function setCleanedLayout() {
@@ -2035,6 +2041,23 @@ function cleanHeaders(rawSource) {
     // Event Listeners
     inputEl.addEventListener('input', () => {
       inputCount.textContent = inputEl.value.length + " characters";
+      
+      // Auto-clean when email source is pasted (with a small delay to prevent excessive processing)
+      if (inputEl.value.length > 50) { // Only auto-clean if there's substantial content
+        clearTimeout(inputEl.autoCleanTimeout);
+        inputEl.autoCleanTimeout = setTimeout(autoCleanHeaders, 500);
+      } else {
+        resetLayout();
+      }
+    });
+
+    inputEl.addEventListener('paste', () => {
+      // Add a small delay to allow the paste to complete
+      setTimeout(() => {
+        if (inputEl.value.length > 50) {
+          autoCleanHeaders();
+        }
+      }, 100);
     });
 
     settingsBtn.addEventListener('click', () => {
@@ -2107,58 +2130,62 @@ function cleanHeaders(rawSource) {
         combineSubjects.checked = false;
         fromRdns.checked = false;
       saveSettingsToStorage();
+      // Auto-clean when checkbox changes
+      if (inputEl.value.length > 50) {
+        autoCleanHeaders();
+      }
     });
 
     fromRdns.addEventListener('change', () => {
        replaceFromSubject.checked = false;
       saveSettingsToStorage();
+      // Auto-clean when checkbox changes
+      if (inputEl.value.length > 50) {
+        autoCleanHeaders();
+      }
     });
 
     removeXHeaders.addEventListener('change', () => {
       saveSettingsToStorage();
+      // Auto-clean when checkbox changes
+      if (inputEl.value.length > 50) {
+        autoCleanHeaders();
+      }
     });
 
     combineSubjects.addEventListener('change', () => {
       replaceFromSubject.checked = false;
       saveSettingsToStorage();
+      // Auto-clean when checkbox changes
+      if (inputEl.value.length > 50) {
+        autoCleanHeaders();
+      }
     });
 
     replaceMailtoLinks.addEventListener('change', () => {
       saveSettingsToStorage();
-    });
-
-    cleanBtn.addEventListener('click', () => {
-      const src = inputEl.value || '';
-      if (!src.trim()) {
-        outpre.textContent = 'Please paste email source first.';
-        outputCount.textContent = outpre.textContent.length + " characters";
-        showAlertInElement('Please paste email source first.', 'error');
-        return;
-      }
-      const cleaned = cleanHeaders(src);
-      outpre.textContent = cleaned;
-      outputCount.textContent = cleaned.length + " characters";
-      
-      // Add to history when cleaning (auto-save without name)
-      addToHistory(src);
-      
-      // Check for mailto links ONLY in <a href=""> tags in the HTML body
-      const mailtoLinks = checkMailtoLinksInEmail(cleaned);
-      showMailtoAlerts(mailtoLinks);
-      
-      // Change layout to cleaned state
-      setCleanedLayout();
-      
-      // Custom toast message
-      if (combineSubjects.checked && newSubject.value.trim()) {
-        showToast('Email headers cleaned with combined subjects!');
-      } else if (replaceMailtoLinks.checked) {
-        showToast('Email headers cleaned with mailto changed to mailtoo!');
-      } else {
-        showToast('Email headers cleaned successfully!');
+      // Auto-clean when checkbox changes
+      if (inputEl.value.length > 50) {
+        autoCleanHeaders();
       }
     });
 
+    // When From or Subject fields change, auto-clean if there's content
+    newFrom.addEventListener('input', () => {
+      if (inputEl.value.length > 50) {
+        clearTimeout(newFrom.autoCleanTimeout);
+        newFrom.autoCleanTimeout = setTimeout(autoCleanHeaders, 500);
+      }
+    });
+
+    newSubject.addEventListener('input', () => {
+      if (inputEl.value.length > 50) {
+        clearTimeout(newSubject.autoCleanTimeout);
+        newSubject.autoCleanTimeout = setTimeout(autoCleanHeaders, 500);
+      }
+    });
+
+    // MANUAL Copy button (not automatic)
     copyBtn.addEventListener('click', async () => {
       const txt = outpre.textContent;
       if (!txt || txt === 'Cleaned email will appear here...') {
@@ -2169,37 +2196,12 @@ function cleanHeaders(rawSource) {
       copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
       showToast('Cleaned email copied to clipboard!');
       
-      // Auto-save to history with name from From + Subject + Date
-      const fromValue = newFrom.value.trim();
-      const subjectValue = newSubject.value.trim();
-      const currentDate = new Date().toLocaleString();
-      
-      // Create name from From + Subject + Date
-      let nameParts = [];
-      if (fromValue) nameParts.push(fromValue);
-      if (subjectValue) nameParts.push(subjectValue);
-      nameParts.push(currentDate);
-      
-      const autoName = nameParts.join(' - ');
-      addToHistory(inputEl.value, autoName);
-      
-      // Clean all inputs and outputs
-      inputEl.value = '';
-      outpre.textContent = 'Cleaned email will appear here...';
-      inputCount.textContent = "0 characters";
-      outputCount.textContent = "0 characters";
-      
-      // DON'T clear the alert when copy button is clicked
-      // Keep the alert visible
-      
-      // Reset layout to default state
-      resetLayout();
-      
       setTimeout(() => {
         copyBtn.innerHTML = '<i class="far fa-copy"></i> Copy';
       }, 2000);
     });
 
+    // MANUAL Download button (not automatic)
     downloadBtn.addEventListener('click', () => {
       const txt = outpre.textContent;
       if (!txt || txt === 'Cleaned email will appear here...') {
@@ -2229,113 +2231,113 @@ function cleanHeaders(rawSource) {
         }
       }
     });
-//--------------------------
-	  // Prevent keyboard shortcuts for developer tools
-document.addEventListener('keydown', function(e) {
-    // Disable F12
-    if (e.key === 'F12') {
-        e.preventDefault();
-        return false;
-    }
-    
-    // Disable Ctrl+Shift+I (Chrome, Firefox)
-    if (e.ctrlKey && e.shiftKey && e.key === 'I') {
-        e.preventDefault();
-        return false;
-    }
-    
-    // Disable Ctrl+Shift+J (Chrome)
-    if (e.ctrlKey && e.shiftKey && e.key === 'J') {
-        e.preventDefault();
-        return false;
-    }
-    
-    // Disable Ctrl+U (View source)
-    if (e.ctrlKey && e.key === 'u') {
-        e.preventDefault();
-        return false;
-    }
-    
-    // Disable Ctrl+Shift+C (Inspect element)
-    if (e.ctrlKey && e.shiftKey && e.key === 'C') {
-        e.preventDefault();
-        return false;
-    }
-    
-    // Disable Ctrl+S (Save page)
-    if (e.ctrlKey && e.key === 's') {
-        e.preventDefault();
-        return false;
-    }
-});
 
-// Detect and prevent developer tools opening
-(function() {
-    let devtools = {
-        open: false,
-        orientation: null
-    };
-    
-    let threshold = 160;
-    
-    let emitEvent = function(state, orientation) {
-        window.dispatchEvent(new CustomEvent('devtoolschange', {
-            detail: {
-                open: state,
-                orientation: orientation
-            }
-        }));
-    };
-    
-    setInterval(function() {
-        let widthThreshold = window.outerWidth - window.innerWidth > threshold;
-        let heightThreshold = window.outerHeight - window.innerHeight > threshold;
-        let orientation = widthThreshold ? 'vertical' : 'horizontal';
+    // Prevent keyboard shortcuts for developer tools
+    document.addEventListener('keydown', function(e) {
+        // Disable F12
+        if (e.key === 'F12') {
+            e.preventDefault();
+            return false;
+        }
         
-        if (!(heightThreshold && widthThreshold) &&
-            ((window.Firebug && window.Firebug.chrome && window.Firebug.chrome.isInitialized) || widthThreshold || heightThreshold)) {
-            
-            if (!devtools.open || devtools.orientation !== orientation) {
-                emitEvent(true, orientation);
-            }
-            
-            devtools.open = true;
-            devtools.orientation = orientation;
-        } else {
-            if (devtools.open) {
-                emitEvent(false, null);
-            }
-            
-            devtools.open = false;
-            devtools.orientation = null;
+        // Disable Ctrl+Shift+I (Chrome, Firefox)
+        if (e.ctrlKey && e.shiftKey && e.key === 'I') {
+            e.preventDefault();
+            return false;
         }
-    }, 500);
-    
-    window.addEventListener('devtoolschange', function(event) {
-        if (event.detail.open) {
-            // Developer tools opened - redirect or show warning
-            document.body.innerHTML = '<div style="display:flex;justify-content:center;align-items:center;height:100vh;font-family:Arial,sans-serif;background:#f0f0f0;"><div style="text-align:center;padding:2rem;background:white;border-radius:10px;box-shadow:0 4px 6px rgba(0,0,0,0.1)"><h1 style="color:#e74c3c;">Developer Tools Detected</h1><p>Inspection is not allowed on this page.</p><p>Please close developer tools to continue.</p></div></div>';
+        
+        // Disable Ctrl+Shift+J (Chrome)
+        if (e.ctrlKey && e.shiftKey && e.key === 'J') {
+            e.preventDefault();
+            return false;
+        }
+        
+        // Disable Ctrl+U (View source)
+        if (e.ctrlKey && e.key === 'u') {
+            e.preventDefault();
+            return false;
+        }
+        
+        // Disable Ctrl+Shift+C (Inspect element)
+        if (e.ctrlKey && e.shiftKey && e.key === 'C') {
+            e.preventDefault();
+            return false;
+        }
+        
+        // Disable Ctrl+S (Save page)
+        if (e.ctrlKey && e.key === 's') {
+            e.preventDefault();
+            return false;
         }
     });
-})();
 
-// Enable full text selection and editing capabilities
-document.addEventListener('DOMContentLoaded', function() {
-    // Enable text selection for the whole document
-    document.body.style.userSelect = 'text';
-    document.body.style.webkitUserSelect = 'text';
-    document.body.style.mozUserSelect = 'text';
-    document.body.style.msUserSelect = 'text';
-    
-    // Ensure textareas and inputs allow selection
-    const textInputs = document.querySelectorAll('textarea, input[type="text"], input[type="email"]');
-    textInputs.forEach(input => {
-        input.style.userSelect = 'text';
-        input.style.webkitUserSelect = 'text';
-        input.style.mozUserSelect = 'text';
-        input.style.msUserSelect = 'text';
+    // Detect and prevent developer tools opening
+    (function() {
+        let devtools = {
+            open: false,
+            orientation: null
+        };
+        
+        let threshold = 160;
+        
+        let emitEvent = function(state, orientation) {
+            window.dispatchEvent(new CustomEvent('devtoolschange', {
+                detail: {
+                    open: state,
+                    orientation: orientation
+                }
+            }));
+        };
+        
+        setInterval(function() {
+            let widthThreshold = window.outerWidth - window.innerWidth > threshold;
+            let heightThreshold = window.outerHeight - window.innerHeight > threshold;
+            let orientation = widthThreshold ? 'vertical' : 'horizontal';
+            
+            if (!(heightThreshold && widthThreshold) &&
+                ((window.Firebug && window.Firebug.chrome && window.Firebug.chrome.isInitialized) || widthThreshold || heightThreshold)) {
+                
+                if (!devtools.open || devtools.orientation !== orientation) {
+                    emitEvent(true, orientation);
+                }
+                
+                devtools.open = true;
+                devtools.orientation = orientation;
+            } else {
+                if (devtools.open) {
+                    emitEvent(false, null);
+                }
+                
+                devtools.open = false;
+                devtools.orientation = null;
+            }
+        }, 500);
+        
+        window.addEventListener('devtoolschange', function(event) {
+            if (event.detail.open) {
+                // Developer tools opened - redirect or show warning
+                document.body.innerHTML = '<div style="display:flex;justify-content:center;align-items:center;height:100vh;font-family:Arial,sans-serif;background:#f0f0f0;"><div style="text-align:center;padding:2rem;background:white;border-radius:10px;box-shadow:0 4px 6px rgba(0,0,0,0.1)"><h1 style="color:#e74c3c;">Developer Tools Detected</h1><p>Inspection is not allowed on this page.</p><p>Please close developer tools to continue.</p></div></div>';
+            }
+        });
+    })();
+
+    // Enable full text selection and editing capabilities
+    document.addEventListener('DOMContentLoaded', function() {
+        // Enable text selection for the whole document
+        document.body.style.userSelect = 'text';
+        document.body.style.webkitUserSelect = 'text';
+        document.body.style.mozUserSelect = 'text';
+        document.body.style.msUserSelect = 'text';
+        
+        // Ensure textareas and inputs allow selection
+        const textInputs = document.querySelectorAll('textarea, input[type="text"], input[type="email"]');
+        textInputs.forEach(input => {
+            input.style.userSelect = 'text';
+            input.style.webkitUserSelect = 'text';
+            input.style.mozUserSelect = 'text';
+            input.style.msUserSelect = 'text';
+        });
     });
-});
 
     // Initialize the application
     document.getElementById('year').textContent = new Date().getFullYear();
