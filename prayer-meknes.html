@@ -55,6 +55,19 @@
             border-radius: 40px;
             border: 1px solid #c6a177;
         }
+
+        /* sliding panel */
+        .control-slider {
+            background: #1d5943;
+            border-bottom: 2px solid #c49f75;
+            overflow: hidden;
+            transition: max-height 0.25s ease;
+            max-height: 0;
+        }
+        .control-slider.visible {
+            max-height: 400px;
+        }
+
         .notification-bar {
             background: #1d5943;
             color: #fbe9cf;
@@ -85,6 +98,142 @@
             color: #1f1b14;
             font-weight: 500;
         }
+
+        /* config panel - updated for multi-chat */
+        .config-panel {
+            background: #2f5847;
+            padding: 0.8rem 2rem 1rem 2rem;
+            color: #f5e1c4;
+        }
+        .config-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 12px;
+        }
+        .config-field {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            flex: 1;
+            min-width: 250px;
+        }
+        .config-field label {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #ffdbb5;
+            min-width: 60px;
+        }
+        .config-field input {
+            background: #faf4e9;
+            border: 1px solid #b2916b;
+            border-radius: 40px;
+            padding: 0.4rem 1rem;
+            width: 100%;
+            font-size: 0.9rem;
+            direction: ltr;
+            color: #1f3a30;
+        }
+        .config-field input::placeholder {
+            color: #7b8a7d;
+            font-size: 0.8rem;
+        }
+        .chat-ids-container {
+            background: #1d5943;
+            border-radius: 16px;
+            padding: 12px 16px;
+            margin-top: 8px;
+            border: 1px solid #c49f75;
+        }
+        .chat-id-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+        .chat-id-row:last-child {
+            margin-bottom: 0;
+        }
+        .chat-id-input {
+            flex: 1;
+            background: #faf4e9;
+            border: 1px solid #b2916b;
+            border-radius: 40px;
+            padding: 0.4rem 1rem;
+            font-size: 0.9rem;
+            direction: ltr;
+            color: #1f3a30;
+        }
+        .remove-chat-btn {
+            background: #b2916b;
+            border: none;
+            color: #1f1b14;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #4e3e2b;
+        }
+        .remove-chat-btn:hover {
+            background: #c49f75;
+        }
+        .add-chat-btn {
+            background: #b2916b;
+            border: none;
+            color: #1f1b14;
+            padding: 0.3rem 1.2rem;
+            border-radius: 40px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-top: 8px;
+            border: 1px solid #4e3e2b;
+        }
+        .add-chat-btn:hover {
+            background: #c49f75;
+        }
+        .chat-count-badge {
+            background: #c49f75;
+            color: #1f1b14;
+            padding: 0.2rem 1rem;
+            border-radius: 40px;
+            font-size: 0.85rem;
+        }
+
+        .toggle-button-row {
+            background: #1d5943;
+            padding: 0.5rem 2rem;
+            display: flex;
+            justify-content: flex-end;
+            border-bottom: 2px solid #c49f75;
+        }
+        .icon-btn {
+            background: #b2916b;
+            border: none;
+            color: #1f1b14;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            font-size: 1.8rem;
+            line-height: 1;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #4e3e2b;
+            transition: 0.2s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        .icon-btn:hover {
+            background: #c9aa84;
+        }
+
         .prayer-table-container {
             padding: 1.8rem 1.5rem 1.2rem 1.5rem;
             overflow-x: auto;
@@ -181,10 +330,6 @@
         .control-btn:hover {
             background: #c9aa84;
         }
-        .control-btn.active {
-            background: #c49f75;
-            box-shadow: 0 0 10px #f7e3b4;
-        }
         .log-container {
             background: #2a3d33;
             color: #e9cfb5;
@@ -197,17 +342,6 @@
         .log-entry {
             margin: 2px 0;
             font-family: monospace;
-        }
-        /* Today indicator */
-        .today-marker {
-            display: inline-block;
-            background: #c49f75;
-            color: #1f1b14;
-            font-size: 0.7rem;
-            padding: 2px 8px;
-            border-radius: 20px;
-            margin-left: 8px;
-            font-weight: bold;
         }
     </style>
 </head>
@@ -223,22 +357,57 @@
         <div id="todayDisplay" style="margin-top: 10px; background: rgba(196, 159, 117, 0.3); padding: 5px 15px; border-radius: 40px; display: inline-block;"></div>
     </div>
 
-    <!-- Notification Control Bar -->
-    <div class="notification-bar">
-        <div class="notification-status">
-            <div class="status-badge" id="status-badge">
-                <span id="status-icon">⏸️</span>
-                <span id="status-text">متوقف</span>
+    <!-- single icon button -->
+    <div class="toggle-button-row">
+        <button class="icon-btn" id="togglePanelBtn" onclick="toggleControlPanel()">⚙️</button>
+    </div>
+
+    <!-- sliding container -->
+    <div class="control-slider" id="controlSlider">
+        <!-- Notification Bar -->
+        <div class="notification-bar">
+            <div class="notification-status">
+                <div class="status-badge" id="status-badge">
+                    <span id="status-icon">⏸️</span>
+                    <span id="status-text">متوقف</span>
+                </div>
+                <div class="status-badge">
+                    <span>⏰</span>
+                    <span>5 دقائق قبل الصلاة</span>
+                </div>
+                <div class="status-badge" id="chatCountBadge">
+                    <span>👥</span>
+                    <span id="chatCount">0</span>
+                </div>
             </div>
-            <div class="status-badge">
-                <span>⏰</span>
-                <span>5 دقائق قبل الصلاة</span>
+            <div>
+                <button class="control-btn" id="startBtn" onclick="startNotifier()">▶️ بدء التنبيهات</button>
+                <button class="control-btn" id="stopBtn" onclick="stopNotifier()" style="display: none;">⏹️ إيقاف</button>
+                <button class="control-btn" onclick="testNotification()">🔔 إرسال اختبار</button>
             </div>
         </div>
-        <div>
-            <button class="control-btn" id="startBtn" onclick="startNotifier()">▶️ بدء التنبيهات</button>
-            <button class="control-btn" id="stopBtn" onclick="stopNotifier()" style="display: none;">⏹️ إيقاف</button>
-            <button class="control-btn" onclick="testNotification()">🔔 إرسال اختبار</button>
+
+        <!-- Config panel with multi-chat support -->
+        <div class="config-panel">
+            <div class="config-row">
+                <div class="config-field">
+                    <label>🤖 توكن البوت:</label>
+                    <input type="text" id="botToken" placeholder="123456:ABC-DEF1234" value="">
+                </div>
+            </div>
+            
+            <div class="chat-ids-container">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <span style="color: #ffdbb5; font-weight: 500;">👥 معرفات الدردشة (المستلمون)</span>
+                    <span class="chat-count-badge" id="chatCountLabel">0</span>
+                </div>
+                <div id="chatIdsList"></div>
+                <button class="add-chat-btn" onclick="addChatIdField()">➕ إضافة معرف جديد</button>
+            </div>
+            
+            <div style="font-size:0.85rem; color:#ffe1b3; margin-top: 8px; text-align: left;">
+                💾 يتم الحفظ تلقائياً
+            </div>
         </div>
     </div>
 
@@ -305,18 +474,19 @@
 
     <!-- Notification Log -->
     <div class="log-container" id="log-container">
-        <div class="log-entry">✅ النظام جاهز. اضغط "بدء التنبيهات" للتفعيل</div>
+        <div class="log-entry">✅ النظام جاهز. أضف معرفات الدردشة ثم اضغط بدء</div>
     </div>
 </div>
 
 <script>
-// Telegram Configuration
-const TELEGRAM_BOT_TOKEN = "8395150174:AAGCipYKNEX_wONgJzMcOsr35GnTUyTMdsE";
-const TELEGRAM_CHAT_ID = "1423164813";
+// ==================== Multi-Chat Configuration ====================
+let notifierInterval = null;
+let isRunning = false;
+let lastNotificationDate = null;
+let sentNotifications = new Set();
 
-// Prayer names mapping (English for message)
 const PRAYER_NAMES = {
-    'العشاء': 'العشاء ',
+    'العشاء': 'العشاء',
     'المغرب': 'المغرب',
     'العصر': 'العصر',
     'الظهر': 'الظهر',
@@ -324,13 +494,129 @@ const PRAYER_NAMES = {
     'الصبح': 'الصبح'
 };
 
-// State
-let notifierInterval = null;
-let isRunning = false;
-let lastNotificationDate = null;
-let sentNotifications = new Set(); // Track which prayers we've sent today
+// DOM elements
+const tokenInput = document.getElementById('botToken');
+const chatIdsList = document.getElementById('chatIdsList');
+const controlSlider = document.getElementById('controlSlider');
+const toggleBtn = document.getElementById('togglePanelBtn');
+const chatCountSpan = document.getElementById('chatCount');
+const chatCountLabel = document.getElementById('chatCountLabel');
 
-// Logging function
+// Store chat IDs as array
+let chatIds = [];
+
+// Load saved data from localStorage
+function loadStoredConfig() {
+    // Load token
+    const savedToken = localStorage.getItem('telegram_bot_token') || '';
+    tokenInput.value = savedToken;
+    
+    // Load chat IDs array
+    const savedChatIds = localStorage.getItem('telegram_chat_ids');
+    if (savedChatIds) {
+        try {
+            chatIds = JSON.parse(savedChatIds);
+            if (!Array.isArray(chatIds)) chatIds = [];
+        } catch {
+            chatIds = [];
+        }
+    } else {
+        // Initialize with one empty field if no saved data
+        chatIds = [''];
+    }
+    
+    // Ensure at least one field
+    if (chatIds.length === 0) chatIds = [''];
+    
+    renderChatIdFields();
+    updateChatCount();
+    addLog('📂 تم تحميل الإعدادات المحفوظة');
+}
+
+// Render all chat ID input fields
+function renderChatIdFields() {
+    chatIdsList.innerHTML = '';
+    chatIds.forEach((id, index) => {
+        const row = document.createElement('div');
+        row.className = 'chat-id-row';
+        
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.className = 'chat-id-input';
+        input.value = id;
+        input.placeholder = 'معرف الدردشة ' + (index + 1);
+        input.addEventListener('input', (e) => {
+            chatIds[index] = e.target.value.trim();
+            saveChatIds();
+            updateChatCount();
+        });
+        
+        const removeBtn = document.createElement('button');
+        removeBtn.className = 'remove-chat-btn';
+        removeBtn.innerHTML = '✕';
+        removeBtn.onclick = () => {
+            if (chatIds.length > 1) {
+                chatIds.splice(index, 1);
+                renderChatIdFields();
+                saveChatIds();
+                updateChatCount();
+                addLog('🗑️ تم حذف معرف دردشة');
+            }
+        };
+        
+        row.appendChild(input);
+        row.appendChild(removeBtn);
+        chatIdsList.appendChild(row);
+    });
+}
+
+// Add new chat ID field
+function addChatIdField() {
+    chatIds.push('');
+    renderChatIdFields();
+    saveChatIds();
+    updateChatCount();
+    addLog('➕ تم إضافة معرف دردشة جديد');
+}
+window.addChatIdField = addChatIdField;
+
+// Save chat IDs to localStorage
+function saveChatIds() {
+    // Filter out empty values but keep structure
+    localStorage.setItem('telegram_chat_ids', JSON.stringify(chatIds));
+}
+
+// Update chat count display
+function updateChatCount() {
+    const nonEmptyCount = chatIds.filter(id => id.trim() !== '').length;
+    chatCountSpan.textContent = nonEmptyCount;
+    chatCountLabel.textContent = nonEmptyCount;
+}
+
+// Get non-empty chat IDs
+function getValidChatIds() {
+    return chatIds.filter(id => id.trim() !== '');
+}
+
+// Auto-save token
+tokenInput.addEventListener('input', () => {
+    localStorage.setItem('telegram_bot_token', tokenInput.value.trim());
+});
+
+// Toggle control panel
+function toggleControlPanel() {
+    const isHidden = !controlSlider.classList.contains('visible');
+    if (isHidden) {
+        controlSlider.classList.add('visible');
+        toggleBtn.innerHTML = '❌';
+    } else {
+        controlSlider.classList.remove('visible');
+        toggleBtn.innerHTML = '⚙️';
+    }
+}
+window.toggleControlPanel = toggleControlPanel;
+
+// Logging
 function addLog(message) {
     const logContainer = document.getElementById('log-container');
     const logEntry = document.createElement('div');
@@ -338,54 +624,76 @@ function addLog(message) {
     logEntry.textContent = `${new Date().toLocaleTimeString('ar-MA')} - ${message}`;
     logContainer.appendChild(logEntry);
     logContainer.scrollTop = logContainer.scrollHeight;
-    
-    // Keep only last 10 logs
     while (logContainer.children.length > 10) {
         logContainer.removeChild(logContainer.firstChild);
     }
 }
 
-// Send Telegram notification
+// Send Telegram notification to multiple recipients
 async function sendTelegramNotification(prayerName, prayerTime) {
+    const token = tokenInput.value.trim();
+    const validChatIds = getValidChatIds();
+    
+    if (!token) {
+        addLog('❌ التوكن فارغ. يرجى تعبئته');
+        return false;
+    }
+    
+    if (validChatIds.length === 0) {
+        addLog('❌ لا يوجد معرفات دردشة صالحة');
+        return false;
+    }
+
     const message = `🔔 تنبيه الصلاة\n\n🕌 صلاة ${prayerName} بعد 5 دقائق\n\n⏰ الوقت: ${prayerTime}`;
     
-    try {
-        const response = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                chat_id: TELEGRAM_CHAT_ID,
-                text: message,
-                parse_mode: 'HTML'
-            })
-        });
-        
-        const data = await response.json();
-        if (data.ok) {
-            addLog(`✅ تم إرسال تنبيه: ${prayerName}`);
-            return true;
-        } else {
-            addLog(`❌ فشل الإرسال: ${data.description}`);
-            return false;
+    let successCount = 0;
+    let failCount = 0;
+    
+    // Send to each chat ID
+    for (const chatId of validChatIds) {
+        try {
+            const response = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    chat_id: chatId, 
+                    text: message, 
+                    parse_mode: 'HTML' 
+                })
+            });
+            
+            const data = await response.json();
+            if (data.ok) {
+                successCount++;
+            } else {
+                failCount++;
+                addLog(`❌ فشل الإرسال إلى ${chatId}: ${data.description}`);
+            }
+        } catch (error) {
+            failCount++;
+            addLog(`❌ خطأ في الاتصال مع ${chatId}: ${error.message}`);
         }
-    } catch (error) {
-        addLog(`❌ خطأ في الاتصال: ${error.message}`);
+    }
+    
+    if (successCount > 0) {
+        addLog(`✅ تم الإرسال بنجاح إلى ${successCount} مستلم` + (failCount > 0 ? ` (فشل ${failCount})` : ''));
+        return true;
+    } else {
+        addLog(`❌ فشل الإرسال إلى جميع المستلمين (${failCount})`);
         return false;
     }
 }
 
 // Test notification
 async function testNotification() {
-    addLog('🔔 إرسال رسالة اختبار...');
+    addLog('🔔 إرسال رسالة اختبار إلى جميع المستلمين...');
     const success = await sendTelegramNotification('اختبار', new Date().toLocaleTimeString('ar-MA'));
     if (success) {
-        addLog('✅ تم إرسال رسالة الاختبار بنجاح');
+        addLog('✅ تم إرسال رسالة الاختبار');
     }
 }
 
-// Function to highlight today's row
+// Highlight today's row (same as before)
 function highlightTodayRow() {
     const table = document.getElementById('prayer-table');
     const rows = table.querySelectorAll('tbody tr');
@@ -393,50 +701,33 @@ function highlightTodayRow() {
     const todayDate = today.getDate();
     const todayWeekday = today.toLocaleDateString('ar-MA', { weekday: 'long' });
     
-    // First, remove any existing today-highlight class
-    rows.forEach(row => {
-        row.classList.remove('today-highlight');
-    });
-    
+    rows.forEach(row => row.classList.remove('today-highlight'));
     let foundRow = false;
     
     for (let row of rows) {
         const cells = row.querySelectorAll('td');
         if (cells.length < 9) continue;
+        const dateCell = cells[6].textContent.trim();
+        const weekdayCell = cells[8].textContent.trim();
         
-        const dateCell = cells[6].textContent.trim(); // February/March day
-        const weekdayCell = cells[8].textContent.trim(); // Weekday
-        
-        // Check if this row matches today
         if (parseInt(dateCell) === todayDate && weekdayCell === todayWeekday) {
             row.classList.add('today-highlight');
             foundRow = true;
-            
-            // Update today display
             const todayDisplay = document.getElementById('todayDisplay');
             const ramadanDay = cells[7].textContent.trim();
-            const gregorianDate = `${
-                todayDate <= 28 ? 'فبراير' : 'مارس'
-            } ${todayDate}`;
-            
+            const gregorianDate = `${todayDate <= 28 ? 'فبراير' : 'مارس'} ${todayDate}`;
             todayDisplay.innerHTML = `📅 اليوم: ${weekdayCell} ${gregorianDate} | رمضان ${ramadanDay}`;
-            
-            // Scroll to the row (optional)
             row.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            
             addLog(`📍 تم تحديد يوم اليوم: ${weekdayCell} ${gregorianDate} (رمضان ${ramadanDay})`);
             break;
         }
     }
-    
     if (!foundRow) {
-        // If today not found, use a default
         document.getElementById('todayDisplay').innerHTML = '📅 اليوم: غير محدد';
-        addLog('⚠️ لم يتم العثور على صف مطابق لليوم');
     }
 }
 
-// Get today's prayer times from the table
+// Get today's prayer times
 function getTodayPrayerTimes() {
     const table = document.getElementById('prayer-table');
     const rows = table.querySelectorAll('tbody tr');
@@ -447,14 +738,10 @@ function getTodayPrayerTimes() {
     for (let row of rows) {
         const cells = row.querySelectorAll('td');
         if (cells.length < 9) continue;
-        
         const dateCell = cells[6].textContent.trim();
         const weekdayCell = cells[8].textContent.trim();
-        
-        // Check if this row matches today
         if (parseInt(dateCell) === todayDate && weekdayCell === todayWeekday) {
-            // Found today's row
-            const prayerTimes = {
+            return {
                 'العشاء': cells[0].textContent.trim(),
                 'المغرب': cells[1].textContent.trim(),
                 'العصر': cells[2].textContent.trim(),
@@ -462,13 +749,8 @@ function getTodayPrayerTimes() {
                 'الشروق': cells[4].textContent.trim(),
                 'الصبح': cells[5].textContent.trim()
             };
-            
-            addLog(`📅 أوقات اليوم: ${Object.values(prayerTimes).join(', ')}`);
-            return prayerTimes;
         }
     }
-    
-    // If no match found, use first row as fallback
     addLog('⚠️ لم يتم العثور على صف اليوم، استخدام أول صف');
     const firstRow = rows[0].querySelectorAll('td');
     return {
@@ -481,19 +763,16 @@ function getTodayPrayerTimes() {
     };
 }
 
-// Check if it's time to send notifications
+// Check prayer times
 async function checkPrayerTimes() {
     if (!isRunning) return;
-    
     const now = new Date();
     const currentDate = now.toDateString();
     
-    // Reset notifications at midnight
     if (lastNotificationDate !== currentDate) {
         sentNotifications.clear();
         lastNotificationDate = currentDate;
         addLog('📆 يوم جديد - تم إعادة تعيين التنبيهات');
-        // Re-highlight today's row at midnight
         highlightTodayRow();
     }
     
@@ -501,85 +780,77 @@ async function checkPrayerTimes() {
     const currentTime = now.getHours() * 60 + now.getMinutes();
     
     for (const [prayerName, timeStr] of Object.entries(prayerTimes)) {
-        // Skip if we already sent notification for this prayer today
         if (sentNotifications.has(prayerName)) continue;
-        
-        // Parse prayer time
         const [hours, minutes] = timeStr.split(':').map(Number);
         const prayerMinutes = hours * 60 + minutes;
-        const notifyTime = prayerMinutes - 5; // 5 minutes before
+        const notifyTime = prayerMinutes - 5;
         
-        // Check if current time is exactly the notification time
-        // Allow 1 minute window to catch any missed checks
         if (currentTime >= notifyTime && currentTime < notifyTime + 1) {
             addLog(`🔔 وقت تنبيه ${prayerName} (الساعة ${timeStr})`);
             const success = await sendTelegramNotification(PRAYER_NAMES[prayerName], timeStr);
-            if (success) {
-                sentNotifications.add(prayerName);
-            }
+            if (success) sentNotifications.add(prayerName);
         }
     }
 }
 
-// Start the notifier
+// Start notifier
 function startNotifier() {
     if (isRunning) return;
+    
+    const token = tokenInput.value.trim();
+    const validChatIds = getValidChatIds();
+    
+    if (!token) {
+        addLog('⚠️ لا يمكن البدء: التوكن ناقص');
+        return;
+    }
+    
+    if (validChatIds.length === 0) {
+        addLog('⚠️ لا يمكن البدء: أضف على الأقل معرف دردشة واحد');
+        return;
+    }
     
     isRunning = true;
     lastNotificationDate = new Date().toDateString();
     sentNotifications.clear();
     
-    // Update UI
     document.getElementById('status-icon').textContent = '🔔';
     document.getElementById('status-text').textContent = 'نشط';
     document.getElementById('status-badge').classList.add('active');
     document.getElementById('startBtn').style.display = 'none';
     document.getElementById('stopBtn').style.display = 'inline-block';
     
-    // Check every minute
-    notifierInterval = setInterval(checkPrayerTimes, 60000); // 60000 ms = 1 minute
-    
-    // Check immediately
+    notifierInterval = setInterval(checkPrayerTimes, 60000);
     checkPrayerTimes();
-    
-    addLog('▶️ تم بدء التنبيهات - سيتم الإشعار قبل كل صلاة بـ 5 دقائق');
+    addLog(`▶️ تم بدء التنبيهات - سيتم الإرسال إلى ${validChatIds.length} مستلم`);
 }
 
-// Stop the notifier
+// Stop notifier
 function stopNotifier() {
     isRunning = false;
-    
     if (notifierInterval) {
         clearInterval(notifierInterval);
         notifierInterval = null;
     }
-    
-    // Update UI
     document.getElementById('status-icon').textContent = '⏸️';
     document.getElementById('status-text').textContent = 'متوقف';
     document.getElementById('status-badge').classList.remove('active');
     document.getElementById('startBtn').style.display = 'inline-block';
     document.getElementById('stopBtn').style.display = 'none';
-    
     addLog('⏹️ تم إيقاف التنبيهات');
 }
 
-// Initialize on page load
+// Initialize
 window.addEventListener('load', () => {
-    addLog('🌙 مرحباً بك في منبه الصلاة');
-    addLog('🤖 بوت تليجرام: @' + TELEGRAM_BOT_TOKEN.split(':')[0]);
-    
-    // Highlight today's row
+    loadStoredConfig();
+    addLog('🌙 مرحباً بك في منبه الصلاة - دعم الإرسال لمتعددين');
+    addLog('⚙️ اضغط على أيقونة الترس لإظهار لوحة التحكم');
     highlightTodayRow();
-    
-    // Test if we can find today's prayer times
     const times = getTodayPrayerTimes();
-    if (times) {
-        addLog('✅ تم تحميل أوقات الصلاة بنجاح');
-    }
+    if (times) addLog('✅ تم تحميل أوقات الصلاة بنجاح');
 });
 
-// Make functions available globally
+// Expose functions globally
 window.startNotifier = startNotifier;
 window.stopNotifier = stopNotifier;
 window.testNotification = testNotification;
