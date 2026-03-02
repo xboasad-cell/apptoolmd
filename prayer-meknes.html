@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>رمضان ١٤٤٦ · منبه الصلاة تليجرام</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Roboto', system-ui, sans-serif;
+        }
+        body {
+            background: #ece3d7;
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+        }
+        .prayer-card {
+            max-width: 1300px;
+            width: 100%;
+            background: #fffcf5;
+            border-radius: 36px 36px 24px 24px;
+            box-shadow: 0 20px 36px rgba(0, 0, 0, 0.15);
+            border: 1px solid #d2bfa6;
+        }
+        .header-bless {
+            background: #0f4637;
+            background: linear-gradient(135deg, #15503e, #07382c);
+            color: #fbe9d3;
+            padding: 1.6rem 2rem 1rem 2rem;
+            text-align: center;
+            border-bottom: 3px solid #c49f75;
+        }
+        .header-bless h2 {
+            font-size: 2.5rem;
+            margin: 0 0 0.2rem;
+            font-weight: 500;
+            color: #ffdcaa;
+            font-family: 'Amiri', 'Times New Roman', serif;
+        }
+        .header-bless .subhead {
+            font-size: 1.2rem;
+            display: flex;
+            justify-content: center;
+            gap: 2.5rem;
+            flex-wrap: wrap;
+            color: #e9cfb5;
+        }
+        .header-bless .subhead span {
+            background: rgba(250, 240, 220, 0.1);
+            padding: 0.2rem 1.5rem;
+            border-radius: 40px;
+            border: 1px solid #c6a177;
+        }
+        .notification-bar {
+            background: #1d5943;
+            color: #fbe9cf;
+            padding: 1rem 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #c49f75;
+        }
+        .notification-status {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .status-badge {
+            background: #2a6b53;
+            padding: 0.4rem 1.2rem;
+            border-radius: 40px;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .status-badge.active {
+            background: #c49f75;
+            color: #1f1b14;
+            font-weight: 500;
+        }
+        .prayer-table-container {
+            padding: 1.8rem 1.5rem 1.2rem 1.5rem;
+            overflow-x: auto;
+            background: #faf6ef;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 1.05rem;
+            min-width: 1000px;
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 6px 14px rgba(0,0,0,0.05);
+        }
+        th {
+            background: #b2916b;
+            color: #1f1b14;
+            font-weight: 620;
+            font-size: 1.1rem;
+            padding: 16px 12px;
+            border-bottom: 3px solid #4e3e2b;
+            text-align: center;
+            letter-spacing: 0.2px;
+            white-space: nowrap;
+        }
+        td {
+            padding: 12px 12px;
+            background-color: #ffffff;
+            border-bottom: 1px solid #dacbb6;
+        }
+        td:first-child, th:first-child {
+            text-align: left;
+        }
+        td:last-child, th:last-child {
+            text-align: right;
+        }
+        td:nth-child(n+2):nth-child(-n+8),
+        th:nth-child(n+2):nth-child(-n+8) {
+            text-align: left;
+        }
+        tbody tr:hover td {
+            background: #f8efde;
+            transition: 0.1s;
+        }
+        .special-row td {
+            background: #efdecb;
+            font-weight: 500;
+            border-top: 2px solid #b2916b;
+            border-bottom: 2px solid #b2916b;
+        }
+        .today-highlight td {
+            background-color: #f7e3b4 !important;
+            border-top: 2px solid #b2916b;
+            border-bottom: 2px solid #b2916b;
+            font-weight: 550;
+        }
+        .footer-note {
+            background: #dfd1bf;
+            padding: 0.9rem 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            color: #2a3d33;
+            border-top: 1px solid #c2aa8b;
+        }
+        .ramadan-badge {
+            background: #1d5943;
+            color: #fbe9cf;
+            padding: 0.4rem 1.6rem;
+            border-radius: 40px;
+            font-size: 1.2rem;
+        }
+        .note {
+            background: #c2a886;
+            color: #1a140e;
+            padding: 0.3rem 1.5rem;
+            border-radius: 40px;
+            font-weight: 500;
+        }
+        .control-btn {
+            background: #b2916b;
+            border: none;
+            color: #1f1b14;
+            padding: 0.5rem 1.5rem;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 1rem;
+            border: 1px solid #4e3e2b;
+            transition: 0.2s;
+        }
+        .control-btn:hover {
+            background: #c9aa84;
+        }
+        .control-btn.active {
+            background: #c49f75;
+            box-shadow: 0 0 10px #f7e3b4;
+        }
+        .log-container {
+            background: #2a3d33;
+            color: #e9cfb5;
+            padding: 0.8rem 2rem;
+            font-size: 0.9rem;
+            max-height: 100px;
+            overflow-y: auto;
+            border-top: 1px solid #c2aa8b;
+        }
+        .log-entry {
+            margin: 2px 0;
+            font-family: monospace;
+        }
+        /* Today indicator */
+        .today-marker {
+            display: inline-block;
+            background: #c49f75;
+            color: #1f1b14;
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 20px;
+            margin-left: 8px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<div class="prayer-card">
+    <div class="header-bless">
+        <h2>🌙 رمضان 1447 هـ</h2>
+        <div class="subhead">
+            <span>الخميس 1 رمضان 19 فبراير</span>
+            <span>الجمعة 29 رمضان 19 مارس (الرؤية)</span>
+        </div>
+        <div style="margin-top: 8px; font-size: 1.1rem; color: #f5d6aa;">❀ مواقيت الصلاة لمدينة مكناس ❀</div>
+        <div id="todayDisplay" style="margin-top: 10px; background: rgba(196, 159, 117, 0.3); padding: 5px 15px; border-radius: 40px; display: inline-block;"></div>
+    </div>
+
+    <!-- Notification Control Bar -->
+    <div class="notification-bar">
+        <div class="notification-status">
+            <div class="status-badge" id="status-badge">
+                <span id="status-icon">⏸️</span>
+                <span id="status-text">متوقف</span>
+            </div>
+            <div class="status-badge">
+                <span>⏰</span>
+                <span>5 دقائق قبل الصلاة</span>
+            </div>
+        </div>
+        <div>
+            <button class="control-btn" id="startBtn" onclick="startNotifier()">▶️ بدء التنبيهات</button>
+            <button class="control-btn" id="stopBtn" onclick="stopNotifier()" style="display: none;">⏹️ إيقاف</button>
+            <button class="control-btn" onclick="testNotification()">🔔 إرسال اختبار</button>
+        </div>
+    </div>
+
+    <div class="prayer-table-container">
+        <table id="prayer-table">
+            <thead>
+                <tr>
+                    <th>العشاء</th>
+                    <th>المغرب</th>
+                    <th>العصر</th>
+                    <th>الظهر</th>
+                    <th>الشروق</th>
+                    <th>الصبح</th>
+                    <th>فبراير / مارس</th>
+                    <th>رمضان</th>
+                    <th>الأيام</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>19:29</td><td>18:16</td><td>15:45</td><td>12:41</td><td>06:58</td><td>05:34</td><td>19</td><td>1</td><td>الخميس</td></tr>
+                <tr><td>19:30</td><td>18:17</td><td>15:45</td><td>12:41</td><td>06:57</td><td>05:33</td><td>20</td><td>2</td><td>الجمعة</td></tr>
+                <tr><td>19:30</td><td>18:18</td><td>15:46</td><td>12:41</td><td>06:55</td><td>05:32</td><td>21</td><td>3</td><td>السبت</td></tr>
+                <tr><td>19:31</td><td>18:18</td><td>15:46</td><td>12:41</td><td>06:54</td><td>05:31</td><td>22</td><td>4</td><td>الأحد</td></tr>
+                <tr><td>19:32</td><td>18:19</td><td>15:47</td><td>12:41</td><td>06:53</td><td>05:30</td><td>23</td><td>5</td><td>الإثنين</td></tr>
+                <tr><td>19:33</td><td>18:20</td><td>15:48</td><td>12:41</td><td>06:52</td><td>05:29</td><td>24</td><td>6</td><td>الثلاثاء</td></tr>
+                <tr><td>19:34</td><td>18:21</td><td>15:48</td><td>12:40</td><td>06:51</td><td>05:28</td><td>25</td><td>7</td><td>الأربعاء</td></tr>
+                <tr><td>19:34</td><td>18:22</td><td>15:49</td><td>12:40</td><td>06:50</td><td>05:26</td><td>26</td><td>8</td><td>الخميس</td></tr>
+                <tr><td>19:35</td><td>18:23</td><td>15:49</td><td>12:40</td><td>06:48</td><td>05:25</td><td>27</td><td>9</td><td>الجمعة</td></tr>
+                <tr><td>19:36</td><td>18:24</td><td>15:50</td><td>12:40</td><td>06:47</td><td>05:24</td><td>28</td><td>10</td><td>السبت</td></tr>
+                <tr><td>19:37</td><td>18:24</td><td>15:50</td><td>12:40</td><td>06:46</td><td>05:23</td><td>1</td><td>11</td><td>الأحد</td></tr>
+                <tr><td>19:38</td><td>18:25</td><td>15:51</td><td>12:39</td><td>06:45</td><td>05:22</td><td>2</td><td>12</td><td>الإثنين</td></tr>
+                <tr><td>19:38</td><td>18:26</td><td>15:51</td><td>12:39</td><td>06:44</td><td>05:20</td><td>3</td><td>13</td><td>الثلاثاء</td></tr>
+                <tr><td>19:39</td><td>18:27</td><td>15:52</td><td>12:39</td><td>06:42</td><td>05:19</td><td>4</td><td>14</td><td>الأربعاء</td></tr>
+                <tr><td>19:40</td><td>18:28</td><td>15:52</td><td>12:39</td><td>06:41</td><td>05:18</td><td>5</td><td>15</td><td>الخميس</td></tr>
+                <tr><td>19:41</td><td>18:29</td><td>15:52</td><td>12:39</td><td>06:40</td><td>05:17</td><td>6</td><td>16</td><td>الجمعة</td></tr>
+                <tr><td>19:42</td><td>18:29</td><td>15:53</td><td>12:38</td><td>06:38</td><td>05:15</td><td>7</td><td>17</td><td>السبت</td></tr>
+                <tr><td>19:43</td><td>18:30</td><td>15:53</td><td>12:38</td><td>06:37</td><td>05:14</td><td>8</td><td>18</td><td>الأحد</td></tr>
+                <tr><td>19:43</td><td>18:31</td><td>15:54</td><td>12:38</td><td>06:36</td><td>05:13</td><td>9</td><td>19</td><td>الإثنين</td></tr>
+                <tr><td>19:44</td><td>18:32</td><td>15:54</td><td>12:38</td><td>06:35</td><td>05:11</td><td>10</td><td>20</td><td>الثلاثاء</td></tr>
+                <tr><td>19:45</td><td>18:33</td><td>15:54</td><td>12:37</td><td>06:33</td><td>05:10</td><td>11</td><td>21</td><td>الأربعاء</td></tr>
+                <tr><td>19:46</td><td>18:33</td><td>15:55</td><td>12:37</td><td>06:32</td><td>05:09</td><td>12</td><td>22</td><td>الخميس</td></tr>
+                <tr><td>19:47</td><td>18:34</td><td>15:55</td><td>12:37</td><td>06:31</td><td>05:07</td><td>13</td><td>23</td><td>الجمعة</td></tr>
+                <tr><td>19:47</td><td>18:35</td><td>15:55</td><td>12:37</td><td>06:29</td><td>05:06</td><td>14</td><td>24</td><td>السبت</td></tr>
+                <tr><td>19:48</td><td>18:36</td><td>15:56</td><td>12:36</td><td>06:28</td><td>05:05</td><td>15</td><td>25</td><td>الأحد</td></tr>
+                <tr><td>19:49</td><td>18:37</td><td>15:56</td><td>12:36</td><td>06:27</td><td>05:03</td><td>16</td><td>26</td><td>الإثنين</td></tr>
+                <tr><td>19:50</td><td>18:37</td><td>15:56</td><td>12:36</td><td>06:25</td><td>05:02</td><td>17</td><td>27</td><td>الثلاثاء</td></tr>
+                <tr><td>19:51</td><td>18:38</td><td>15:57</td><td>12:35</td><td>06:24</td><td>05:00</td><td>18</td><td>28</td><td>الأربعاء</td></tr>
+                <tr><td>19:52</td><td>18:39</td><td>15:57</td><td>12:35</td><td>06:23</td><td>04:59</td><td>19</td><td>29</td><td>الخميس</td></tr>
+                <tr class="special-row">
+                    <td>19:52</td><td>18:40</td><td>15:57</td><td>12:35</td><td>06:21</td><td>04:57</td><td>20</td><td>حسب نتيجة المراقبة</td><td>الجمعة</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="footer-note">
+        <span class="ramadan-badge">✨ رمضان كريم ✨</span>
+        <span class="gregorian">🗓️ ١ رمضان ١٤٤٦ = ١٩ فبراير ٢٠٢٥</span>
+        <span class="note"><span class="small-note">🕌</span> الجمعة ٢٩ رمضان حسب الرؤية</span>
+    </div>
+    <div class="footer-sub" style="background: #cebea8; text-align: center; font-size: 0.85rem; padding: 0.3rem; color: #1d3d31; border-top: 1px dashed #a38664;">
+        <span>🔔 تنبيه تليجرام قبل كل صلاة بـ 5 دقائق</span>
+    </div>
+
+    <!-- Notification Log -->
+    <div class="log-container" id="log-container">
+        <div class="log-entry">✅ النظام جاهز. اضغط "بدء التنبيهات" للتفعيل</div>
+    </div>
+</div>
+
+<script>
+// Telegram Configuration
+const TELEGRAM_BOT_TOKEN = "8395150174:AAGCipYKNEX_wONgJzMcOsr35GnTUyTMdsE";
+const TELEGRAM_CHAT_ID = "1423164813";
+
+// Prayer names mapping (English for message)
+const PRAYER_NAMES = {
+    'العشاء': 'العشاء ',
+    'المغرب': 'المغرب',
+    'العصر': 'العصر',
+    'الظهر': 'الظهر',
+    'الشروق': 'الشروق',
+    'الصبح': 'الصبح'
+};
+
+// State
+let notifierInterval = null;
+let isRunning = false;
+let lastNotificationDate = null;
+let sentNotifications = new Set(); // Track which prayers we've sent today
+
+// Logging function
+function addLog(message) {
+    const logContainer = document.getElementById('log-container');
+    const logEntry = document.createElement('div');
+    logEntry.className = 'log-entry';
+    logEntry.textContent = `${new Date().toLocaleTimeString('ar-MA')} - ${message}`;
+    logContainer.appendChild(logEntry);
+    logContainer.scrollTop = logContainer.scrollHeight;
+    
+    // Keep only last 10 logs
+    while (logContainer.children.length > 10) {
+        logContainer.removeChild(logContainer.firstChild);
+    }
+}
+
+// Send Telegram notification
+async function sendTelegramNotification(prayerName, prayerTime) {
+    const message = `🔔 تنبيه الصلاة\n\n🕌 صلاة ${prayerName} بعد 5 دقائق\n\n⏰ الوقت: ${prayerTime}`;
+    
+    try {
+        const response = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                chat_id: TELEGRAM_CHAT_ID,
+                text: message,
+                parse_mode: 'HTML'
+            })
+        });
+        
+        const data = await response.json();
+        if (data.ok) {
+            addLog(`✅ تم إرسال تنبيه: ${prayerName}`);
+            return true;
+        } else {
+            addLog(`❌ فشل الإرسال: ${data.description}`);
+            return false;
+        }
+    } catch (error) {
+        addLog(`❌ خطأ في الاتصال: ${error.message}`);
+        return false;
+    }
+}
+
+// Test notification
+async function testNotification() {
+    addLog('🔔 إرسال رسالة اختبار...');
+    const success = await sendTelegramNotification('اختبار', new Date().toLocaleTimeString('ar-MA'));
+    if (success) {
+        addLog('✅ تم إرسال رسالة الاختبار بنجاح');
+    }
+}
+
+// Function to highlight today's row
+function highlightTodayRow() {
+    const table = document.getElementById('prayer-table');
+    const rows = table.querySelectorAll('tbody tr');
+    const today = new Date();
+    const todayDate = today.getDate();
+    const todayWeekday = today.toLocaleDateString('ar-MA', { weekday: 'long' });
+    
+    // First, remove any existing today-highlight class
+    rows.forEach(row => {
+        row.classList.remove('today-highlight');
+    });
+    
+    let foundRow = false;
+    
+    for (let row of rows) {
+        const cells = row.querySelectorAll('td');
+        if (cells.length < 9) continue;
+        
+        const dateCell = cells[6].textContent.trim(); // February/March day
+        const weekdayCell = cells[8].textContent.trim(); // Weekday
+        
+        // Check if this row matches today
+        if (parseInt(dateCell) === todayDate && weekdayCell === todayWeekday) {
+            row.classList.add('today-highlight');
+            foundRow = true;
+            
+            // Update today display
+            const todayDisplay = document.getElementById('todayDisplay');
+            const ramadanDay = cells[7].textContent.trim();
+            const gregorianDate = `${
+                todayDate <= 28 ? 'فبراير' : 'مارس'
+            } ${todayDate}`;
+            
+            todayDisplay.innerHTML = `📅 اليوم: ${weekdayCell} ${gregorianDate} | رمضان ${ramadanDay}`;
+            
+            // Scroll to the row (optional)
+            row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            
+            addLog(`📍 تم تحديد يوم اليوم: ${weekdayCell} ${gregorianDate} (رمضان ${ramadanDay})`);
+            break;
+        }
+    }
+    
+    if (!foundRow) {
+        // If today not found, use a default
+        document.getElementById('todayDisplay').innerHTML = '📅 اليوم: غير محدد';
+        addLog('⚠️ لم يتم العثور على صف مطابق لليوم');
+    }
+}
+
+// Get today's prayer times from the table
+function getTodayPrayerTimes() {
+    const table = document.getElementById('prayer-table');
+    const rows = table.querySelectorAll('tbody tr');
+    const today = new Date();
+    const todayDate = today.getDate();
+    const todayWeekday = today.toLocaleDateString('ar-MA', { weekday: 'long' });
+    
+    for (let row of rows) {
+        const cells = row.querySelectorAll('td');
+        if (cells.length < 9) continue;
+        
+        const dateCell = cells[6].textContent.trim();
+        const weekdayCell = cells[8].textContent.trim();
+        
+        // Check if this row matches today
+        if (parseInt(dateCell) === todayDate && weekdayCell === todayWeekday) {
+            // Found today's row
+            const prayerTimes = {
+                'العشاء': cells[0].textContent.trim(),
+                'المغرب': cells[1].textContent.trim(),
+                'العصر': cells[2].textContent.trim(),
+                'الظهر': cells[3].textContent.trim(),
+                'الشروق': cells[4].textContent.trim(),
+                'الصبح': cells[5].textContent.trim()
+            };
+            
+            addLog(`📅 أوقات اليوم: ${Object.values(prayerTimes).join(', ')}`);
+            return prayerTimes;
+        }
+    }
+    
+    // If no match found, use first row as fallback
+    addLog('⚠️ لم يتم العثور على صف اليوم، استخدام أول صف');
+    const firstRow = rows[0].querySelectorAll('td');
+    return {
+        'العشاء': firstRow[0].textContent.trim(),
+        'المغرب': firstRow[1].textContent.trim(),
+        'العصر': firstRow[2].textContent.trim(),
+        'الظهر': firstRow[3].textContent.trim(),
+        'الشروق': firstRow[4].textContent.trim(),
+        'الصبح': firstRow[5].textContent.trim()
+    };
+}
+
+// Check if it's time to send notifications
+async function checkPrayerTimes() {
+    if (!isRunning) return;
+    
+    const now = new Date();
+    const currentDate = now.toDateString();
+    
+    // Reset notifications at midnight
+    if (lastNotificationDate !== currentDate) {
+        sentNotifications.clear();
+        lastNotificationDate = currentDate;
+        addLog('📆 يوم جديد - تم إعادة تعيين التنبيهات');
+        // Re-highlight today's row at midnight
+        highlightTodayRow();
+    }
+    
+    const prayerTimes = getTodayPrayerTimes();
+    const currentTime = now.getHours() * 60 + now.getMinutes();
+    
+    for (const [prayerName, timeStr] of Object.entries(prayerTimes)) {
+        // Skip if we already sent notification for this prayer today
+        if (sentNotifications.has(prayerName)) continue;
+        
+        // Parse prayer time
+        const [hours, minutes] = timeStr.split(':').map(Number);
+        const prayerMinutes = hours * 60 + minutes;
+        const notifyTime = prayerMinutes - 5; // 5 minutes before
+        
+        // Check if current time is exactly the notification time
+        // Allow 1 minute window to catch any missed checks
+        if (currentTime >= notifyTime && currentTime < notifyTime + 1) {
+            addLog(`🔔 وقت تنبيه ${prayerName} (الساعة ${timeStr})`);
+            const success = await sendTelegramNotification(PRAYER_NAMES[prayerName], timeStr);
+            if (success) {
+                sentNotifications.add(prayerName);
+            }
+        }
+    }
+}
+
+// Start the notifier
+function startNotifier() {
+    if (isRunning) return;
+    
+    isRunning = true;
+    lastNotificationDate = new Date().toDateString();
+    sentNotifications.clear();
+    
+    // Update UI
+    document.getElementById('status-icon').textContent = '🔔';
+    document.getElementById('status-text').textContent = 'نشط';
+    document.getElementById('status-badge').classList.add('active');
+    document.getElementById('startBtn').style.display = 'none';
+    document.getElementById('stopBtn').style.display = 'inline-block';
+    
+    // Check every minute
+    notifierInterval = setInterval(checkPrayerTimes, 60000); // 60000 ms = 1 minute
+    
+    // Check immediately
+    checkPrayerTimes();
+    
+    addLog('▶️ تم بدء التنبيهات - سيتم الإشعار قبل كل صلاة بـ 5 دقائق');
+}
+
+// Stop the notifier
+function stopNotifier() {
+    isRunning = false;
+    
+    if (notifierInterval) {
+        clearInterval(notifierInterval);
+        notifierInterval = null;
+    }
+    
+    // Update UI
+    document.getElementById('status-icon').textContent = '⏸️';
+    document.getElementById('status-text').textContent = 'متوقف';
+    document.getElementById('status-badge').classList.remove('active');
+    document.getElementById('startBtn').style.display = 'inline-block';
+    document.getElementById('stopBtn').style.display = 'none';
+    
+    addLog('⏹️ تم إيقاف التنبيهات');
+}
+
+// Initialize on page load
+window.addEventListener('load', () => {
+    addLog('🌙 مرحباً بك في منبه الصلاة');
+    addLog('🤖 بوت تليجرام: @' + TELEGRAM_BOT_TOKEN.split(':')[0]);
+    
+    // Highlight today's row
+    highlightTodayRow();
+    
+    // Test if we can find today's prayer times
+    const times = getTodayPrayerTimes();
+    if (times) {
+        addLog('✅ تم تحميل أوقات الصلاة بنجاح');
+    }
+});
+
+// Make functions available globally
+window.startNotifier = startNotifier;
+window.stopNotifier = stopNotifier;
+window.testNotification = testNotification;
+</script>
+</body>
+</html>
