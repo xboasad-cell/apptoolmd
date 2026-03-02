@@ -99,7 +99,7 @@
             font-weight: 500;
         }
 
-        /* config panel - updated for multi-chat */
+        /* config panel */
         .config-panel {
             background: #2f5847;
             padding: 0.8rem 2rem 1rem 2rem;
@@ -343,6 +343,20 @@
             margin: 2px 0;
             font-family: monospace;
         }
+        /* Today's date styling */
+        .today-marker {
+            display: inline-block;
+            background: #c49f75;
+            color: #1f1b14;
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 20px;
+            margin-left: 8px;
+            font-weight: bold;
+        }
+        #todayDisplay {
+            direction: ltr;
+        }
     </style>
 </head>
 <body>
@@ -354,7 +368,7 @@
             <span>الجمعة 29 رمضان 19 مارس (الرؤية)</span>
         </div>
         <div style="margin-top: 8px; font-size: 1.1rem; color: #f5d6aa;">❀ مواقيت الصلاة لمدينة مكناس ❀</div>
-        <div id="todayDisplay" style="margin-top: 10px; background: rgba(196, 159, 117, 0.3); padding: 5px 15px; border-radius: 40px; display: inline-block;"></div>
+        <div id="todayDisplay" style="margin-top: 10px; background: rgba(196, 159, 117, 0.3); padding: 8px 20px; border-radius: 40px; display: inline-block; font-weight: 500;"></div>
     </div>
 
     <!-- single icon button -->
@@ -505,6 +519,23 @@ const chatCountLabel = document.getElementById('chatCountLabel');
 // Store chat IDs as array
 let chatIds = [];
 
+// Weekday mapping for Arabic
+const weekdayMap = {
+    'Sunday': 'الأحد',
+    'Monday': 'الإثنين',
+    'Tuesday': 'الثلاثاء',
+    'Wednesday': 'الأربعاء',
+    'Thursday': 'الخميس',
+    'Friday': 'الجمعة',
+    'Saturday': 'السبت'
+};
+
+// Month mapping
+const monthMap = {
+    'February': 'فبراير',
+    'March': 'مارس'
+};
+
 // Load saved data from localStorage
 function loadStoredConfig() {
     // Load token
@@ -582,7 +613,6 @@ window.addChatIdField = addChatIdField;
 
 // Save chat IDs to localStorage
 function saveChatIds() {
-    // Filter out empty values but keep structure
     localStorage.setItem('telegram_chat_ids', JSON.stringify(chatIds));
 }
 
@@ -693,13 +723,22 @@ async function testNotification() {
     }
 }
 
-// Highlight today's row (same as before)
+// Improved function to highlight today's row
 function highlightTodayRow() {
     const table = document.getElementById('prayer-table');
     const rows = table.querySelectorAll('tbody tr');
     const today = new Date();
+    
+    // Get today's date and weekday in Arabic
     const todayDate = today.getDate();
-    const todayWeekday = today.toLocaleDateString('ar-MA', { weekday: 'long' });
+    const todayMonth = today.getMonth(); // 1 = February, 2 = March
+    const todayWeekdayEnglish = today.toLocaleDateString('en-US', { weekday: 'long' });
+    const todayWeekdayArabic = weekdayMap[todayWeekdayEnglish];
+    
+    // Determine which month we're in based on the date
+    const currentMonth = todayMonth === 1 ? 'فبراير' : todayMonth === 2 ? 'مارس' : null;
+    
+    addLog(`📅 البحث عن: اليوم ${todayDate} ${currentMonth || ''} (${todayWeekdayArabic})`);
     
     rows.forEach(row => row.classList.remove('today-highlight'));
     let foundRow = false;
@@ -707,23 +746,73 @@ function highlightTodayRow() {
     for (let row of rows) {
         const cells = row.querySelectorAll('td');
         if (cells.length < 9) continue;
+        
         const dateCell = cells[6].textContent.trim();
         const weekdayCell = cells[8].textContent.trim();
         
-        if (parseInt(dateCell) === todayDate && weekdayCell === todayWeekday) {
+        // Parse the date cell - it might be just a number
+        const rowDate = parseInt(dateCell);
+        
+        // Check if this row matches today
+        if (rowDate === todayDate && weekdayCell === todayWeekdayArabic) {
             row.classList.add('today-highlight');
             foundRow = true;
+            
             const todayDisplay = document.getElementById('todayDisplay');
             const ramadanDay = cells[7].textContent.trim();
-            const gregorianDate = `${todayDate <= 28 ? 'فبراير' : 'مارس'} ${todayDate}`;
-            todayDisplay.innerHTML = `📅 اليوم: ${weekdayCell} ${gregorianDate} | رمضان ${ramadanDay}`;
+            
+            // Format the display text
+            const monthName = todayDate <= 28 ? 'فبراير' : 'مارس';
+            const gregorianDate = `${todayDate} ${monthName} ${today.getFullYear()}`;
+            
+            todayDisplay.innerHTML = `📅 اليوم: ${todayWeekdayArabic} ${gregorianDate} | رمضان ${ramadanDay}`;
+            
+            // Scroll to the row
             row.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            addLog(`📍 تم تحديد يوم اليوم: ${weekdayCell} ${gregorianDate} (رمضان ${ramadanDay})`);
+            
+            addLog(`📍 تم تحديد يوم اليوم: ${todayWeekdayArabic} ${gregorianDate} (رمضان ${ramadanDay})`);
             break;
         }
     }
+    
     if (!foundRow) {
-        document.getElementById('todayDisplay').innerHTML = '📅 اليوم: غير محدد';
+        // Try a fallback - use the first row that matches just the date
+        for (let row of rows) {
+            const cells = row.querySelectorAll('td');
+            if (cells.length < 9) continue;
+            
+            const dateCell = cells[6].textContent.trim();
+            const rowDate = parseInt(dateCell);
+            
+            if (rowDate === todayDate) {
+                row.classList.add('today-highlight');
+                foundRow = true;
+                
+                const todayDisplay = document.getElementById('todayDisplay');
+                const ramadanDay = cells[7].textContent.trim();
+                const weekdayCell = cells[8].textContent.trim();
+                
+                const monthName = todayDate <= 28 ? 'فبراير' : 'مارس';
+                const gregorianDate = `${todayDate} ${monthName} ${today.getFullYear()}`;
+                
+                todayDisplay.innerHTML = `📅 اليوم: ${weekdayCell} ${gregorianDate} (تقريبي) | رمضان ${ramadanDay}`;
+                
+                addLog(`📍 تم تحديد يوم تقريبي: ${weekdayCell} ${gregorianDate}`);
+                break;
+            }
+        }
+    }
+    
+    if (!foundRow) {
+        // If still not found, use the first row as fallback
+        const firstRow = rows[0].querySelectorAll('td');
+        const ramadanDay = firstRow[7].textContent.trim();
+        const weekdayCell = firstRow[8].textContent.trim();
+        const dateCell = firstRow[6].textContent.trim();
+        
+        document.getElementById('todayDisplay').innerHTML = 
+            `📅 اليوم: ${weekdayCell} ${dateCell} فبراير (افتراضي) | رمضان ${ramadanDay}`;
+        addLog('⚠️ لم يتم العثور على صف مطابق لليوم، استخدام أول صف');
     }
 }
 
@@ -733,14 +822,18 @@ function getTodayPrayerTimes() {
     const rows = table.querySelectorAll('tbody tr');
     const today = new Date();
     const todayDate = today.getDate();
-    const todayWeekday = today.toLocaleDateString('ar-MA', { weekday: 'long' });
+    const todayWeekdayEnglish = today.toLocaleDateString('en-US', { weekday: 'long' });
+    const todayWeekdayArabic = weekdayMap[todayWeekdayEnglish];
     
     for (let row of rows) {
         const cells = row.querySelectorAll('td');
         if (cells.length < 9) continue;
+        
         const dateCell = cells[6].textContent.trim();
         const weekdayCell = cells[8].textContent.trim();
-        if (parseInt(dateCell) === todayDate && weekdayCell === todayWeekday) {
+        const rowDate = parseInt(dateCell);
+        
+        if (rowDate === todayDate && weekdayCell === todayWeekdayArabic) {
             return {
                 'العشاء': cells[0].textContent.trim(),
                 'المغرب': cells[1].textContent.trim(),
@@ -751,6 +844,28 @@ function getTodayPrayerTimes() {
             };
         }
     }
+    
+    // Fallback: try to match by date only
+    for (let row of rows) {
+        const cells = row.querySelectorAll('td');
+        if (cells.length < 9) continue;
+        
+        const dateCell = cells[6].textContent.trim();
+        const rowDate = parseInt(dateCell);
+        
+        if (rowDate === todayDate) {
+            addLog('⚠️ تم استخدام تطابق التاريخ فقط (تجاهل اليوم)');
+            return {
+                'العشاء': cells[0].textContent.trim(),
+                'المغرب': cells[1].textContent.trim(),
+                'العصر': cells[2].textContent.trim(),
+                'الظهر': cells[3].textContent.trim(),
+                'الشروق': cells[4].textContent.trim(),
+                'الصبح': cells[5].textContent.trim()
+            };
+        }
+    }
+    
     addLog('⚠️ لم يتم العثور على صف اليوم، استخدام أول صف');
     const firstRow = rows[0].querySelectorAll('td');
     return {
@@ -785,7 +900,8 @@ async function checkPrayerTimes() {
         const prayerMinutes = hours * 60 + minutes;
         const notifyTime = prayerMinutes - 5;
         
-        if (currentTime >= notifyTime && currentTime < notifyTime + 1) {
+        // Allow a 2-minute window to catch any timing issues
+        if (currentTime >= notifyTime && currentTime < notifyTime + 2) {
             addLog(`🔔 وقت تنبيه ${prayerName} (الساعة ${timeStr})`);
             const success = await sendTelegramNotification(PRAYER_NAMES[prayerName], timeStr);
             if (success) sentNotifications.add(prayerName);
@@ -845,9 +961,13 @@ window.addEventListener('load', () => {
     loadStoredConfig();
     addLog('🌙 مرحباً بك في منبه الصلاة - دعم الإرسال لمتعددين');
     addLog('⚙️ اضغط على أيقونة الترس لإظهار لوحة التحكم');
-    highlightTodayRow();
-    const times = getTodayPrayerTimes();
-    if (times) addLog('✅ تم تحميل أوقات الصلاة بنجاح');
+    
+    // Small delay to ensure DOM is ready
+    setTimeout(() => {
+        highlightTodayRow();
+        const times = getTodayPrayerTimes();
+        if (times) addLog('✅ تم تحميل أوقات الصلاة بنجاح');
+    }, 100);
 });
 
 // Expose functions globally
